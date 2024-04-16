@@ -27,6 +27,16 @@ This music player was a lot of work, so if you use it in your ghost I would ask 
 This will require some adjustment to slot into your ghost. Specifically, there is a label below for BUILT IN SHIORI EVENTS
 The functions there may already exist in your ghost and therefore cause errors. You will need to go over them carefully and integrate them into your ghost's existing code.
 
+In order for hotkeys to work, you must also adjust your OnKeyPress. If you don't have OnKeyPress, you can rename the function MusicPlayer.OnKeyPress to just OnKeyPress. If you have OnKeyPress, then you'll want to make it so that if a key is pressed that isn't one of your chosen hotkeys, it calls the MusicPlayer.OnKeyPress function. Typically, this will be a simple else statement. For example, this is how you would implement it into the setup included in the Simplicity template:
+
+OnKeyPress
+{
+	if reference0 == "f1"; "\![open,readme]"
+	elseif reference0 == "t"; OnAiTalk
+	elseif reference0 == "r"; OnLastTalk
+	else; MusicPlayer.OnKeyPress
+}
+
 There are also optional Discord functions. These require a good bit of additional setup, I go into more detail in the DISCORD section. You can completely ignore them if you don't want them.
 
 I have left markers in the file for what bits you actually need to mess with. You should have a look at the section markers I have added, and also run searches for the following terms:
@@ -1414,7 +1424,7 @@ OnBalloonBreak
 }
 
 //Hotkeys. reference0 is the name of the key as displayed on the keycap. reference4, for SSP only, will have things like ctrl and alt, separated by commas.
-OnKeyPress
+MusicPlayer.OnKeyPress
 {
 	reference0 = TOSTR(reference0)
 	if "changing hotkey: " _in_ SPLIT(SHIORI3FW.LastTalk,"\e")[1] //If the hotkey input is open
@@ -1423,7 +1433,7 @@ OnKeyPress
 		_changing = TOINT(SPLIT(SHIORI3FW.LastTalk,"changing hotkey: ")[1])
 		
 		//CUSTOMIZE: Customizable list of reserved hotkeys. Add in any hotkeys you've already used to this array.
-		_reserved_keys = ("T","R","F1","V")
+		_reserved_keys = ("T","R","F1")
 		
 		if ASEARCH(_k,_reserved_keys) != -1 //If it's reserved
 		{

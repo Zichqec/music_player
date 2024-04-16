@@ -6,9 +6,9 @@ ABOUT THE MUSIC PLAYER:
 
 This music player is based off of the one in FLUX. It is written for YAYA, and most likely is _not_ compatible with AYA.
 
-Compatibility version: this version is built to be compatible with older versions of YAYA. If you are running YAYATc569-4 or later, you may want to try the Modern version, which has cleaner syntax allowed by newer versions of YAYA. You can find both versions on my website, linked above.
+It requires YAYATc569-4 or later. You can change some of the syntax to make it compatible with older versions, but you really should upgrade for security reasons anyways. How to upgrade: https://ukagaka.zichqec.com/guide/upgrade_old_versions_of_yaya
 
-This music player allows the user to add songs by dragging and dropping files and folders onto the ghost, and copy in .m3u playlists the same way. Music can be played through the music menu, which can be called with \![raise,OnMusicMenu] or \q[Music Menu,OnMusicMenu], etc. It can also be played via hotkeys or hotspots, which you can customize a bit.
+The music player allows the user to add songs by dragging and dropping files and folders onto the ghost, and copy in .m3u playlists the same way. Music can be played through the music menu, which can be called with tags such as q[Music Menu,OnMusicMenu], \![raise,OnMusicMenu], etc. It can also be played via hotkeys or hotspots, which you can customize a bit.
 
 The volume, speed, and left/right balance of the music can be customized in the settings menu, and it also comes with a few different play modes. Additionally, there is an option to make playback stop after the current song finishes.
 
@@ -58,7 +58,8 @@ I will also recommend that you use developer_options.txt in order to prevent you
 
 If you run into any trouble do let me know and I will try to help you. If you find any bugs in the music player itself, please let me know and I will try to get them fixed.
 
-I may release new versions of this from time to time, but you will probably have to update this file piecemeal if you decide to update. I will likely have some sort of instructions in that case.
+I may release new versions of this from time to time, but you will probably have to update this file piecemeal if you decide to update. Please check the GitHub repository for this file to see what changes have been made.
+https://github.com/Zichqec/music_player
 */
 
 /*

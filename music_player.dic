@@ -131,7 +131,7 @@ OnMusicMenu
 	"\0%(MusicPlayerBalloon)\_q\*\![set,autoscroll,disable]\c"
 	--
 	//CUSTOMIZE: If you're using something other than OnMenuRun for your menu, you'll need to edit this button and the one at the bottom of the menu
-	"\![*]\q[Back,OnMenuRun]  \![*]\__q[OnCancelBlank]Close window\__q\n"
+	"\![*]\q[Back,OnMenuRun]  \![*]\__q[blank]Close window\__q\n"
 	--
 	"\![*]\__q[OnMusicSettings]Settings and Info\__q  \![*]\__q[OnScootSongMenu]Move songs\__q\n\n[half]"
 	--
@@ -169,7 +169,7 @@ OnMusicMenu
 	--
 	"\n\n[half]%(_display)\n"
 	--
-	"\![*]\q[Back,OnMenuRun]  \![*]\__q[OnCancelBlank]Close window\__q"
+	"\![*]\q[Back,OnMenuRun]  \![*]\__q[blank]Close window\__q"
 	--
 	"\e __MUSIC_PLAYER_MAIN_MENU__" //Do not remove this, it's here so the menu can update dynamically
 }
@@ -1241,7 +1241,7 @@ OnPlaylistCleared
 		//DIALOGUE: After clearing the playlist
 		"The playlist has been cleared."
 		--
-		"\n\n\_q\![*]\q[Open music controls,OnMusicMenu]  \![*]\q[Close,OnCancel]\e"
+		"\n\n\_q\![*]\q[Open music controls,OnMusicMenu]  \![*]\q[Close,blank]\e"
 	}
 }
 
@@ -1273,7 +1273,7 @@ PlaylistCopied
 	{
 		"\0Successfully copied playlist '\_?%(_playlist)\_?'. Do you want to load it now?"
 		--
-		"\n\n\![*]\__q[OnSelectPlaylist,%(_playlist)]Load '\_?%(_playlist)\_?'\__q\n\![*]\q[Open music player,OnMusicMenu]\n\n\![*]\q[Close,OnCancel]\e"
+		"\n\n\![*]\__q[OnSelectPlaylist,%(_playlist)]Load '\_?%(_playlist)\_?'\__q\n\![*]\q[Open music player,OnMusicMenu]\n\n\![*]\q[Close,blank]\e"
 	}
 	else //If it failed
 	{
@@ -1566,7 +1566,7 @@ OnFileDrop2
 			//DIALOGUE: Added a file to the playlist
 			"\0Added '\_?%(_filename)\_?' to the playlist."
 			--
-			"\n\n\_q\![*]\q[Play it now,OnPlaySong,%(CHR(34))%(_filearray)%(CHR(34)),,justadded]\n\![*]\q[Open music player,OnMusicMenu]\n\n\![*]\q[Close,OnCancel]\e"
+			"\n\n\_q\![*]\q[Play it now,OnPlaySong,%(CHR(34))%(_filearray)%(CHR(34)),,justadded]\n\![*]\q[Open music player,OnMusicMenu]\n\n\![*]\q[Close,blank]\e"
 		}
 		elseif _fileext == ".m3u" //If it's a playlist
 		{
@@ -1613,7 +1613,7 @@ OnFileDrop2
 			//Multiple files were dragged on the ghost, and some of them were music files. %(_s) can be used to add an s if the number of compatible files is plural, and %(_num) can be used to list the number of files.
 			"\0%(_num) compatible song%(_s) added to the playlist."
 			--
-			"\n\n\_q\![*]\q[Open music player,OnMusicMenu]\n\![*]\q[Close,OnCancel]\e"
+			"\n\n\_q\![*]\q[Open music player,OnMusicMenu]\n\![*]\q[Close,blank]\e"
 		}
 	}
 }
@@ -1644,7 +1644,7 @@ OnDirectoryDrop
 		//DIALOGUE: The user dropped a folder on the ghost, and some files inside were compatible music files. %(_s) can be used to add an s if the number of compatible files is plural, %(_num) can be used to list the number of files, and %(_folder) is the name of the folder that was dropped.
 		"\0Added %(_num) song%(_s) from \_?%(_folder)\_?."
 		--
-		"\n\n\_q\![*]\q[Open music player,OnMusicMenu]\n\![*]\q[Close,OnCancel]\e"
+		"\n\n\_q\![*]\q[Open music player,OnMusicMenu]\n\![*]\q[Close,blank]\e"
 	}
 }
 

@@ -1271,44 +1271,6 @@ PlaylistCopied
 	}
 }
 
-//Wallpaper setting function, in case you don't want to fuss too much with OnFileDrop2. Feel free to scrap this if you don't want it.
-SetWallpaper
-{
-	_filepath = SPLITPATH(_argv[0])
-	_name = _filepath[2] +_filepath[3]
-	_file = CHR(34) + REPLACE(_argv[0],"]","\]") + CHR(34)
-	
-	//DIALOGUE: Menu for setting a new wallpaper
-	--;"\0Setting '\_?%(_name)\_?' as wallpaper..."
-	--; "\n\n\_q"
-	--; "\![*]\q[Centered,OnWallpaper,%(_file),center]\n"
-	--; "\![*]\q[Tiled,OnWallpaper,%(_file),tile]\n"
-	--; "\![*]\q[Stretched,OnWallpaper,%(_file),stretch]"
-	
-	--
-	if "Windows 10" _in_ NotifyOS //NotifyOS is set just below. The Span option is only available if you're on Win 10, so this means it won't display unless you're on Win 10
-	{
-		--; "\n\![*]\q[Spanned,OnWallpaper,%(_file),span]"
-	}
-	--
-	if "Windows 7" _in_ NotifyOS || "Windows 10" _in_ NotifyOS //These are the 'fit' and 'fill' options available from win 7 on
-	{
-		--; "\n\![*]\q[Fill,OnWallpaper,%(_file),stretch-x]"
-		--; "\n\![*]\q[Fit,OnWallpaper,%(_file),stretch-y]"
-	}
-	
-	--; "\n\n\![*]\q[Cancel,OnCancel]\e"
-}
-
-//Setting the wallpaper
-OnWallpaper
-{
-	"\0\![set,wallpaper,%(REPLACE(reference0,']','\]')),%(reference1)]"
-	--
-	//DIALOGUE: After the wallpaper is set
-	"Wallpaper set.\e"
-}
-
 //Sending information about the current song to other open ghosts. Also sends information to Discord, if you set that up.
 OnNotifySongInfo
 {
@@ -1586,13 +1548,7 @@ OnFileDrop2
 		_fileext = TOLOWER(_filepath[3])
 		
 		//Incompatible audio types: cdda, cvs, cvsd, cvu, dvms, fssd, grst, htk, ima, prc, smp, sndr, sndt, sou, txw, vms, vox
-		_imgtypes = (".jpg",".jpeg",".bmp",".png")
-		if ASEARCH(_fileext,_imgtypes) != -1 //If it's a compatible image file for a wallpaper
-		{
-			//CUSTOMIZE: Because this whole function changed so much, I added in this function for dealing with the wallpaper setting. You can exclude this if you want, or put other code in, or whatever. It's just here for convenience.
-			SetWallpaper(_filearray)
-		}
-		elseif ASEARCH(_fileext,CompatibleMusicFileTypes) != -1 //If it's a compatible music file
+		if ASEARCH(_fileext,CompatibleMusicFileTypes) != -1 //If it's a compatible music file
 		{
 			CurrentPlaylist ,= _filearray
 			ShuffledPlaylist = ShufflePlaylist(NowPlaying[1],CurrentPlaylist)
@@ -1938,13 +1894,6 @@ newline
 SHIORI3FW.MakeValueNotify : void
 {
 	SHIORI3FW.PushAdditionalReturn('ValueNotify',_argv)
-}
-
-
-//You can get other information about the OS here, it's in the other references. Reference0 includes the OS system, version, and display name. This is used for the wallpaper setting function.
-OnNotifyOSInfo
-{
-	NotifyOS = reference0
 }
 
 //A list of compatible music file types.

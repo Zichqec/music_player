@@ -27,7 +27,8 @@ This music player was a lot of work, so if you use it in your ghost I would ask 
 This will require some adjustment to slot into your ghost. Specifically, there is a label below for BUILT IN SHIORI EVENTS
 The functions there may already exist in your ghost and therefore cause errors. You will need to go over them carefully and integrate them into your ghost's existing code.
 
-In order for hotkeys to work, you must also adjust your OnKeyPress. If you don't have OnKeyPress, you can rename the function MusicPlayer.OnKeyPress to just OnKeyPress. If you have OnKeyPress, then you'll want to make it so that if a key is pressed that isn't one of your chosen hotkeys, it calls the MusicPlayer.OnKeyPress function. Typically, this will be a simple else statement. For example, this is how you would implement it into the setup included in the Simplicity template:
+In order for hotkeys to work, you must also adjust your OnKeyPress. If you don't have OnKeyPress, you can rename the function MusicPlayer.OnKeyPress to just OnKeyPress. If you have OnKeyPress, then you'll want to make it so that if a key is pressed that isn't one of your chosen hotkeys, it calls the MusicPlayer.OnKeyPress function. Typically, this will be a simple else statement.
+For example, this is how you would implement it into the setup included in the Simplicity template:
 
 OnKeyPress
 {
@@ -36,6 +37,27 @@ OnKeyPress
 	elseif reference0 == "r"; OnLastTalk
 	else; MusicPlayer.OnKeyPress
 }
+
+Similarly, you will also need to implement the hotspot function. If you don't have OnMouseDoubleClick, you can rename MusicPlayer.OnMouseDoubleClick to OnMouseDoubleClick. If you do have it, then much like the above, you can adjust your OnMouseDoubleClick so that if no recognized hotspots are clicked, it calls the MusicPlayer.OnMouseDoubleClick function.
+For example, here is how it could be implemented into the setup included in the Simplicity template (although you may need to adjust if the sakura is not the music player):
+OnMouseDoubleClick
+{
+	if reference5 == 0 //reference5 is the mouse button being clicked, in this case a left click
+	{
+		//reference3 is which character is being clicked
+		//If you want to add double click interactions, reference4 will be the name of the hitbox the mouse is over
+		if reference3 == 0
+		{
+			if reference4 == ""; OnSakuraMenu
+			else; MusicPlayer.OnMouseDoubleClick
+		}
+		else
+		{
+			OnKeroMenu
+		}
+	}
+}
+
 
 There are also optional Discord functions. These require a good bit of additional setup, I go into more detail in the DISCORD section. You can completely ignore them if you don't want them.
 
@@ -1459,26 +1481,7 @@ MusicPlayer.OnKeyPress
 		reference0 = TOUPPER(reference0)
 		_inmenu = CheckWhichMenu
 		
-		//CUSTOMIZE: I just put the normal hotkeys that I use in here. If you use different hotkeys, you'll need to change this and update the list of reserved keys.
-		if reference0 == "T" //Talk
-		{
-			"\![raise,OnAiTalk,Hotkey]"
-		}
-		elseif reference0 == "R" //Repeat
-		{
-			lastTalk
-		}
-		elseif reference0 == "F1" //Help
-		{
-			"\![open,readme]"
-		}
-		elseif reference0 == "V" //Test variable (if debug mode is on; this is a variable I manually set in script input)
-		{
-			if debug; OnTestVar
-		}
-		//—————————————————————————————————————————————————————————————————————
-		//Don't mess with anything beyond this point unless you want to change the behavior of the music player.
-		elseif reference0 == Hotkeys[0] //Play/Pause
+		if reference0 == Hotkeys[0] //Play/Pause
 		{
 			if MenuIsOpen; "\C"
 			--
@@ -1648,8 +1651,7 @@ OnDirectoryDrop
 	}
 }
 
-//This assumes that you have this function over in mouse.dic. If not, this'll be OnMouseDoubleClick
-MouseDoubleClickSakura
+MusicPlayer.OnMouseDoubleClick
 {
 	_inmenu = CheckWhichMenu
 	

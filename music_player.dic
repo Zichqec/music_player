@@ -150,7 +150,7 @@ OnMusicMenu : all
 		_currentsong[1] = NowPlaying[0]
 	}
 	
-	"\0%(MusicPlayerBalloon)\_q\*\![set,autoscroll,disable]\c"
+	"%(MusicPlayerScope)\c%(MusicPlayerBalloon)\_q\*\![set,autoscroll,disable]"
 	
 	//CUSTOMIZE: If you're using something other than OnMenuRun for your menu, you'll need to edit this button and the one at the bottom of the menu
 	"\![*]\q[Back,OnMenuRun]  \![*]\__q[blank]Close window\__q\n"
@@ -522,9 +522,9 @@ OnScootSongMenu : all
 		}
 		_display += "\n\f[align,left]%(newline)%(_d)" //Align commands... so useful but so tricky. Idk why this works but it does. It was putting extra spaces before which are really obvious on some balloons with fonts that have wide spaces
 	}
-	if reference1 != ""; "\C\![lock,balloonrepaint]\c"
+	if reference1 != ""; "\C%(MusicPlayerScope)\![lock,balloonrepaint]\c"
 	
-	"\0%(MusicPlayerBalloon)\_q\*"
+	"%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\*"
 	
 	"\![*]\q[Back,OnMusicMenu]\n\n"
 	
@@ -639,7 +639,7 @@ OnMusicSettings : all
 	elseif _mode == 4; _mode = "Random"
 	else; _mode = "Loop Playlist"
 	
-	"\C\![lock,balloonrepaint]\c\0\![set,autoscroll,disable]\_q\*%(MusicPlayerBalloon)"
+	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c\![set,autoscroll,disable]\_q\*%(MusicPlayerBalloon)"
 	
 	//▲▼⯇⯈ - buttons for ease of copying
 	//Doing this here so that the menu bit itself can be cleaner... This is just handling graying out the buttons if clicking them would do nothing.
@@ -689,7 +689,7 @@ OnMusicSettings : all
 //Changing the playback type
 OnPlaybackType : all
 {
-	"\0%(MusicPlayerBalloon)\_q"
+	"%(MusicPlayerScope)%(MusicPlayerBalloon)\_q"
 	
 	"\![*]\q[Loop Playlist,OnPlaybackTypeChange,0]\n"
 	"\![*]\q[Shuffle and Loop,OnPlaybackTypeChange,1]\n"
@@ -714,7 +714,7 @@ OnPlaybackTypeChange
 //Bringing up input boxes
 OnMusicSet : all
 {
-	"\0%(MusicPlayerBalloon)\_q\*"
+	"%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\*"
 	
 	if reference0 == "Balance"; "\![open,inputbox,OnMusicBalance,-1]"
 	elseif reference0 == "Speed"; "\![open,sliderinput,OnMusicSpeed,-1,100,1,%(MAX_RATE)]"
@@ -923,7 +923,7 @@ OnHotkeys : all
 	_h = "\f[color,default.anchor]" //Highlight color
 	_d = "\f[color,default]" //Default color
 
-	"\C\![lock,balloonrepaint]\c\0%(MusicPlayerBalloon)\_q\*\![set,autoscroll,disable]"
+	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\_q\*\![set,autoscroll,disable]"
 	
 	//DIALOGUE: Menu for changing the hotkeys
 	"Click a hotkey to change it, click the (x) to unset it.\n\n"
@@ -965,7 +965,7 @@ OnChangeHotkey : all
 	elseif reference0 == 11; _option = "balance right"
 	else; _option =  "Play/Pause"
 	
-	"\C\![lock,balloonrepaint]\c\0%(MusicPlayerBalloon)\*\_q"
+	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\*\_q"
 	
 	//DIALOGUE: Changing a hotkey
 	"Press a key for %(_option)."
@@ -996,7 +996,7 @@ OnMusicInfo : all
 		if FENUM(_path) == ""; void MKDIR(_path) //make directory if none exists
 	}
 	
-	"\C\0%(MusicPlayerBalloon)\_q\![lock,balloonrepaint]\c"
+	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\_q"
 	
 	//DIALOGUE: Answers for the FAQ - Make sure you replace the file path in the one about where playlists save
 	if reference0 == "addsong" //Asking how to add songs
@@ -1018,7 +1018,7 @@ OnMusicInfo : all
 //Display a list of all the compatible filetypes
 OnDisplayFileTypes : all
 {
-	"\0%(MusicPlayerBalloon)\_q"
+	"%(MusicPlayerScope)%(MusicPlayerBalloon)\_q"
 	
 	_display = ""
 	_i = 0
@@ -1053,7 +1053,7 @@ OnSavePlaylist : all
 		_display += "\__q[OnPlaylistOverwrite,%(CHR(34))%(_playlist)%(CHR(34))]\_?%(_playlist)\_?\__q\n"
 	}
 	
-	"\C\![lock,balloonrepaint]\c\0%(MusicPlayerBalloon)\*\_q\![set,autoscroll,disable]\![open,inputbox,OnPlaylistName,-1]"
+	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\*\_q\![set,autoscroll,disable]\![open,inputbox,OnPlaylistName,-1]"
 	
 	//DIALOGUE: Saving a playlist
 	"Type a name to save the current playlist as a new playlist, or click an old playlist to save over it."
@@ -1098,7 +1098,7 @@ OnPlaylistName : all
 		
 		void FCLOSE(_path)
 		
-		"\C\![lock,balloonrepaint]\![close,inputbox,OnPlaylistName]\c\0%(MusicPlayerBalloon)\_q"
+		"\C%(MusicPlayerScope)\![lock,balloonrepaint]\![close,inputbox,OnPlaylistName]\c%(MusicPlayerBalloon)\_q"
 		
 		//DIALOGUE: a playlist saving correctly, or failing to save
 		if _o == 1 //If it saves successfully
@@ -1119,7 +1119,7 @@ OnPlaylistOverwrite : all
 {
 	if reference1 == "are you sure"
 	{
-		"\C\![lock,balloonrepaint]\c\*\0%(MusicPlayerBalloon)\_q"
+		"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c\*%(MusicPlayerBalloon)\_q"
 		
 		//DIALOGUE: If the user puts in a playlist name that is the same as an existing playlist, it'll ask if they want to overwrite the old one or not
 		"The name '\_?%(reference0)\_?' is already in use. Do you want to overwrite '\_?%(reference0)\_?'?"
@@ -1146,7 +1146,7 @@ OnLoadPlaylist : all
 		_display += "\q[(x),OnDeletePlaylist,%(_playlist)] \q[%(CHR(34))%(_playlist)%(CHR(34)),OnSelectPlaylist,%(_playlist)]\n"
 	}
 	
-	"\C\![lock,balloonrepaint]\c\0\_q%(MusicPlayerBalloon)\*\![set,autoscroll,disable]"
+	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c\_q%(MusicPlayerBalloon)\*\![set,autoscroll,disable]"
 	
 	//DIALOGUE: Loading a playlist
 	"Which playlist do you want to load? If the current playlist is not saved, it will be lost."
@@ -1196,7 +1196,7 @@ OnDeletePlaylist : all
 	
 	_songs = ARRAYSIZE(_playlist)
 	
-	"\0%(MusicPlayerBalloon)\*"
+	"%(MusicPlayerScope)%(MusicPlayerBalloon)\*"
 	
 	_s = ""; if _songs != 1; _s = "s"
 	//DIALOGUE: Asking for confirmation before deleting a playlist. You can use %(_s) to add an s if there is more than one song in the playlist
@@ -1210,7 +1210,7 @@ OnPlaylistDeleted : all
 {
 	_path = PLAYLIST_FOLDER + "%(reference0).m3u"
 	
-	"\0%(MusicPlayerBalloon)"
+	"%(MusicPlayerScope)%(MusicPlayerBalloon)"
 	
 	//DIALOGUE: Going through with deleting the playlist. If it fails it will offer the directory so that the user can delete it manually.
 	if FDEL(_path) == 1 //If the playlist deleted successfully
@@ -1233,7 +1233,7 @@ OnClearPlaylist : all
 	_are = "are"; _s = "s"
 	if _num == 1; {_are = "is"; _s = ""}
 	
-	"\0%(MusicPlayerBalloon)"
+	"%(MusicPlayerScope)%(MusicPlayerBalloon)"
 	
 	//DIALOGUE: Asking for confirmation before clearing the current playlist. %(_are) and %(_s) can be used for plurals.
 	"There %(_are) %(_num) song%(_s) in the current playlist. Are you sure you want to clear it? It cannot be brought back unless you have saved it."
@@ -1277,7 +1277,7 @@ OnPlaylistCopy
 	else
 	{
 		//DIALOGUE: If the user chooses not to overwrite a playlist after dragging and dropping it onto the ghost (and having a filename conflict), then it will recommend that they rename the playlist before trying again.
-		"\0Please rename the playlist,\w4 then drag and drop it again.\e"
+		"%(MusicPlayerScope)Please rename the playlist,\w4 then drag and drop it again.\e"
 	}
 }
 
@@ -1289,13 +1289,13 @@ PlaylistCopied : all
 	//DIALOGUE: If the user copies a playlist into the playlists folder by dragging and dropping it onto the ghost, and also dialogue for if this fails.
 	if _argv[0] == "1" //If it was successful
 	{
-		"\0Successfully copied playlist '\_?%(_playlist)\_?'. Do you want to load it now?"
+		"%(MusicPlayerScope)Successfully copied playlist '\_?%(_playlist)\_?'. Do you want to load it now?"
 		
 		"\n\n\![*]\__q[OnSelectPlaylist,%(_playlist)]Load '\_?%(_playlist)\_?'\__q\n\![*]\q[Open music player,OnMusicMenu]\n\n\![*]\q[Close,blank]\e"
 	}
 	else //If it failed
 	{
-		"\0Copying failed, please try again.\e"
+		"%(MusicPlayerScope)Copying failed, please try again.\e"
 	}
 }
 
@@ -1392,6 +1392,12 @@ NonSingingSurfaces
 	"\s[0]"
 }
 
+//Which scope will be used as the music player. \0 for the sakura, \1 for the kero, \p[*] for additional characters, replacing the * with the number of the character you want
+MusicPlayerScope
+{
+	"\1"
+}
+
 //Which balloon will be used for the menus in the music player.
 MusicPlayerBalloon
 {
@@ -1456,12 +1462,12 @@ MusicPlayer.OnKeyPress : all
 		if ASEARCH(_k,_reserved_keys) != -1 //If it's reserved
 		{
 			//DIALOGUE: If the user tries to put in a hotkey that is reserved
-			"\0That hotkey is reserved, please choose another.\x"
+			"%(MusicPlayerScope)That hotkey is reserved, please choose another.\x"
 		}
 		elseif ASEARCH(_k,Hotkeys) != -1 //If this hotkey is already selected for something else
 		{
 			//DIALOGUE: If the user tries to enter a hotkey that is already being used
-			"\0That hotkey is already in use, please clear it before assigning it to another option.\x"
+			"%(MusicPlayerScope)That hotkey is already in use, please clear it before assigning it to another option.\x"
 		}
 		else //If it's a valid key
 		{
@@ -1563,7 +1569,7 @@ OnFileDrop2 : all
 			ShuffledPlaylist = ShufflePlaylist(NowPlaying[1],CurrentPlaylist)
 			
 			//DIALOGUE: Added a file to the playlist
-			"\0Added '\_?%(_filename)\_?' to the playlist."
+			"%(MusicPlayerScope)Added '\_?%(_filename)\_?' to the playlist."
 			
 			"\n\n\_q\![*]\q[Play it now,OnPlaySong,%(CHR(34))%(_filearray)%(CHR(34)),,justadded]\n\![*]\q[Open music player,OnMusicMenu]\n\n\![*]\q[Close,blank]\e"
 		}
@@ -1576,7 +1582,7 @@ OnFileDrop2 : all
 			if ASEARCH("%(_filename).m3u",_playlists) != -1
 			{
 				//DIALOGUE: Dragged and dropped a playlist onto the ghost, but a playlist with the same name already exists
-				"\0A playlist called '\_?%(_filename)\_?' already exists.\w8 Do you wish to overwrite it?"
+				"%(MusicPlayerScope)A playlist called '\_?%(_filename)\_?' already exists.\w8 Do you wish to overwrite it?"
 				
 				"\n\n\![*]\q[Overwrite it,OnPlaylistCopy,Overwrite,%(CHR(34))%(_filearray)%(CHR(34)),%(CHR(34))%(_filename)%(CHR(34))]\n\![*]\q[Cancel,OnPlaylistCopy,Don't]"
 			}
@@ -1591,7 +1597,7 @@ OnFileDrop2 : all
 		else //Incompatible
 		{
 			//DIALOGUE: Any file that is not music, a playlist, or an image that can be set as a wallpaper
-			"\0This isn't a recognized file type.\e"
+			"%(MusicPlayerScope)This isn't a recognized file type.\e"
 		}
 	}
 	else //More than 1 file
@@ -1601,7 +1607,7 @@ OnFileDrop2 : all
 		if ARRAYSIZE(_musicfiles) == 0 //If there are no music files
 		{
 			//DIALOGUE: Multiple files were dropped on the ghost, but none of them are compatible music files.
-			"\0None of these files are compatible with the music player.\e"
+			"%(MusicPlayerScope)None of these files are compatible with the music player.\e"
 		}
 		else //If there are music files
 		{
@@ -1610,7 +1616,7 @@ OnFileDrop2 : all
 			_s = ""; if _num != 1; _s = "s"
 			
 			//Multiple files were dragged on the ghost, and some of them were music files. %(_s) can be used to add an s if the number of compatible files is plural, and %(_num) can be used to list the number of files.
-			"\0%(_num) compatible song%(_s) added to the playlist."
+			"%(MusicPlayerScope)%(_num) compatible song%(_s) added to the playlist."
 			
 			"\n\n\_q\![*]\q[Open music player,OnMusicMenu]\n\![*]\q[Close,blank]\e"
 		}
@@ -1633,7 +1639,7 @@ OnDirectoryDrop : all
 	if ARRAYSIZE(_musicfiles) == 0 //If there were no compatible songs inside
 	{
 		//DIALOGUE: The user dropped a folder on the ghost, but nothing inside was a compatible music file
-		"\0None of the files in \_?%(_folder)\_? are compatible music files.\e"
+		"%(MusicPlayerScope)None of the files in \_?%(_folder)\_? are compatible music files.\e"
 	}
 	else //If there are compatible songs
 	{
@@ -1641,7 +1647,7 @@ OnDirectoryDrop : all
 		_s = ""; if _num != 1; _s = "s"
 		
 		//DIALOGUE: The user dropped a folder on the ghost, and some files inside were compatible music files. %(_s) can be used to add an s if the number of compatible files is plural, %(_num) can be used to list the number of files, and %(_folder) is the name of the folder that was dropped.
-		"\0Added %(_num) song%(_s) from \_?%(_folder)\_?."
+		"%(MusicPlayerScope)Added %(_num) song%(_s) from \_?%(_folder)\_?."
 		
 		"\n\n\_q\![*]\q[Open music player,OnMusicMenu]\n\![*]\q[Close,blank]\e"
 	}
@@ -1826,7 +1832,7 @@ OnSoundError : all
 	else; "%(OnNotifySongInfo)"
 	
 	//DIALOGUE: If there is an error, it will tell the user and try to play the next song. reference3 is the error message, reference2 is the file name. Below is dialogue for attempting to play the next song
-	"\0Cannot play file \f[color,default.anchor]\_?%(reference2)\_?\f[color,default]; '%(reference3)'"
+	"%(MusicPlayerScope)Cannot play file \f[color,default.anchor]\_?%(reference2)\_?\f[color,default]; '%(reference3)'"
 	
 	//If it's able to play another song
 	if _playnext
@@ -2069,7 +2075,7 @@ OnFindSongs
 //Opening the folder for the user
 OnPlaylistPath
 {
-	"\C\![open,file,playlists]\_l[0,0] "
+	"\C%(MusicPlayerScope)\![open,file,playlists]\_l[0,0] "
 }
 
 //Checks for special text to determine which menu the ghost is currently in, and returns 

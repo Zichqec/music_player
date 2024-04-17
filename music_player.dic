@@ -73,6 +73,8 @@ You will also definitely want to go over the functions in the FUNCTIONS THAT SHO
 
 A function you might find helpful is the Singing function. It returns a 1 if music is currently playing, and a 0 if not. You can use this to add checks to functions like OnSurfaceRestore, to make sure your ghost stays in the singing poses while playing music.
 
+Another useful function is MusicPlayer.CurrentSong, which outputs the name of the currently playing song.
+
 Listed below are the variables this music player uses, as well as the values they should be initialized to. I would recommend putting this in your OnFirstBoot.
 
 NowPlaying = ("",-1,"")
@@ -84,6 +86,8 @@ BalloonLines = # //Replace the # with the number of lines in the balloon that yo
 Playtime = 0 //Only needed if you implement the Playtime counter below
 DiscordDisplay = ("On",0) //Only needed if you implement the Discord functions
 MusicPlayer.Tooltips = "On"
+MusicPlayer.AnnounceSongs = "Off"
+MusicPlayer.Priority = "Dialogue"
 
 Additionally, I would recommend putting %(OnNotifySongInfo) into your firstboot, boot dialogues, ghost changing dialogues, etc. This will ensure that your ghost updates any open ghosts on the status of the music player. 
 
@@ -275,6 +279,10 @@ OnPlaySong : all
 			
 			if reference2 == "frommenu"; reference2 = "OnMusicMenu" //At this point it doesn't need to be distinct anymore
 			if reference2 != ""; "\![raise,%(reference2)]" //If music menu is already open, reopen it so that it highlights the correct song properly
+			elseif !MenuIsOpen
+			{
+				if MusicPlayer.SongAnnouncement == "If not in menu" || !SHIORI3FW.IsTalking && MusicPlayer.SongAnnouncement == "If not talking"; "%(MusicPlayerScope)Now playing:\n%(MusicPlayer.CurrentSong)"
+			}
 		}
 	}
 	else //If there are no songs available to play
@@ -623,6 +631,8 @@ OnMusicSettings : all
 	if MusicSettings[5] == ""; MusicSettings[5] = "Off" //Song bar
 	if DiscordDisplay[0] == ""; DiscordDisplay[0] = "On"
 	if MusicPlayer.Tooltips == ""; MusicPlayer.Tooltips = "On"
+	if MusicPlayer.SongAnnouncement == ""; MusicPlayer.SongAnnouncement = "On"
+	if MusicPlayer.Priority == ""; MusicPlayer.Priority = "Dialogue" //Whether it interrupts dialogue or not when going to the next song
 	
 	_h = "\f[color,default.anchor]"
 	_g = "\f[color,disable]"
@@ -668,6 +678,8 @@ OnMusicSettings : all
 	"\n"
 	"Song Bar \![*]%(_h)\__q[OnToggleSongBar]%(MusicSettings[5])\__q%(_d)\n"
 	"Tooltips \![*]%(_h)\__q[OnToggleTooltips]%(MusicPlayer.Tooltips)\__q%(_d)\n"
+	"Song announcements \![*]%(_h)\__q[OnToggleSongAnnouncement]%(MusicPlayer.SongAnnouncement)\__q%(_d)\n"
+	"Prioritize \![*]%(_h)\__q[OnTogglePriority]%(MusicPlayer.Priority)\__q%(_d)\n"
 	
 	//CUSTOMIZE: If you want Discord functionality, you'll need to uncomment this
 	//"Show current song in Discord? %(_h)\__q[OnToggleDiscordPlugin]%(DiscordDisplay[0])\__q%(_d)\n"
@@ -892,6 +904,23 @@ OnToggleTooltips : all
 {
 	if MusicPlayer.Tooltips != "Off"; MusicPlayer.Tooltips = "Off"
 	else; MusicPlayer.Tooltips = "On"
+	
+	OnMusicSettings
+}
+
+OnToggleSongAnnouncement : all
+{
+	if MusicPlayer.SongAnnouncement == "Off"; MusicPlayer.SongAnnouncement = "If not talking"
+	elseif MusicPlayer.SongAnnouncement == "If not talking"; MusicPlayer.SongAnnouncement = "If not in menu"
+	else; MusicPlayer.SongAnnouncement = "Off"
+	
+	OnMusicSettings
+}
+
+OnTogglePriority : all
+{
+	if MusicPlayer.Priority != "Seamless music"; MusicPlayer.Priority = "Seamless music"
+	else; MusicPlayer.Priority = "Dialogue"
 	
 	OnMusicSettings
 }
@@ -1763,7 +1792,7 @@ OnSoundStop : all
 {
 	_inmenu = CheckWhichMenu
 	NowPlaying[2] = "" //Clear paused song if there somehow was one
-	if BalloonIsOpen; "\C\_l[0,0]"
+	if BalloonIsOpen && MusicPlayer.Priority != "Seamless music"; "\C\_l[0,0]"
 	
 	if MusicSettings[3] == 3  //If it's set to play one song and then stop
 	{
@@ -1904,6 +1933,11 @@ Singing
 newline
 {
 	"\_l[]"
+}
+
+MusicPlayer.CurrentSong
+{
+	SPLITPATH(NowPlaying[0])[2] //Picks out just the name of the file, no extension
 }
 
 //Added with help from steve02081504. Send an argument to this function to send it with ValueNotify. This can be used even while the ghost is minimized to run tags like the sound command.

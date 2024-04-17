@@ -812,12 +812,14 @@ OnQuickVolume : all
 	}
 	if Singing
 	{
-		if MenuIsOpen; "\C"
+		if MenuIsOpen || "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; "\C"
 		
 		"\![sound,option,""%(NowPlaying[0])"",--volume=%(MusicSettings[0])]"
 	}
 	
-	if _argc == 0 || _argv[1] == "OnMusicSettings"; OnMusicSettings //Only refresh in the music settings menu
+	LOGGING("SHIORI3FW.LastTalk: %(SHIORI3FW.LastTalk)")
+	LOGGING("MusicPlayer.LastTalk: %(MusicPlayer.LastTalk)")
+	if "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; OnMusicSettings //Only refresh in the music settings menu
 }
 
 //Up/Down speed buttons
@@ -838,12 +840,12 @@ OnQuickSpeed : all
 	}
 	if Singing
 	{
-		if MenuIsOpen; "\C"
+		if MenuIsOpen || "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; "\C"
 		
 		"\![sound,option,""%(NowPlaying[0])"",--rate=%(MusicSettings[1])]"
 	}
 	
-	if _argc == 0 || _argv[1] == "OnMusicSettings"; OnMusicSettings //Only refresh in the music settings menu
+	if "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; OnMusicSettings //Only refresh in the music settings menu
 }
 
 //Left/Right balance buttons
@@ -864,12 +866,12 @@ OnQuickBalance : all
 	}
 	if Singing
 	{
-		if MenuIsOpen; "\C"
+		if MenuIsOpen || "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; "\C"
 		
 		"\![sound,option,""%(NowPlaying[0])"",--balance=%(MusicSettings[2])]"
 	}
 	
-	if _argc == 0 || _argv[1] == "OnMusicSettings"; OnMusicSettings //Only refresh in the music settings menu
+	if "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; OnMusicSettings //Only refresh in the music settings menu
 }
 
 //Toggles the stop after playback function
@@ -1421,6 +1423,12 @@ On_tooltip
 	}
 }
 
+OnTranslateInternal.MusicPlayer
+{
+	LOGGING("reference.raw: %(reference.raw)")
+	if SHIORI3FW.Eventid != "On_tooltip"; MusicPlayer.LastTalk = _argv[0]
+}
+
 
 
 
@@ -1493,7 +1501,7 @@ This will let it know to run OnMenuRun again if the current song changes/stops/e
 OnBalloonBreak
 {
 	//Should make it so that if the user closes the balloon while the song is waiting to repeat, it repeats properly
-	if "\![raise,OnSoundStop]" _in_ SHIORI3FW.LastTalk; "\![raise,OnSoundStop]"
+	if "\![raise,OnSoundStop]" _in_ MusicPlayer.LastTalk; "\![raise,OnSoundStop]"
 }
 
 //Hotkeys. reference0 is the name of the key as displayed on the keycap. reference4, for SSP only, will have things like ctrl and alt, separated by commas.
@@ -1501,10 +1509,10 @@ MusicPlayer.OnKeyPress : all
 {
 	reference0 = TOSTR(reference0)
 	_key = TOUPPER(reference0)
-	if "changing hotkey: " _in_ SPLIT(SHIORI3FW.LastTalk,"\e")[1] //If the hotkey input is open
+	if "changing hotkey: " _in_ SPLIT(MusicPlayer.LastTalk,"\e")[1] //If the hotkey input is open
 	{
 		
-		_changing = TOINT(SPLIT(SHIORI3FW.LastTalk,"changing hotkey: ")[1])
+		_changing = TOINT(SPLIT(MusicPlayer.LastTalk,"changing hotkey: ")[1])
 		
 		//CUSTOMIZE: Customizable list of reserved hotkeys. Add in any hotkeys you've already used to this array.
 		_reserved_keys = ("T","R","F1")
@@ -1662,7 +1670,6 @@ OnFileDrop2 : all
 		}
 		elseif _fileext == ".m3u" //If it's a playlist
 		{
-			LOGGING("Playlist")
 			_path = PLAYLIST_FOLDER
 			_playlists = FENUM(_pathmC_BYTE1)
 			_playlists = SPLIT(_playlists,C_BYTE1)
@@ -2174,9 +2181,9 @@ CheckWhichMenu
 	_inmenu = ""
 	if BalloonIsOpen
 	{
-		if "__MUSIC_PLAYER_MAIN_MENU__" _in_ SHIORI3FW.LastTalk; _inmenu = "OnMusicMenu"
-		elseif "__GHOST_MAIN_MENU__" _in_ SHIORI3FW.LastTalk; _inmenu = "OnMenuRun"
-		elseif "__MUSIC_SETTINGS_MENU__" _in_ SHIORI3FW.LastTalk; _inmenu = "OnMusicSettings"
+		if "__MUSIC_PLAYER_MAIN_MENU__" _in_ MusicPlayer.LastTalk; _inmenu = "OnMusicMenu"
+		elseif "__GHOST_MAIN_MENU__" _in_ MusicPlayer.LastTalk; _inmenu = "OnMenuRun"
+		elseif "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; _inmenu = "OnMusicSettings"
 	}
 	_inmenu
 }

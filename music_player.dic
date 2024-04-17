@@ -1482,28 +1482,35 @@ OnBalloonBreak
 MusicPlayer.OnKeyPress : all
 {
 	reference0 = TOSTR(reference0)
+	_key = TOUPPER(reference0)
 	if "changing hotkey: " _in_ SPLIT(SHIORI3FW.LastTalk,"\e")[1] //If the hotkey input is open
 	{
-		_k = TOUPPER(reference0)
+		
 		_changing = TOINT(SPLIT(SHIORI3FW.LastTalk,"changing hotkey: ")[1])
 		
 		//CUSTOMIZE: Customizable list of reserved hotkeys. Add in any hotkeys you've already used to this array.
 		_reserved_keys = ("T","R","F1")
 		
-		if ASEARCH(_k,_reserved_keys) != -1 //If it's reserved
+		if ASEARCH(_key,_reserved_keys) != -1 //If it's reserved
 		{
 			//DIALOGUE: If the user tries to put in a hotkey that is reserved
 			"%(MusicPlayerScope)That hotkey is reserved, please choose another.\x"
 		}
-		elseif ASEARCH(_k,Hotkeys) != -1 //If this hotkey is already selected for something else
+		elseif _key == Hotkeys[_changing] //Same option as was already entered
+		{
+			"\C\![raise,OnHotkeys]"
+			return
+		}
+		elseif ASEARCH(_key,Hotkeys) != -1 //If this hotkey is already selected for something else
 		{
 			//DIALOGUE: If the user tries to enter a hotkey that is already being used
 			"%(MusicPlayerScope)That hotkey is already in use, please clear it before assigning it to another option.\x"
 		}
 		else //If it's a valid key
 		{
-			Hotkeys[_changing] = TOUPPER(reference0)
-			"\C\![raise,OnHotkeys]\e"
+			Hotkeys[_changing] = _key
+			"\C\![raise,OnHotkeys]"
+			return
 		}
 		
 		"\![raise,OnChangeHotkey,%(_changing)]"
@@ -1511,10 +1518,9 @@ MusicPlayer.OnKeyPress : all
 	}
 	else //Actually using a hotkey
 	{
-		reference0 = TOUPPER(reference0)
 		_inmenu = CheckWhichMenu
 		
-		if reference0 == Hotkeys[0] //Play/Pause
+		if _key == Hotkeys[0] //Play/Pause
 		{
 			if MenuIsOpen; "\C"
 			
@@ -1522,7 +1528,7 @@ MusicPlayer.OnKeyPress : all
 			elseif NowPlaying[2] != ""; "\![raise,OnPauseSong,%(_inmenu),resume]"
 			else; "\![raise,OnPauseSong,%(_inmenu),pause]"
 		}
-		elseif reference0 == Hotkeys[1] //Next song
+		elseif _key == Hotkeys[1] //Next song
 		{
 			if NowPlaying[0] != ""
 			{
@@ -1531,7 +1537,7 @@ MusicPlayer.OnKeyPress : all
 				"\![raise,OnNextSong,%(_inmenu)]\e"
 			}
 		}
-		elseif reference0 == Hotkeys[2] //Previous song
+		elseif _key == Hotkeys[2] //Previous song
 		{
 			if NowPlaying[0] != ""
 			{
@@ -1540,41 +1546,41 @@ MusicPlayer.OnKeyPress : all
 				"\![raise,OnPrevSong,%(_inmenu)]\e"
 			}
 		}
-		elseif reference0 == Hotkeys[3] //Stop song
+		elseif _key == Hotkeys[3] //Stop song
 		{
 			if MenuIsOpen; "\C"
 			
 			"\![raise,OnStopSong,%(_inmenu)]"
 		}
-		elseif reference0 == Hotkeys[4] //Music menu
+		elseif _key == Hotkeys[4] //Music menu
 		{
 			OnMusicMenu("manual")
 		}
-		elseif reference0 == Hotkeys[5] //Song Bar
+		elseif _key == Hotkeys[5] //Song Bar
 		{
 			OnToggleSongBar("Hotkey",_inmenu)
 		}
-		elseif reference0 == Hotkeys[6] //Volume up
+		elseif _key == Hotkeys[6] //Volume up
 		{
 			OnQuickVolume("Up",_inmenu)
 		}
-		elseif reference0 == Hotkeys[7] //Volume down
+		elseif _key == Hotkeys[7] //Volume down
 		{
 			OnQuickVolume("Down",_inmenu)
 		}
-		elseif reference0 == Hotkeys[8] //Speed up
+		elseif _key == Hotkeys[8] //Speed up
 		{
 			OnQuickSpeed("Up",_inmenu)
 		}
-		elseif reference0 == Hotkeys[9] //Speed down
+		elseif _key == Hotkeys[9] //Speed down
 		{
 			OnQuickSpeed("Down",_inmenu)
 		}
-		elseif reference0 == Hotkeys[10] //Balance left
+		elseif _key == Hotkeys[10] //Balance left
 		{
 			OnQuickBalance("Left",_inmenu)
 		}
-		elseif reference0 == Hotkeys[11] //Balance right
+		elseif _key == Hotkeys[11] //Balance right
 		{
 			OnQuickBalance("Right",_inmenu)
 		}

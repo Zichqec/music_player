@@ -145,7 +145,7 @@ OnMusicMenu : all
 			_currentsong[0] = _song //Song name
 			_currentsong[1] = CurrentPlaylist[_i] //Song path
 		}
-		_display += "%(_h)\__q[OnPlaySong,%(CHR(34))%(_path)%(CHR(34)),%(_i),frommenu]%(_song)\__q%(_d)\n"
+		_display += "%(_h)\__q[OnPlaySong,""%(_path)"",%(_i),frommenu]%(_song)\__q%(_d)\n"
 		if _i == NowPlaying[1]; _display += "\f[default]" //Reset the bold/italic if it was applied
 	}
 	
@@ -191,7 +191,7 @@ OnMusicMenu : all
 	
 	"Now playing:"
 	
-	if NowPlaying[0] != ""; " %(_h)\__q[OnSongLocation,%(CHR(34))%(_currentsong[1])%(CHR(34))]%(_currentsong[0])\__q\f[default]"
+	if NowPlaying[0] != ""; " %(_h)\__q[OnSongLocation,""%(_currentsong[1])""]%(_currentsong[0])\__q\f[default]"
 	
 	"\n\n[half]%(_display)\n"
 	"\![*]\q[Back,OnMenuRun]  \![*]\__q[blank]Close window\__q"
@@ -267,7 +267,7 @@ OnPlaySong : all
 		_window = "False"
 		if MusicSettings[5] == "On"; _window = "True"
 		
-		_send += "\![sound,play,%(CHR(34))%(reference0)%(CHR(34)),--volume=%(MusicSettings[0]),--rate=%(MusicSettings[1]),--balance=%(MusicSettings[2]),--window=%(_window),--sound-only=true]" //Play new song
+		_send += "\![sound,play,""%(reference0)"",--volume=%(MusicSettings[0]),--rate=%(MusicSettings[1]),--balance=%(MusicSettings[2]),--window=%(_window),--sound-only=true]" //Play new song
 		
 		if IsMinimized
 		{
@@ -321,7 +321,7 @@ OnPauseSong : all
 	
 	if MenuIsOpen; "\C" //If the balloon is open, keep it open
 	
-	"\![sound,option,%(CHR(34))%(NowPlaying[0])%(CHR(34)),--volume=%(MusicSettings[0]),--rate=%(MusicSettings[1]),--balance=%(MusicSettings[2]),--window=%(_window)]"
+	"\![sound,option,""%(NowPlaying[0])"",--volume=%(MusicSettings[0]),--rate=%(MusicSettings[1]),--balance=%(MusicSettings[2]),--window=%(_window)]"
 	
 	if reference1 == "resume" //Unpausing
 	{
@@ -379,7 +379,7 @@ OnNextSong : all
 		NowPlaying[0] = CurrentPlaylist[_next] //song name
 		NowPlaying[1] = _next //song position
 		
-		"\![raise,OnPlaySong,%(CHR(34))%(CurrentPlaylist[_next])%(CHR(34)),%(_next),%(_from)]"
+		"\![raise,OnPlaySong,""%(CurrentPlaylist[_next])"",%(_next),%(_from)]"
 	}
 	else //No more songs to play
 	{
@@ -428,7 +428,7 @@ OnPrevSong : all
 		NowPlaying[0] = CurrentPlaylist[_next] //song name
 		NowPlaying[1] = _next //song position
 		
-		"\![raise,OnPlaySong,%(CHR(34))%(CurrentPlaylist[_next])%(CHR(34)),%(_next),%(_from)]\e"
+		"\![raise,OnPlaySong,""%(CurrentPlaylist[_next])"",%(_next),%(_from)]\e"
 	}
 	else //No songs available to play
 	{
@@ -616,7 +616,7 @@ OnSongLocation
 	_path = SPLITPATH(reference0)[0] + SPLITPATH(reference0)[1]
 	_path = ERASE(_path,STRLEN(_path) - 1,1) //Erases the last backslash
 	
-	"\![open,file,%(CHR(34))%(_path)%(CHR(34))]\![raise,OnMusicMenu]"
+	"\![open,file,""%(_path)""]\![raise,OnMusicMenu]"
 }
 
 //Settings menu
@@ -758,7 +758,7 @@ OnMusicBalance : all
 	if MusicSettings[2] > 100; MusicSettings[2] = 100
 	if MusicSettings[2] < -100; MusicSettings[2] = -100
 	
-	if Singing; "\![sound,option,%(CHR(34))%(NowPlaying[0])%(CHR(34)),--balance=%(MusicSettings[2])]"
+	if Singing; "\![sound,option,""%(NowPlaying[0])"",--balance=%(MusicSettings[2])]"
 	
 	OnMusicSettings
 }
@@ -768,7 +768,7 @@ OnMusicSpeed : all
 {
 	MusicSettings[1] = reference0
 	
-	if Singing; "\![sound,option,%(CHR(34))%(NowPlaying[0])%(CHR(34)),--rate=%(MusicSettings[1])]"
+	if Singing; "\![sound,option,""%(NowPlaying[0])"",--rate=%(MusicSettings[1])]"
 	
 	OnMusicSettings
 }
@@ -778,7 +778,7 @@ OnMusicVolume : all
 {
 	MusicSettings[0] = reference0
 	
-	if Singing; "\![sound,option,%(CHR(34))%(NowPlaying[0])%(CHR(34)),--volume=%(MusicSettings[0])]"
+	if Singing; "\![sound,option,""%(NowPlaying[0])"",--volume=%(MusicSettings[0])]"
 	
 	OnMusicSettings
 }
@@ -808,7 +808,7 @@ OnQuickVolume : all
 	{
 		if MenuIsOpen; "\C"
 		
-		"\![sound,option,%(CHR(34))%(NowPlaying[0])%(CHR(34)),--volume=%(MusicSettings[0])]"
+		"\![sound,option,""%(NowPlaying[0])"",--volume=%(MusicSettings[0])]"
 	}
 	
 	if _argc == 0; OnMusicSettings //If this was done with the buttons - there will be no args in that case
@@ -835,7 +835,7 @@ OnQuickSpeed : all
 	{
 		if MenuIsOpen; "\C"
 		
-		"\![sound,option,%(CHR(34))%(NowPlaying[0])%(CHR(34)),--rate=%(MusicSettings[1])]"
+		"\![sound,option,""%(NowPlaying[0])"",--rate=%(MusicSettings[1])]"
 	}
 	
 	if _argc == 0; OnMusicSettings //If this was done with the buttons - there will be no args in that case
@@ -862,7 +862,7 @@ OnQuickBalance : all
 	{
 		if MenuIsOpen; "\C"
 		
-		"\![sound,option,%(CHR(34))%(NowPlaying[0])%(CHR(34)),--balance=%(MusicSettings[2])]"
+		"\![sound,option,""%(NowPlaying[0])"",--balance=%(MusicSettings[2])]"
 	}
 	
 	if _argc == 0; OnMusicSettings //If this was done with the buttons - there will be no args in that case
@@ -891,7 +891,7 @@ OnToggleSongBar : all
 	
 	if MenuIsOpen; "\C"
 	
-	if Singing || NowPlaying[2] != ""; "\![sound,option,%(CHR(34))%(NowPlaying[0])%(CHR(34)),--window=%(_onoff)]"
+	if Singing || NowPlaying[2] != ""; "\![sound,option,""%(NowPlaying[0])"",--window=%(_onoff)]"
 	
 	if _argc == 0; OnMusicSettings //If this was done with the buttons - there will be no args in that case
 	elseif _argv[1] != "" //If a menu is listed to refresh
@@ -1089,7 +1089,7 @@ OnSavePlaylist : all
 	{
 		_playlist = _playlists[_i]
 		_playlist = RE_REPLACE(_playlist,"\.m3u$","")
-		_display += "\__q[OnPlaylistOverwrite,%(CHR(34))%(_playlist)%(CHR(34))]\_?%(_playlist)\_?\__q\n"
+		_display += "\__q[OnPlaylistOverwrite,""%(_playlist)""]\_?%(_playlist)\_?\__q\n"
 	}
 	
 	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\*\_q\![set,autoscroll,disable]\![open,inputbox,OnPlaylistName,-1]"
@@ -1124,7 +1124,7 @@ OnPlaylistName : all
 	
 	_playlists = FENUM(PLAYLIST_FOLDER,C_BYTE1)
 	_playlists = SPLIT(_playlists,C_BYTE1)
-	if ASEARCH("%(_name).m3u",_playlists) != -1 && reference1 == ""; "\C\![raise,OnPlaylistOverwrite,%(CHR(34))%(_name)%(CHR(34)),are you sure]\e"
+	if ASEARCH("%(_name).m3u",_playlists) != -1 && reference1 == ""; "\C\![raise,OnPlaylistOverwrite,""%(_name)"",are you sure]\e"
 	else
 	{
 		_path = PLAYLIST_FOLDER + "%(_name).m3u"
@@ -1163,7 +1163,7 @@ OnPlaylistOverwrite : all
 		//DIALOGUE: If the user puts in a playlist name that is the same as an existing playlist, it'll ask if they want to overwrite the old one or not
 		"The name '\_?%(reference0)\_?' is already in use. Do you want to overwrite '\_?%(reference0)\_?'?"
 		
-		"\n\n\![*]\q[Overwrite it,OnPlaylistOverwrite,%(CHR(34))%(reference0)%(CHR(34))]  \![*]\q[Don't,OnSavePlaylist]"
+		"\n\n\![*]\q[Overwrite it,OnPlaylistOverwrite,""%(reference0)""]  \![*]\q[Don't,OnSavePlaylist]"
 		
 		"\![unlock,balloonrepaint]\e"
 	}
@@ -1182,7 +1182,7 @@ OnLoadPlaylist : all
 	foreach _playlists; _playlist
 	{
 		_playlist = RE_REPLACE(_playlist,"\.m3u$","")
-		_display += "\q[(x),OnDeletePlaylist,%(_playlist)] \q[%(CHR(34))%(_playlist)%(CHR(34)),OnSelectPlaylist,%(_playlist)]\n"
+		_display += "\q[(x),OnDeletePlaylist,%(_playlist)] \q[""%(_playlist)"",OnSelectPlaylist,%(_playlist)]\n"
 	}
 	
 	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c\_q%(MusicPlayerBalloon)\*\![set,autoscroll,disable]"
@@ -1241,7 +1241,7 @@ OnDeletePlaylist : all
 	//DIALOGUE: Asking for confirmation before deleting a playlist. You can use %(_s) to add an s if there is more than one song in the playlist
 	"Are you sure you want to delete '\_?%(reference0)\_?' and the %(_songs) song%(_s) inside?\w8 This cannot be undone."
 	
-	"\n\n\![*]\q[Delete it,OnPlaylistDeleted,%(CHR(34))%(reference0)%(CHR(34))]\n\![*]\q[Cancel,OnLoadPlaylist]\e"
+	"\n\n\![*]\q[Delete it,OnPlaylistDeleted,""%(reference0)""]\n\![*]\q[Cancel,OnLoadPlaylist]\e"
 }
 
 //Actually deleting the file
@@ -1346,14 +1346,14 @@ OnNotifySongInfo
 	_song = " "
 	if Singing
 	{
-		_song = "♫ %(CHR(34))%(SPLITPATH(NowPlaying[0])[2])%(CHR(34)) ♫"
+		_song = "♫ ""%(SPLITPATH(NowPlaying[0])[2])"" ♫"
 	}
 	
 	if DiscordDisplay[0] == "On"; "\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomDetail,%(_song)]"
 	else; "\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomDetail, ]"
 	*/
 	--
-	"\![notifyother,__SYSTEM_ALL_GHOST__,OnSongInfo,%(CHR(34))%(selfname)%(CHR(34)),%(CHR(34))%(NowPlaying[0])%(CHR(34)),%(NowPlaying[1]),%(CHR(34))%(NowPlaying[2])%(CHR(34)),%(MusicSettings[0]),%(MusicSettings[1]),%(MusicSettings[2]),%(MusicSettings[3]),%(MusicSettings[4]),%(ARRAYSIZE(CurrentPlaylist))]"
+	"\![notifyother,__SYSTEM_ALL_GHOST__,OnSongInfo,""%(selfname)"",""%(NowPlaying[0])"",%(NowPlaying[1]),""%(NowPlaying[2])"",%(MusicSettings[0]),%(MusicSettings[1]),%(MusicSettings[2]),%(MusicSettings[3]),%(MusicSettings[4]),%(ARRAYSIZE(CurrentPlaylist))]"
 	
 	//References:
 	//0 - The name of this ghost, since this event may come from multiple ghosts
@@ -1608,7 +1608,7 @@ OnFileDrop2 : all
 			//DIALOGUE: Added a file to the playlist
 			"%(MusicPlayerScope)Added '\_?%(_filename)\_?' to the playlist."
 			
-			"\n\n\_q\![*]\q[Play it now,OnPlaySong,%(CHR(34))%(_filearray)%(CHR(34)),,justadded]\n\![*]\q[Open music player,OnMusicMenu]\n\n\![*]\q[Close,blank]\e"
+			"\n\n\_q\![*]\q[Play it now,OnPlaySong,""%(_filearray)"",,justadded]\n\![*]\q[Open music player,OnMusicMenu]\n\n\![*]\q[Close,blank]\e"
 		}
 		elseif _fileext == ".m3u" //If it's a playlist
 		{
@@ -1621,7 +1621,7 @@ OnFileDrop2 : all
 				//DIALOGUE: Dragged and dropped a playlist onto the ghost, but a playlist with the same name already exists
 				"%(MusicPlayerScope)A playlist called '\_?%(_filename)\_?' already exists.\w8 Do you wish to overwrite it?"
 				
-				"\n\n\![*]\q[Overwrite it,OnPlaylistCopy,Overwrite,%(CHR(34))%(_filearray)%(CHR(34)),%(CHR(34))%(_filename)%(CHR(34))]\n\![*]\q[Cancel,OnPlaylistCopy,Don't]"
+				"\n\n\![*]\q[Overwrite it,OnPlaylistCopy,Overwrite,""%(_filearray)"",""%(_filename)""]\n\![*]\q[Cancel,OnPlaylistCopy,Don't]"
 			}
 			else
 			{
@@ -1846,7 +1846,7 @@ OnSoundStop : all
 			}
 			else
 			{
-				"%(SingingSurfaces)\![raise,OnPlaySong,%(CHR(34))%(CurrentPlaylist[_next])%(CHR(34)),%(_next),%(_inmenu)]"
+				"%(SingingSurfaces)\![raise,OnPlaySong,""%(CurrentPlaylist[_next])"",%(_next),%(_inmenu)]"
 			}
 		}
 	}
@@ -2158,7 +2158,7 @@ OnDiscordPluginCustomEnd
 OnDiscordPluginBoot : all
 {
 	_song = " "
-	if Singing; _song = "♫ %(CHR(34))%(SPLITPATH(NowPlaying[0])[2])%(CHR(34)) ♫"
+	if Singing; _song = "♫ ""%(SPLITPATH(NowPlaying[0])[2])"" ♫"
 	
 	"\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomALL,YOUR APP ID HERE,,,thumbnail,YOUR GHOSTS'S URL OR A MESSAGE HERE,]"
 	
@@ -2192,7 +2192,7 @@ OnToggleDiscordPlugin : all
 	if DiscordDisplay[0] != "On"
 	{
 		_song = " "
-		if Singing; _song = "♫ %(CHR(34))%(SPLITPATH(NowPlaying[0])[2])%(CHR(34)) ♫"
+		if Singing; _song = "♫ ""%(SPLITPATH(NowPlaying[0])[2])"" ♫"
 
 		DiscordDisplay[0] = "On"
 		"\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomDetail,%(_song)]"

@@ -83,8 +83,9 @@ Hotkeys = IARRAY
 BalloonLines = # //Replace the # with the number of lines in the balloon that you'll be using for the music menu. This is mostly used for the menu where you can change the order of songs in the playlist. This will be automatically set any time the user changes balloons, but it's good to make sure the initial value is correct. If you look in the OnBalloonChange function, it'll have a property command you could use for this, as well.
 Playtime = 0 //Only needed if you implement the Playtime counter below
 DiscordDisplay = ("On",0) //Only needed if you implement the Discord functions
+MusicPlayer.Tooltips = "On"
 
-Additionally, I would recommend putting %(UpdateTooltips) and %(OnNotifySongInfo) into your firstboot, boot dialogues, ghost changing dialogues, etc. This will ensure that your ghost shows the tooltips properly and also updates any open ghosts on the status of the music player. 
+Additionally, I would recommend putting %(OnNotifySongInfo) into your firstboot, boot dialogues, ghost changing dialogues, etc. This will ensure that your ghost updates any open ghosts on the status of the music player. 
 
 I will also recommend that you use developer_options.txt in order to prevent your playlists folder from ending up in your update files or nar files.
 
@@ -253,8 +254,6 @@ OnPlaySong : all
 		}
 		if MenuIsOpen; "\C" //If the balloon is currently open, keep it open
 		
-		UpdateTooltips
-		
 		"%(SingingSurfaces)" //Start the singing animations if they weren't already started
 		
 		_send = ""
@@ -299,7 +298,7 @@ OnStopSong : all
 	
 	"\![sound,stop]"
 	
-	"%(NonSingingSurfaces)%(OnNotifySongInfo)%(UpdateTooltips)" //Stop the singing animations
+	"%(NonSingingSurfaces)%(OnNotifySongInfo)" //Stop the singing animations
 	
 	if reference0 != ""; "\![raise,%(reference0)]" //If music menu is already open, reopen it so that it highlights the correct song properly
 }
@@ -327,7 +326,7 @@ OnPauseSong : all
 		"%(NonSingingSurfaces)\![sound,pause]"
 	}
 	
-	"%(OnNotifySongInfo)%(UpdateTooltips)"
+	"%(OnNotifySongInfo)"
 	
 	if reference0 != ""; "\![raise,%(reference0)]" //If music menu is already open, reopen it so that it highlights the correct song properly
 }
@@ -623,6 +622,7 @@ OnMusicSettings : all
 	//MusicSettings[4] is the 'stop after current' option
 	if MusicSettings[5] == ""; MusicSettings[5] = "Off" //Song bar
 	if DiscordDisplay[0] == ""; DiscordDisplay[0] = "On"
+	if MusicPlayer.Tooltips == ""; MusicPlayer.Tooltips = "On"
 	
 	_h = "\f[color,default.anchor]"
 	_g = "\f[color,disable]"
@@ -667,6 +667,8 @@ OnMusicSettings : all
 	if MusicSettings[4] == "stop after playback"; " \![*]"
 	"\n"
 	"Song Bar \![*]%(_h)\__q[OnToggleSongBar]%(MusicSettings[5])\__q%(_d)\n"
+	"Tooltips \![*]%(_h)\__q[OnToggleTooltips]%(MusicPlayer.Tooltips)\__q%(_d)\n"
+	
 	//CUSTOMIZE: If you want Discord functionality, you'll need to uncomment this
 	//"Show current song in Discord? %(_h)\__q[OnToggleDiscordPlugin]%(DiscordDisplay[0])\__q%(_d)\n"
 	"\n"
@@ -884,6 +886,14 @@ OnToggleSongBar : all
 	{
 		"\C\![raise,%(_argv[1])]"
 	}
+}
+
+OnToggleTooltips : all
+{
+	if MusicPlayer.Tooltips != "Off"; MusicPlayer.Tooltips = "Off"
+	else; MusicPlayer.Tooltips = "On"
+	
+	OnMusicSettings
 }
 
 //Hotkey menu
@@ -1329,48 +1339,40 @@ OnNotifySongInfo
 	//9 - Number of songs in the current playlist
 }
 
-UpdateTooltips
+//reference4 is the name of the collision identifier as written in surfaces.txt
+On_tooltip
 {
 	//CUSTOMIZE: Setting up tooltips for hotspots
-	//Each of these array elements is for a hotspot. You can remove any that you don't want to use.
-	//The string on the left of the C_BYTE1 is the label that will show up on the tooltip, and the string on the right is the name of the collision EXACTLY as it is written in surfaces.txt. If you change the names of these hotspots, you will also have to change them over in MouseDoubleClickSakura!
-	//If you don't want tooltips you can just make this function empty
+	//You can adjust the tooltips here if you need, or if you used different collision names you'll need to replace the defaults here.
+	//Note: if you assign tooltips on the shell side, they will take precedence. But I recommend doing it here so that users can toggle them off if they prefer!
 	
-	_buttons = IARRAY
-	
-	//If there's already a song playing, the play button will act as a next button. So this needs to change based on whether a song is playing or not.
-	if Singing; _buttons ,= "Play" + C_BYTE1 + "play_button"
-	else; _buttons ,= "Play" + C_BYTE1 + "play_button"
-	
-	//Similarly, this will create a pause button if there is a song playing, and a resume button if there is a paused song
-	if NowPlaying[2] == ""; _buttons ,= "Pause" + C_BYTE1 + "pause_resume_button"
-	else; _buttons ,= "Resume" + C_BYTE1 + "pause_resume_button"
-	
-	_buttons ,= "Stop" + C_BYTE1 + "stop_button"
-	_buttons ,= "Next Song" + C_BYTE1 + "next_button"
-	_buttons ,= "Previous Song" + C_BYTE1 + "previous_button"
-	_buttons ,= "Music Menu" + C_BYTE1 + "music_menu_button"
-	_buttons ,= "Clear Playlist" + C_BYTE1 + "clear_button"
-	_buttons ,= "Stop After Current Song" + C_BYTE1 + "stop_after_current_button"
-	_buttons ,= "Toggle Song Bar" + C_BYTE1 + "song_bar_button"
-	_buttons ,= "Volume Up" + C_BYTE1 + "volume_up_button"
-	_buttons ,= "Volume Down" + C_BYTE1 + "volume_down_button"
-	_buttons ,= "Speed Up" + C_BYTE1 + "speed_up_button"
-	_buttons ,= "Speed Down" + C_BYTE1 + "speed_down_button"
-	_buttons ,= "Balance Left" + C_BYTE1 + "balance_left_button"
-	_buttons ,= "Balance Right" + C_BYTE1 + "balance_right_button"
-	
-	_cmd = ""
-	foreach _buttons; _button
+	if MusicPlayer.Tooltips == "On"
 	{
-		_name = _button[0,C_BYTE1]
-		_collision = _button[1,C_BYTE1]
-		_cmd += "\![set,property,currentghost.seriko.tooltip.scope(0).textlist(%(_collision)).text,%(_name)]"
+		if reference4 == "play_button"
+		{
+			if Singing; "Play / Next"
+			else; "Play"
+		}
+		elseif reference4 == "pause_resume_button"
+		{
+			if NowPlaying[2] == ""; "Pause"
+			else; "Resume"
+		}
+		elseif reference4 == "stop_button"; "Stop"
+		elseif reference4 == "next_button"; "Next Song"
+		elseif reference4 == "previous_button"; "Previous Song"
+		elseif reference4 == "music_menu_button"; "Music Menu"
+		elseif reference4 == "clear_button"; "Clear Playlist"
+		elseif reference4 == "stop_after_current_button"; "Stop After Current Song"
+		elseif reference4 == "song_bar_button"; "Toggle Song Bar"
+		elseif reference4 == "volume_up_button"; "Volume Up"
+		elseif reference4 == "volume_down_button"; "Volume Down"
+		elseif reference4 == "speed_up_button"; "Speed Up"
+		elseif reference4 == "speed_down_button"; "Speed Down"
+		elseif reference4 == "balance_left_button"; "Balance Left"
+		elseif reference4 == "balance_right_button"; "Balance Right"
 	}
-	_cmd
 }
-
-
 
 
 

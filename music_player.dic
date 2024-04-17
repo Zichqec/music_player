@@ -88,6 +88,7 @@ DiscordDisplay = ("On",0) //Only needed if you implement the Discord functions
 MusicPlayer.Tooltips = "On"
 MusicPlayer.AnnounceSongs = "Off"
 MusicPlayer.Priority = "Dialogue"
+MusicPlayer.Scroll = "Volume"
 
 Additionally, I would recommend putting %(OnNotifySongInfo) into your firstboot, boot dialogues, ghost changing dialogues, etc. This will ensure that your ghost updates any open ghosts on the status of the music player. 
 
@@ -633,6 +634,7 @@ OnMusicSettings : all
 	if MusicPlayer.Tooltips == ""; MusicPlayer.Tooltips = "On"
 	if MusicPlayer.SongAnnouncement == ""; MusicPlayer.SongAnnouncement = "On"
 	if MusicPlayer.Priority == ""; MusicPlayer.Priority = "Dialogue" //Whether it interrupts dialogue or not when going to the next song
+	if MusicPlayer.Scroll == ""; MusicPlayer.Scroll = "Volume" //Scroll wheel setting
 	
 	_h = "\f[color,default.anchor]"
 	_g = "\f[color,disable]"
@@ -680,6 +682,7 @@ OnMusicSettings : all
 	"Tooltips \![*]%(_h)\__q[OnToggleTooltips]%(MusicPlayer.Tooltips)\__q%(_d)\n"
 	"Song announcements \![*]%(_h)\__q[OnToggleSongAnnouncement]%(MusicPlayer.SongAnnouncement)\__q%(_d)\n"
 	"Prioritize \![*]%(_h)\__q[OnTogglePriority]%(MusicPlayer.Priority)\__q%(_d)\n"
+	"Scroll wheel controls \![*]%(_h)\__q[OnToggleScrollWheel]%(MusicPlayer.Scroll)\__q%(_d)\n"
 	
 	//CUSTOMIZE: If you want Discord functionality, you'll need to uncomment this
 	//"Show current song in Discord? %(_h)\__q[OnToggleDiscordPlugin]%(DiscordDisplay[0])\__q%(_d)\n"
@@ -794,14 +797,17 @@ OnCloseMusicSet : all
 //Up/Down volume buttons
 OnQuickVolume : all
 {
+	_amt = 5
+	if _argv[2] != ""; _amt = _argv[2]
+	
 	if reference0 == "Up" || _argv[0] == "Up"
 	{
-		MusicSettings[0] += 5
+		MusicSettings[0] += _amt
 		if MusicSettings[0] > 100; MusicSettings[0] = 100
 	}
 	else //Down
 	{
-		MusicSettings[0] -= 5
+		MusicSettings[0] -= _amt
 		if MusicSettings[0] < 0; MusicSettings[0] = 0
 	}
 	if Singing
@@ -821,14 +827,17 @@ OnQuickVolume : all
 //Up/Down speed buttons
 OnQuickSpeed : all
 {
+	_amt = 5
+	if _argv[2] != ""; _amt = _argv[2]
+	
 	if reference0 == "Up" || _argv[0] == "Up"
 	{
-		MusicSettings[1] += 5
+		MusicSettings[1] += _amt
 		if MusicSettings[1] > MAX_RATE; MusicSettings[1] = MAX_RATE
 	}
 	else //Down
 	{
-		MusicSettings[1] -= 5
+		MusicSettings[1] -= _amt
 		if MusicSettings[1] < 0; MusicSettings[1] = 0
 	}
 	if Singing
@@ -848,14 +857,17 @@ OnQuickSpeed : all
 //Left/Right balance buttons
 OnQuickBalance : all
 {
+	_amt = 5
+	if _argv[2] != ""; _amt = _argv[2]
+	
 	if reference0 == "Right" || _argv[0] == "Right"
 	{
-		MusicSettings[2] += 5
+		MusicSettings[2] += _amt
 		if MusicSettings[2] > 100; MusicSettings[2] = 100
 	}
 	else //Left
 	{
-		MusicSettings[2] -= 5
+		MusicSettings[2] -= _amt
 		if MusicSettings[2] < -100; MusicSettings[2] = 0
 	}
 	if Singing
@@ -921,6 +933,16 @@ OnTogglePriority : all
 {
 	if MusicPlayer.Priority != "Seamless music"; MusicPlayer.Priority = "Seamless music"
 	else; MusicPlayer.Priority = "Dialogue"
+	
+	OnMusicSettings
+}
+
+OnToggleScrollWheel : all
+{
+	if MusicPlayer.Scroll == "Volume"; MusicPlayer.Scroll = "Speed"
+	elseif MusicPlayer.Scroll == "Speed"; MusicPlayer.Scroll = "Balance"
+	elseif MusicPlayer.Scroll == "Balance"; MusicPlayer.Scroll = "Off"
+	else; MusicPlayer.Scroll = "Volume"
 	
 	OnMusicSettings
 }
@@ -1591,6 +1613,38 @@ MusicPlayer.OnKeyPress : all
 		elseif _key == Hotkeys[11] //Balance right
 		{
 			OnQuickBalance("Right",_inmenu)
+		}
+	}
+}
+
+MusicPlayer.OnMouseWheel
+{
+	_character = REPLACE(MusicPlayerScope,"\","")
+	_character = REPLACE(_character,"p[","")
+	_character = REPLACE(_character,"]","")
+	
+	if TOSTR(reference3) == _character
+	{
+		_inmenu = CheckWhichMenu
+		
+		_amt = TOSTR(reference2)
+		_direction = "Up"
+		if SUBSTR(_amt,0,1) == "-"; _direction = "Down"
+		
+		if MusicPlayer.Scroll == "Volume"
+		{
+			OnQuickVolume(_direction,_inmenu,1)
+		}
+		elseif MusicPlayer.Scroll == "Speed"
+		{
+			OnQuickSpeed(_direction,_inmenu,1)
+		}
+		elseif MusicPlayer.Scroll == "Balance"
+		{
+			if _direction == "Up"; _direction = "Right"
+			else; _direction = "Left"
+			
+			OnQuickBalance(_direction,_inmenu,1)
 		}
 	}
 }

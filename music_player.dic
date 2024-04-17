@@ -967,19 +967,19 @@ OnHotkeys : all
 	//DIALOGUE: Menu for changing the hotkeys
 	"Click a hotkey to change it, click the (x) to unset it.\n\n"
 
-	"\q[(x),OnUnsetHotkey,0] Play/Pause: %(_h)\__q[OnChangeHotkey,0]%(_playpause)\__q%(_d)\n"
-	"\q[(x),OnUnsetHotkey,1] Next Song: %(_h)\__q[OnChangeHotkey,1]%(_next)\__q%(_d)\n"
-	"\q[(x),OnUnsetHotkey,2] Previous Song: %(_h)\__q[OnChangeHotkey,2]%(_prev)\__q%(_d)\n"
-	"\q[(x),OnUnsetHotkey,3] Stop Song: %(_h)\__q[OnChangeHotkey,3]%(_stop)\__q%(_d)\n"
-	"\q[(x),OnUnsetHotkey,4] Open Music Menu: %(_h)\__q[OnChangeHotkey,4]%(_menu)\__q%(_d)\n"
-	"\q[(x),OnUnsetHotkey,5] Toggle Song Bar: %(_h)\__q[OnChangeHotkey,5]%(_songbar)\__q%(_d)\n\n"
+	"\q[(x),OnUnsetHotkey,0] \__q[OnChangeHotkey,0]Play/Pause: %(_h)%(_playpause)%(_d)\__q\n"
+	"\q[(x),OnUnsetHotkey,1] \__q[OnChangeHotkey,1]Next Song: %(_h)%(_next)%(_d)\__q\n"
+	"\q[(x),OnUnsetHotkey,2] \__q[OnChangeHotkey,2]Previous Song: %(_h)%(_prev)%(_d)\__q\n"
+	"\q[(x),OnUnsetHotkey,3] \__q[OnChangeHotkey,3]Stop Song: %(_h)%(_stop)%(_d)\__q\n"
+	"\q[(x),OnUnsetHotkey,4] \__q[OnChangeHotkey,4]Open Music Menu: %(_h)%(_menu)%(_d)\__q\n"
+	"\q[(x),OnUnsetHotkey,5] \__q[OnChangeHotkey,5]Toggle Song Bar: %(_h)%(_songbar)%(_d)\__q\n\n"
 	
-	"\q[(x),OnUnsetHotkey,6] Volume Up: %(_h)\__q[OnChangeHotkey,6]%(_volup)\__q%(_d)\n"
-	"\q[(x),OnUnsetHotkey,7] Volume Down: %(_h)\__q[OnChangeHotkey,7]%(_voldown)\__q%(_d)\n"
-	"\q[(x),OnUnsetHotkey,8] Speed Up: %(_h)\__q[OnChangeHotkey,8]%(_speedup)\__q%(_d)\n"
-	"\q[(x),OnUnsetHotkey,9] Speed Down: %(_h)\__q[OnChangeHotkey,9]%(_speeddown)\__q%(_d)\n"
-	"\q[(x),OnUnsetHotkey,10] Balance Left: %(_h)\__q[OnChangeHotkey,10]%(_balanceleft)\__q%(_d)\n"
-	"\q[(x),OnUnsetHotkey,11] Balance Right: %(_h)\__q[OnChangeHotkey,11]%(_balanceright)\__q%(_d)\n"
+	"\q[(x),OnUnsetHotkey,6] \__q[OnChangeHotkey,6]Volume Up: %(_h)%(_volup)%(_d)\__q\n"
+	"\q[(x),OnUnsetHotkey,7] \__q[OnChangeHotkey,7]Volume Down: %(_h)%(_voldown)%(_d)\__q\n"
+	"\q[(x),OnUnsetHotkey,8] \__q[OnChangeHotkey,8]Speed Up: %(_h)%(_speedup)%(_d)\__q\n"
+	"\q[(x),OnUnsetHotkey,9] \__q[OnChangeHotkey,9]Speed Down: %(_h)%(_speeddown)%(_d)\__q\n"
+	"\q[(x),OnUnsetHotkey,10] \__q[OnChangeHotkey,10]Balance Left: %(_h)%(_balanceleft)%(_d)\__q\n"
+	"\q[(x),OnUnsetHotkey,11] \__q[OnChangeHotkey,11]Balance Right: %(_h)%(_balanceright)%(_d)\__q\n"
 	
 	"\n\![*]\q[Back to Music Settings,OnMusicSettings]\![unlock,balloonrepaint]\e"
 }

@@ -2118,9 +2118,12 @@ OnPlaylistPath
 CheckWhichMenu
 {
 	_inmenu = ""
-	if "__MUSIC_PLAYER_MAIN_MENU__" _in_ SHIORI3FW.LastTalk; _inmenu = "OnMusicMenu"
-	elseif "__GHOST_MAIN_MENU__" _in_ SHIORI3FW.LastTalk; _inmenu = "OnMenuRun"
-	elseif "__MUSIC_SETTINGS_MENU__" _in_ SHIORI3FW.LastTalk; _inmenu = "OnMusicSettings"
+	if BalloonIsOpen
+	{
+		if "__MUSIC_PLAYER_MAIN_MENU__" _in_ SHIORI3FW.LastTalk; _inmenu = "OnMusicMenu"
+		elseif "__GHOST_MAIN_MENU__" _in_ SHIORI3FW.LastTalk; _inmenu = "OnMenuRun"
+		elseif "__MUSIC_SETTINGS_MENU__" _in_ SHIORI3FW.LastTalk; _inmenu = "OnMusicSettings"
+	}
 	_inmenu
 }
 

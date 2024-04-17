@@ -1089,7 +1089,7 @@ OnSavePlaylist : all
 	{
 		_playlist = _playlists[_i]
 		_playlist = RE_REPLACE(_playlist,"\.m3u$","")
-		_display += "\__q[OnPlaylistOverwrite,""%(_playlist)""]\_?%(_playlist)\_?\__q\n"
+		_display += "\__q[OnPlaylistOverwrite,""%(_playlist)"",are you sure click]\_?%(_playlist)\_?\__q\n"
 	}
 	
 	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\*\_q\![set,autoscroll,disable]\![open,inputbox,OnPlaylistName,-1]"
@@ -1156,12 +1156,20 @@ OnPlaylistName : all
 //Checking before overwriting playlists
 OnPlaylistOverwrite : all
 {
-	if reference1 == "are you sure"
+	"\![close,inputbox,OnPlaylistName]"
+	if "are you sure" _in_ reference1
 	{
 		"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c\*%(MusicPlayerBalloon)\_q"
 		
 		//DIALOGUE: If the user puts in a playlist name that is the same as an existing playlist, it'll ask if they want to overwrite the old one or not
-		"The name '\_?%(reference0)\_?' is already in use. Do you want to overwrite '\_?%(reference0)\_?'?"
+		if "click" _in_ reference1 //This is for if they clicked an existing playlist
+		{
+			"Are you sure you want to overwrite '\_?%(reference0)\_?'?"
+		}
+		else //This is if they typed the name in
+		{
+			"The name '\_?%(reference0)\_?' is already in use. Do you want to overwrite '\_?%(reference0)\_?'?"
+		}
 		
 		"\n\n\![*]\q[Overwrite it,OnPlaylistOverwrite,""%(reference0)""]  \![*]\q[Don't,OnSavePlaylist]"
 		

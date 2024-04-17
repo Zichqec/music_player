@@ -817,11 +817,7 @@ OnQuickVolume : all
 		"\![sound,option,""%(NowPlaying[0])"",--volume=%(MusicSettings[0])]"
 	}
 	
-	if _argc == 0; OnMusicSettings //If this was done with the buttons - there will be no args in that case
-	elseif _argv[1] != "" //If a menu is listed to refresh
-	{
-		"\C\![raise,%(_argv[1])]"
-	}
+	if _argc == 0 || _argv[1] == "OnMusicSettings"; OnMusicSettings //Only refresh in the music settings menu
 }
 
 //Up/Down speed buttons
@@ -847,11 +843,7 @@ OnQuickSpeed : all
 		"\![sound,option,""%(NowPlaying[0])"",--rate=%(MusicSettings[1])]"
 	}
 	
-	if _argc == 0; OnMusicSettings //If this was done with the buttons - there will be no args in that case
-	elseif _argv[1] != "" //If a menu is listed to refresh
-	{
-		"\C\![raise,%(_argv[1])]"
-	}
+	if _argc == 0 || _argv[1] == "OnMusicSettings"; OnMusicSettings //Only refresh in the music settings menu
 }
 
 //Left/Right balance buttons
@@ -877,11 +869,7 @@ OnQuickBalance : all
 		"\![sound,option,""%(NowPlaying[0])"",--balance=%(MusicSettings[2])]"
 	}
 	
-	if _argc == 0; OnMusicSettings //If this was done with the buttons - there will be no args in that case
-	elseif _argv[1] != "" //If a menu is listed to refresh
-	{
-		"\C\![raise,%(_argv[1])]"
-	}
+	if _argc == 0 || _argv[1] == "OnMusicSettings"; OnMusicSettings //Only refresh in the music settings menu
 }
 
 //Toggles the stop after playback function

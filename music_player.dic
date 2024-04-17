@@ -675,7 +675,7 @@ OnMusicSettings : all
 	"Balance: %(_balance_left_btn)%(_balance_right_btn) %(_h)\q[%(_bal),OnMusicSet,Balance]%(_d)\n\n"
 	"\__q[OnStopAfterPlayback]Stop after current song\__q"
 	if MusicSettings[4] == "stop after playback"; " \![*]"
-	"\n"
+	"\n\n"
 	"Song Bar \![*]%(_h)\__q[OnToggleSongBar]%(MusicSettings[5])\__q%(_d)\n"
 	"Tooltips \![*]%(_h)\__q[OnToggleTooltips]%(MusicPlayer.Tooltips)\__q%(_d)\n"
 	"Song announcements \![*]%(_h)\__q[OnToggleSongAnnouncement]%(MusicPlayer.SongAnnouncement)\__q%(_d)\n"
@@ -1631,6 +1631,34 @@ OnFileDrop2 : all
 				PlaylistCopied("%(_f)","%(_filename)")
 			}
 		}
+		elseif _fileext == "" //If it's a single folder
+		{
+			_files = FENUM(reference0,C_BYTE1) //Gets all the files in the folder
+			_orig = _files
+
+			_musicfiles = OnFindSongs(reference0,_files)
+			
+			_path = SPLITPATH(reference0)[1]
+			SETDELIM(_path,"\")
+			_len = ARRAYSIZE(_path) - 2
+			_folder = _path[_len] //This stuff gets the folder name
+			
+			if ARRAYSIZE(_musicfiles) == 0 //If there were no compatible songs inside
+			{
+				//DIALOGUE: The user dropped a folder on the ghost, but nothing inside was a compatible music file
+				"%(MusicPlayerScope)None of the files in \_?%(_folder)\_? are compatible music files.\e"
+			}
+			else //If there are compatible songs
+			{
+				_num = ARRAYSIZE(_musicfiles)
+				_s = ""; if _num != 1; _s = "s"
+				
+				//DIALOGUE: The user dropped a folder on the ghost, and some files inside were compatible music files. %(_s) can be used to add an s if the number of compatible files is plural, %(_num) can be used to list the number of files, and %(_folder) is the name of the folder that was dropped.
+				"%(MusicPlayerScope)Added %(_num) song%(_s) from \_?%(_folder)\_?."
+				
+				"\n\n\_q\![*]\q[Open music player,OnMusicMenu]\n\![*]\q[Close,blank]\e"
+			}
+		}
 		else //Incompatible
 		{
 			//DIALOGUE: Any file that is not music, a playlist, or an image that can be set as a wallpaper
@@ -1657,36 +1685,6 @@ OnFileDrop2 : all
 			
 			"\n\n\_q\![*]\q[Open music player,OnMusicMenu]\n\![*]\q[Close,blank]\e"
 		}
-	}
-}
-
-//If a folder is dropped on the ghost
-OnDirectoryDrop : all
-{
-	_files = FENUM(reference0,C_BYTE1) //Gets all the files in the folder
-	_orig = _files
-
-	_musicfiles = OnFindSongs(reference0,_files)
-	
-	_path = SPLITPATH(reference0)[1]
-	SETDELIM(_path,"\")
-	_len = ARRAYSIZE(_path) - 2
-	_folder = _path[_len] //This stuff gets the folder name
-	
-	if ARRAYSIZE(_musicfiles) == 0 //If there were no compatible songs inside
-	{
-		//DIALOGUE: The user dropped a folder on the ghost, but nothing inside was a compatible music file
-		"%(MusicPlayerScope)None of the files in \_?%(_folder)\_? are compatible music files.\e"
-	}
-	else //If there are compatible songs
-	{
-		_num = ARRAYSIZE(_musicfiles)
-		_s = ""; if _num != 1; _s = "s"
-		
-		//DIALOGUE: The user dropped a folder on the ghost, and some files inside were compatible music files. %(_s) can be used to add an s if the number of compatible files is plural, %(_num) can be used to list the number of files, and %(_folder) is the name of the folder that was dropped.
-		"%(MusicPlayerScope)Added %(_num) song%(_s) from \_?%(_folder)\_?."
-		
-		"\n\n\_q\![*]\q[Open music player,OnMusicMenu]\n\![*]\q[Close,blank]\e"
 	}
 }
 

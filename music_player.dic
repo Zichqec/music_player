@@ -110,7 +110,13 @@ OnMusicMenu : all
 	_g = "\f[color,disable]" //Gray
 	_d = "\f[color,default]" //Default
 	
-	if _argv[0] != "manual" && BalloonIsOpen; "\C"
+	if _argv[0] != "manual" && BalloonIsOpen; "\C\![lock,balloonrepaint]\c" //TODO this needs tested fully
+	
+	_starting_value = 0
+	if MusicPlayer.Pagination == "Paginated"
+	{
+		_starting_value = MusicPlayer.PageIndex * MusicPlayer.SongsPerPage
+	}
 	
 	_display = ""
 	_currentsong = IARRAY
@@ -119,14 +125,30 @@ OnMusicMenu : all
 		_song = CurrentPlaylist[_i]
 		_song = SPLITPATH(_song)[2] //Picks out just the name of the file, no extension
 		_path = CurrentPlaylist[_i]
+		
+		if _i == NowPlaying[1] //If this is the song that's playing right now
+		{
+			_currentsong[0] = _song //Song name
+			_currentsong[1] = CurrentPlaylist[_i] //Song path
+		}
+		if MusicPlayer.Pagination == "Paginated" 
+		{
+			if _i < _starting_value; continue
+			if _i > _starting_value + (MusicPlayer.SongsPerPage - 1)
+			{
+				if _currentsong[0] == ""; continue
+				else; break
+			}
+		}
+		
+		
+		
 
 		_display += "\q[(x),OnRemoveSong,%(_i)] " //(x) button
 
 		if _i == NowPlaying[1] //If this is the song that's playing right now
 		{
 			_display += "\f[bold,1]\f[italic,1]"
-			_currentsong[0] = _song //Song name
-			_currentsong[1] = CurrentPlaylist[_i] //Song path
 		}
 		_display += "%(_h)\__q[OnPlaySong,""%(_path)"",%(_i),OnMusicMenu,frommenu]%(_song)\__q%(_d)\n"
 		if _i == NowPlaying[1]; _display += "\f[default]" //Reset the bold/italic if it was applied
@@ -176,10 +198,31 @@ OnMusicMenu : all
 	
 	if NowPlaying[0] != ""; " %(_h)\__q[OnSongLocation,""%(_currentsong[1])""]%(_currentsong[0])\__q\f[default]"
 	
+	if MusicPlayer.Pagination == "Paginated"
+	{
+		"\n\n"
+		"\f[align,left]    "
+		switch MusicPlayer.PageIndex == 0
+		{
+			"\q[▲▲,OnMusicPlayer.PlaylistPage,previous]"
+			"\f[color,disable]▲▲\f[color,default]"
+		}
+		"\_l[]\f[align,right]"
+		switch MusicPlayer.PageIndex == MusicPlayer.MaxPages
+		{
+			"\q[▼▼,OnMusicPlayer.PlaylistPage,next]"
+			"\f[color,disable]▼▼\f[color,default]"
+		}
+		"    "
+		"\n \n[-100]\f[align,center]\__q[OnMusicPlayer.JumpToPlaylistPage]%(MusicPlayer.PageIndex + 1)/%(MusicPlayer.MaxPages + 1)\__q"
+		"\_l[]\f[align,left]"
+	}
+	
 	"\n\n[half]%(_display)\n"
+	
 	"\![*]\q[Back,OnMenuRun]  \![*]\__q[blank]Close window\__q"
 	
-	"\e __MUSIC_PLAYER_MAIN_MENU__" //Do not remove this, it's here so the menu can update dynamically
+	"\![unlock,balloonrepaint]\e __MUSIC_PLAYER_MAIN_MENU__" //Do not remove this, it's here so the menu can update dynamically
 }
 
 //Function that actually plays the songs
@@ -428,6 +471,9 @@ OnPrevSong : all
 //Removing a song from the current playlist
 OnRemoveSong : all
 {
+	_origmax = MusicPlayer.MaxPages
+	
+	
 	if NowPlaying[2] != "" && reference0 == NowPlaying[1]; NowPlaying[2] = "" //If the song being removed was the paused song, clear it
 	CurrentPlaylist[reference0] = IARRAY //Clear the song that we want to remove
 	
@@ -443,7 +489,67 @@ OnRemoveSong : all
 		ShuffledPlaylist = ShufflePlaylist(NowPlaying[1],CurrentPlaylist) //Shuffle with the current song as 1
 	}
 	
+	if _origmax > MusicPlayer.MaxPages && MusicPlayer.PageIndex == _origmax
+	{
+		if _origmax > 0; MusicPlayer.PageIndex--
+	}
+	
 	"%(OnNotifySongInfo)\![raise,OnMusicMenu]"
+}
+
+OnMusicPlayer.PlaylistPage
+{
+	if reference0 == "next"; MusicPlayer.PageIndex++
+	else; MusicPlayer.PageIndex--
+	
+	if MusicPlayer.PageIndex > MusicPlayer.MaxPages; MusicPlayer.PageIndex = MusicPlayer.MaxPages
+	if MusicPlayer.PageIndex < 0; MusicPlayer.PageIndex = 0
+	
+	OnMusicMenu
+}
+
+OnMusicPlayer.JumpToPlaylistPage : all
+{
+	"\C\![lock,balloonrepaint]\c%(MusicPlayerScope)\_q\![set,autoscroll,disable]"
+	"\![open,inputbox,OnMusicPlayer.JumpIndex,-1]"
+	
+	//DIALOGUE: Dialogue for typing in a page number to jump to manually in the playlist
+	"Write a page number to jump to, from 1 to %(MusicPlayer.MaxPages + 1)"
+	"\n\n"
+	"\![*]\__q[OnMusicPlayer.JumpToCurrent]Jump to location of current song\__q"
+	"\n\n"
+	"\![*]\__q[OnMusicPlayer.JumpBack]Back\__q"
+	
+	"\![unlock,balloonrepaint]"
+}
+
+OnMusicPlayer.JumpIndex : all
+{
+	_num = reference0 - 1
+	if GETTYPE(reference0) == 1 && (_num >= 0 && _num <= MusicPlayer.MaxPages)
+	{
+		MusicPlayer.PageIndex = _num
+		
+		OnMusicMenu
+	}
+	else
+	{
+		//DIALOGUE: Dialogue for putting in an invalid number, or something that isn't a number
+		"%(MusicPlayerScope)\_q\![set,autoscroll,disable]"
+		"Invalid input.\x\![raise,OnMusicPlayer.JumpToPlaylistPage]"
+	}
+}
+
+OnMusicPlayer.JumpToCurrent
+{
+	MusicPlayer.PageIndex = NowPlaying[1] / MusicPlayer.SongsPerPage
+	
+	"\C\![close,inputbox,OnMusicPlayer.JumpIndex]\![raise,OnMusicMenu]"
+}
+
+OnMusicPlayer.JumpBack
+{
+	"\C\![close,inputbox,OnMusicPlayer.JumpIndex]\![raise,OnMusicMenu]"
 }
 
 //Menu for moving songs around in the playlist. Would love to eventually set it up to allow you to move songs to certain index numbers...
@@ -661,6 +767,7 @@ OnMusicSettings : all
 	"Prioritize \![*]%(_h)\__q[OnTogglePriority]%(MusicPlayer.Priority)\__q%(_d)\n"
 	"Scroll wheel controls \![*]%(_h)\__q[OnToggleScrollWheel]%(MusicPlayer.Scroll)\__q%(_d)\n"
 	"Previous button \![*]%(_h)\__q[OnTogglePreviousButton]%(MusicPlayer.PreviousButton)\__q%(_d)\n"
+	"Playlist view \![*]%(_h)\__q[OnTogglePagination]%(MusicPlayer.Pagination)\__q%(_d)\n"
 	
 	//CUSTOMIZE: If you want Discord functionality, you'll need to uncomment this
 	//"Show current song in Discord? %(_h)\__q[OnToggleDiscordPlugin]%(DiscordDisplay[0])\__q%(_d)\n"
@@ -919,6 +1026,14 @@ OnTogglePreviousButton : all
 {
 	if MusicPlayer.PreviousButton != "Goes to previous song"; MusicPlayer.PreviousButton = "Goes to previous song"
 	else; MusicPlayer.PreviousButton = "Restarts song"
+	
+	OnMusicSettings
+}
+
+OnTogglePagination : all
+{
+	if MusicPlayer.Pagination != "One long list (slower)"; MusicPlayer.Pagination = "One long list (slower)"
+	else; MusicPlayer.Pagination = "Paginated"
 	
 	OnMusicSettings
 }
@@ -1474,6 +1589,12 @@ MusicPlayer.DefaultBalloonLines
 	15
 }
 
+//Used for the pagination option. If more/fewer songs would suit your balloon better, you can adjust how many songs are displayed per page here.
+MusicPlayer.SongsPerPage
+{
+	10
+}
+
 /*
 //If you want a count of the total time the user has been listening to music, you can add this to your OnSecondChange
 if Singing
@@ -1955,6 +2076,7 @@ OnBalloonLines
 OnUserInputCancel
 {
 	if reference0 == "OnMusicSpeed" || reference0 == "OnMusicVolume" || reference0 == "OnMusicBalance" || reference0 == "OnPlaylistName"; "\C\![raise,OnMusicSettings]"
+	elseif reference0 == "OnMusicPlayer.JumpIndex"; "\C\![raise,OnMusicMenu]"
 }
 
 
@@ -2003,6 +2125,15 @@ MusicPlayer.CurrentSong
 	SPLITPATH(NowPlaying[0])[2] //Picks out just the name of the file, no extension
 }
 
+MusicPlayer.MaxPages
+{
+	_max_page = (ARRAYSIZE(CurrentPlaylist) / MusicPlayer.SongsPerPage) - 1
+	if ARRAYSIZE(CurrentPlaylist) % MusicPlayer.SongsPerPage != 0; _max_page++
+	
+	if ARRAYSIZE(CurrentPlaylist) == 0; 0
+	else; _max_page
+}
+
 //Added with help from steve02081504. Send an argument to this function to send it with ValueNotify. This can be used even while the ghost is minimized to run tags like the sound command.
 MusicPlayer.MakeValueNotify : void
 {
@@ -2046,6 +2177,8 @@ MusicPlayer.SetDefaultSettings
 	MusicPlayer.Priority = "Dialogue"
 	MusicPlayer.Scroll = "Volume"
 	MusicPlayer.PreviousButton = "Restarts song" //Behavior of the previous button
+	MusicPlayer.Pagination = "Paginated" //Playlist display option
+	MusicPlayer.PageIndex = 0
 }
 
 MusicPlayer.ResetDefaultSettings
@@ -2063,6 +2196,8 @@ MusicPlayer.ResetDefaultSettings
 	if MusicPlayer.Priority == ""; MusicPlayer.Priority = "Dialogue" //Whether it interrupts dialogue or not when going to the next song
 	if MusicPlayer.Scroll == ""; MusicPlayer.Scroll = "Volume" //Scroll wheel setting
 	if MusicPlayer.PreviousButton == ""; MusicPlayer.PreviousButton = "Restarts song" //Behavior of the previous button
+	if MusicPlayer.Pagination == ""; MusicPlayer.Pagination = "Paginated" //Playlist display option
+	if MusicPlayer.PageIndex == ""; MusicPlayer.PageIndex = 0 //Pagination index
 }
 
 //——— ASCOOTEX ———

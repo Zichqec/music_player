@@ -1460,7 +1460,7 @@ NonSingingSurfaces
 //Which scope will be used as the music player. \0 for the sakura, \1 for the kero, \p[*] for additional characters, replacing the * with the number of the character you want
 MusicPlayerScope
 {
-	"\1"
+	"\0"
 }
 
 //Which balloon will be used for the menus in the music player.

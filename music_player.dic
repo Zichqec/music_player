@@ -1324,6 +1324,7 @@ OnSelectPlaylist : all
 	NowPlaying[2] = ""
 	CurrentPlaylist = IARRAY
 	_path = PLAYLIST_FOLDER + "%(reference0).m3u"
+	MusicPlayer.PageIndex = 0
 	
 	void FOPEN(_path,"r")
 	for _buff = FREAD(_path); _buff != -1; _buff = FREAD(_path)
@@ -1408,6 +1409,7 @@ OnPlaylistCleared : all
 	NowPlaying[0] = "" //song name
 	NowPlaying[1] = -1 //song position
 	NowPlaying[2] = "" //Paused song
+	MusicPlayer.PageIndex = 0
 	
 	"\![sound,stop]%(OnNotifySongInfo)"
 	

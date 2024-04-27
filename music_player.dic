@@ -1425,8 +1425,16 @@ On_tooltip
 
 OnTranslateInternal.MusicPlayer
 {
-	LOGGING("reference.raw: %(reference.raw)")
-	if SHIORI3FW.Eventid != "On_tooltip"; MusicPlayer.LastTalk = _argv[0]
+	_id = SHIORI3FW.Eventid
+	_end = SPLIT(_id,".")
+	_end = _end[ARRAYSIZE(_end) - 1]
+	
+	_filter = ("visible","caption","recommendsites","portalsites")
+	
+	if !(_id == "On_tooltip" || SUBSTR(_id,0,3) == "On_" && ASEARCH(_end,_filter) != -1)
+	{
+		MusicPlayer.LastTalk = _argv[0]
+	}
 }
 
 

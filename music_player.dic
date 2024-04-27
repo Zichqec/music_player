@@ -2164,7 +2164,6 @@ OnFindSongs
 		_ext = TOLOWER(_path[3])
 		if ASEARCH(_ext,CompatibleMusicFileTypes) != -1
 		{
-			_file = REPLACE(_file,",","%(C_BYTE1)")
 			CurrentPlaylist ,= "%(_argv[0])%(_file)"
 			_added ,= _file
 		}
@@ -2174,7 +2173,7 @@ OnFindSongs
 			if _recursive != ""; _added ,= _recursive
 		}
 	}
-	TOSTR(_added)
+	_added
 }
 
 //Opening the folder for the user

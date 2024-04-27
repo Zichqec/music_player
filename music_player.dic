@@ -272,7 +272,7 @@ OnPlaySong : all
 		
 		if IsMinimized
 		{
-			SHIORI3FW.MakeValueNotify(_send)
+			MusicPlayer.MakeValueNotify(_send)
 		}
 		else
 		{
@@ -1928,7 +1928,7 @@ OnSoundError : all
 		NowPlaying[0] = "" //song name
 		NowPlaying[2] = "" //Clearing paused song
 	}
-	if IsMinimized && !_playnext; SHIORI3FW.MakeValueNotify("%(OnNotifySongInfo)")
+	if IsMinimized && !_playnext; MusicPlayer.MakeValueNotify("%(OnNotifySongInfo)")
 	else; "%(OnNotifySongInfo)"
 	
 	//DIALOGUE: If there is an error, it will tell the user and try to play the next song. reference3 is the error message, reference2 is the file name. Below is dialogue for attempting to play the next song
@@ -2010,7 +2010,7 @@ MusicPlayer.CurrentSong
 }
 
 //Added with help from steve02081504. Send an argument to this function to send it with ValueNotify. This can be used even while the ghost is minimized to run tags like the sound command.
-SHIORI3FW.MakeValueNotify : void
+MusicPlayer.MakeValueNotify : void
 {
 	SHIORI3FW.PushAdditionalReturn('ValueNotify',_argv)
 }

@@ -1679,7 +1679,7 @@ OnFileDrop2 : all
 		elseif _fileext == ".m3u" //If it's a playlist
 		{
 			_path = PLAYLIST_FOLDER
-			_playlists = FENUM(_pathmC_BYTE1)
+			_playlists = FENUM(_path,C_BYTE1)
 			_playlists = SPLIT(_playlists,C_BYTE1)
 			if ASEARCH("%(_filename).m3u",_playlists) != -1
 			{

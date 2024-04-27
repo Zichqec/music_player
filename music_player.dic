@@ -268,6 +268,8 @@ OnPlaySong : all
 		_window = "False"
 		if MusicSettings[5] == "On"; _window = "True"
 		
+		MusicPlayer.SongStartTime = GETSECCOUNT
+		
 		_send += "\![sound,play,""%(reference0)"",--volume=%(MusicSettings[0]),--rate=%(MusicSettings[1]),--balance=%(MusicSettings[2]),--window=%(_window),--sound-only=true]" //Play new song
 		
 		if IsMinimized
@@ -406,26 +408,36 @@ OnPrevSong : all
 	
 	if ARRAYSIZE(CurrentPlaylist) > 0 //Songs available to play
 	{
-		if MusicSettings[3] == 1
+		_diff = GETSECCOUNT - MusicPlayer.SongStartTime
+		
+		if MusicPlayer.PreviousButton == "Restarts song" && _diff > 3
 		{
-			ShuffledPlaylist = ACYCLE('-',ShuffledPlaylist)
-			_next = ShuffledPlaylist[0]
+			_next = NowPlaying[1]
 		}
-		elseif MusicSettings[3] == 4
+		else
 		{
-			_next = RAND(ARRAYSIZE(CurrentPlaylist))
-		}
-		else //Looping the list normally
-		{
-			if NowPlaying[1] <= 0 //If this was the last song on the list
+			if MusicSettings[3] == 1
 			{
-				_next = ARRAYSIZE(CurrentPlaylist) - 1
+				ShuffledPlaylist = ACYCLE('-',ShuffledPlaylist)
+				_next = ShuffledPlaylist[0]
 			}
-			else //If there are more songs to go
+			elseif MusicSettings[3] == 4
 			{
-				_next = NowPlaying[1] - 1
+				_next = RAND(ARRAYSIZE(CurrentPlaylist))
+			}
+			else //Looping the list normally
+			{
+				if NowPlaying[1] <= 0 //If this was the last song on the list
+				{
+					_next = ARRAYSIZE(CurrentPlaylist) - 1
+				}
+				else //If there are more songs to go
+				{
+					_next = NowPlaying[1] - 1
+				}
 			}
 		}
+		
 		NowPlaying[0] = CurrentPlaylist[_next] //song name
 		NowPlaying[1] = _next //song position
 		
@@ -635,6 +647,7 @@ OnMusicSettings : all
 	if MusicPlayer.SongAnnouncement == ""; MusicPlayer.SongAnnouncement = "On"
 	if MusicPlayer.Priority == ""; MusicPlayer.Priority = "Dialogue" //Whether it interrupts dialogue or not when going to the next song
 	if MusicPlayer.Scroll == ""; MusicPlayer.Scroll = "Volume" //Scroll wheel setting
+	if MusicPlayer.PreviousButton == ""; MusicPlayer.PreviousButton = "Restarts song" //Behavior of the previous button
 	
 	_h = "\f[color,default.anchor]"
 	_g = "\f[color,disable]"
@@ -683,6 +696,7 @@ OnMusicSettings : all
 	"Song announcements \![*]%(_h)\__q[OnToggleSongAnnouncement]%(MusicPlayer.SongAnnouncement)\__q%(_d)\n"
 	"Prioritize \![*]%(_h)\__q[OnTogglePriority]%(MusicPlayer.Priority)\__q%(_d)\n"
 	"Scroll wheel controls \![*]%(_h)\__q[OnToggleScrollWheel]%(MusicPlayer.Scroll)\__q%(_d)\n"
+	"Previous button \![*]%(_h)\__q[OnTogglePreviousButton]%(MusicPlayer.PreviousButton)\__q%(_d)\n"
 	
 	//CUSTOMIZE: If you want Discord functionality, you'll need to uncomment this
 	//"Show current song in Discord? %(_h)\__q[OnToggleDiscordPlugin]%(DiscordDisplay[0])\__q%(_d)\n"
@@ -933,6 +947,14 @@ OnToggleScrollWheel : all
 	elseif MusicPlayer.Scroll == "Speed"; MusicPlayer.Scroll = "Balance"
 	elseif MusicPlayer.Scroll == "Balance"; MusicPlayer.Scroll = "Off"
 	else; MusicPlayer.Scroll = "Volume"
+	
+	OnMusicSettings
+}
+
+OnTogglePreviousButton : all
+{
+	if MusicPlayer.PreviousButton != "Goes to previous song"; MusicPlayer.PreviousButton = "Goes to previous song"
+	else; MusicPlayer.PreviousButton = "Restarts song"
 	
 	OnMusicSettings
 }

@@ -1467,6 +1467,13 @@ PLAYLIST_FOLDER
 	"../../playlists/"
 }
 
+//Replace this number with the number of lines in the balloon that you'll be using for the music menu.
+//This is mostly used for the menu where you can change the order of songs in the playlist. This will be automatically set any time the user changes balloons, but it's good to make sure the initial value is correct. If you change balloons and then change back to your default, you can check the value in BalloonLines to see what the default here should be.
+MusicPlayer.DefaultBalloonLines
+{
+	15
+}
+
 /*
 //If you want a count of the total time the user has been listening to music, you can add this to your OnSecondChange
 if Singing
@@ -2030,7 +2037,7 @@ MusicPlayer.SetDefaultSettings
 	CurrentPlaylist = IARRAY
 	ShuffledPlaylist = IARRAY
 	Hotkeys = IARRAY
-	BalloonLines = 0 //Replace the # with the number of lines in the balloon that you'll be using for the music menu. This is mostly used for the menu where you can change the order of songs in the playlist. This will be automatically set any time the user changes balloons, but it's good to make sure the initial value is correct. If you look in the OnBalloonChange function, it'll have a property command you could use for this, as well.
+	BalloonLines = MusicPlayer.DefaultBalloonLines
 	Playtime = 0 //Only needed if you implement the Playtime counter below
 	DiscordDisplay = ("On",0) //Only needed if you implement the Discord functions
 	MusicPlayer.Tooltips = "On"

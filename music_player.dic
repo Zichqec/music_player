@@ -118,6 +118,13 @@ OnMusicMenu : all
 		_starting_value = MusicPlayer.PageIndex * MusicPlayer.SongsPerPage
 	}
 	
+	_current_song_index = NowPlaying[1]
+	if MusicSettings[3] == 1 //Shuffle and loop
+	{
+		_index = NowPlaying[1]
+		_current_song_index = ShuffledPlaylist[_index]
+	}
+	
 	_display = ""
 	_currentsong = IARRAY
 	for _i = 0; _i < ARRAYSIZE(CurrentPlaylist); _i++
@@ -126,7 +133,7 @@ OnMusicMenu : all
 		_song = SPLITPATH(_song)[2] //Picks out just the name of the file, no extension
 		_path = CurrentPlaylist[_i]
 		
-		if _i == NowPlaying[1] //If this is the song that's playing right now
+		if _i == _current_song_index //If this is the song that's playing right now
 		{
 			_currentsong[0] = _song //Song name
 			_currentsong[1] = CurrentPlaylist[_i] //Song path
@@ -140,18 +147,15 @@ OnMusicMenu : all
 				else; break
 			}
 		}
-		
-		
-		
 
 		_display += "\q[(x),OnRemoveSong,%(_i)] " //(x) button
 
-		if _i == NowPlaying[1] //If this is the song that's playing right now
+		if _i == _current_song_index //If this is the song that's playing right now
 		{
 			_display += "\f[bold,1]\f[italic,1]"
 		}
 		_display += "%(_h)\__q[OnPlaySong,""%(_path)"",%(_i),OnMusicMenu,frommenu]%(_song)\__q%(_d)\n"
-		if _i == NowPlaying[1]; _display += "\f[default]" //Reset the bold/italic if it was applied
+		if _i == _current_song_index; _display += "\f[default]" //Reset the bold/italic if it was applied
 	}
 	
 	if _currentsong[0] == "" //Placeholder if the song was removed from the playlist
@@ -250,25 +254,30 @@ OnPlaySong : all
 		{
 			if NowPlaying[1] == -1 //If no song was playing
 			{
+				NowPlaying[1] = 0
 				if MusicSettings[3] == 1 //If it's set to shuffle
 				{
 					ShuffledPlaylist = ShufflePlaylist(RAND(ARRAYSIZE(CurrentPlaylist)),CurrentPlaylist)
-					NowPlaying[1] = ShuffledPlaylist[0]
 				}
 				elseif MusicSettings[3] == 4 //If it's set to random
 				{
 					NowPlaying[1] = RAND(ARRAYSIZE(CurrentPlaylist))
 				}
-				else //If it's not shuffling
-				{
-					NowPlaying[1] = 0
-				}
 			}
 			reference1 = NowPlaying[1]
 			reference0 = CurrentPlaylist[reference1]
 		}
-
-		NowPlaying[0] = reference0 //Name of the current song
+		
+		if MusicSettings[3] == 1 //Shuffle and loop
+		{
+			_index = NowPlaying[1]
+			_songnum = ShuffledPlaylist[_index]
+			NowPlaying[0] = CurrentPlaylist[_songnum]
+		}
+		else
+		{
+			NowPlaying[0] = reference0 //Name of the current song
+		}
 		
 		if reference3 == "justadded"; NowPlaying[1] = ARRAYSIZE(CurrentPlaylist) - 1 //Position of the current song
 		else; NowPlaying[1] = TOINT(reference1) //Position of the current song
@@ -378,12 +387,7 @@ OnNextSong : all
 	
 	if ARRAYSIZE(CurrentPlaylist) > 0 //Songs available to play
 	{
-		if MusicSettings[3] == 1
-		{
-			ShuffledPlaylist = ACYCLE('+',ShuffledPlaylist)
-			_next = ShuffledPlaylist[0]
-		}
-		elseif MusicSettings[3] == 4
+		if MusicSettings[3] == 4
 		{
 			_next = RAND(ARRAYSIZE(CurrentPlaylist))
 		}
@@ -398,10 +402,20 @@ OnNextSong : all
 				_next = NowPlaying[1] + 1
 			}
 		}
-		NowPlaying[0] = CurrentPlaylist[_next] //song name
-		NowPlaying[1] = _next //song position
 		
-		"\![raise,OnPlaySong,""%(CurrentPlaylist[_next])"",%(_next),%(_from)]"
+		NowPlaying[1] = _next //song position
+		if MusicSettings[3] == 1 //Shuffle and loop
+		{
+			_index = NowPlaying[1]
+			_songnum = ShuffledPlaylist[_index]
+			NowPlaying[0] = CurrentPlaylist[_songnum] //Song name
+		}
+		else
+		{
+			NowPlaying[0] = CurrentPlaylist[_next] //Song name
+		}
+		
+		"\![raise,OnPlaySong,""%(NowPlaying[0])"",%(NowPlaying[1]),%(_from)]"
 	}
 	else //No more songs to play
 	{
@@ -435,12 +449,7 @@ OnPrevSong : all
 		}
 		else
 		{
-			if MusicSettings[3] == 1
-			{
-				ShuffledPlaylist = ACYCLE('-',ShuffledPlaylist)
-				_next = ShuffledPlaylist[0]
-			}
-			elseif MusicSettings[3] == 4
+			if MusicSettings[3] == 4
 			{
 				_next = RAND(ARRAYSIZE(CurrentPlaylist))
 			}
@@ -457,10 +466,19 @@ OnPrevSong : all
 			}
 		}
 		
-		NowPlaying[0] = CurrentPlaylist[_next] //song name
 		NowPlaying[1] = _next //song position
+		if MusicSettings[3] == 1 //Shuffle and loop
+		{
+			_index = NowPlaying[1]
+			_songnum = ShuffledPlaylist[_index]
+			NowPlaying[0] = CurrentPlaylist[_songnum] //Song name
+		}
+		else
+		{
+			NowPlaying[0] = CurrentPlaylist[_next] //Song name
+		}
 		
-		"\![raise,OnPlaySong,""%(CurrentPlaylist[_next])"",%(_next),%(_from)]\e"
+		"\![raise,OnPlaySong,""%(NowPlaying[0])"",%(NowPlaying[1]),%(_from)]"
 	}
 	else //No songs available to play
 	{
@@ -1988,12 +2006,7 @@ OnSoundStop : all
 	{
 		_next = 0
 		
-		if MusicSettings[3] == 1 //Shuffle and loop
-		{
-			ShuffledPlaylist = ACYCLE('+',ShuffledPlaylist)
-			_next = ShuffledPlaylist[0]
-		}
-		elseif MusicSettings[3] == 2 //Loop one song
+		if MusicSettings[3] == 2 //Loop one song
 		{
 			_next = NowPlaying[1]
 		}
@@ -2001,7 +2014,7 @@ OnSoundStop : all
 		{
 			_next = RAND(ARRAYSIZE(CurrentPlaylist))
 		}
-		else //Loop playlist
+		else //Loop playlist or shuffle
 		{
 			if NowPlaying[1] >= (ARRAYSIZE(CurrentPlaylist) - 1) //If it was the last song on the list
 			{
@@ -2012,8 +2025,18 @@ OnSoundStop : all
 				_next = NowPlaying[1] + 1
 			}
 		}
-		NowPlaying[0] = CurrentPlaylist[_next] //Song name
+		
 		NowPlaying[1] = _next //Song index
+		if MusicSettings[3] == 1 //Shuffle and loop
+		{
+			_index = NowPlaying[1]
+			_songnum = ShuffledPlaylist[_index]
+			NowPlaying[0] = CurrentPlaylist[_songnum] //Song name
+		}
+		else
+		{
+			NowPlaying[0] = CurrentPlaylist[_next] //Song name
+		}
 		
 		//If it's set to stop after the current song, make sure it stops. Down here so the index number still advances if you're not set to loop a single song
 		if MusicSettings[4] == "stop after playback"
@@ -2028,7 +2051,7 @@ OnSoundStop : all
 			}
 			else
 			{
-				"%(SingingSurfaces)\![raise,OnPlaySong,""%(CurrentPlaylist[_next])"",%(_next),%(_inmenu)]"
+				"%(SingingSurfaces)\![raise,OnPlaySong,""%(NowPlaying[0])"",%(NowPlaying[1]),%(_inmenu)]"
 			}
 		}
 	}
@@ -2254,30 +2277,6 @@ ASCOOTEX
 		_array[_nxtnum] = _current
 	}
 	_array
-}
-
-//Cycles items in an array backwards or forwards, in such a way that they loop around. So when going forwards, the item at the start of the array will end up being cycled to the end of the array. ...I might have that backwards but you get the idea.
-ACYCLE
-{
-	_output = IARRAY
-	if _argv[0] == "-" //Backwards
-	{
-		_c = _argc - 1
-		_output ,= _argv[_c]
-		for _i = 1; _i < _c; _i++
-		{
-			_output ,= _argv[_i]
-		}
-	}
-	else //Forwards
-	{
-		for _i = 2; _i < _argc; _i++
-		{
-			_output ,= _argv[_i]
-		}
-		_output ,= _argv[1]
-	}
-	_output
 }
 
 //Shuffles the array but keeps the first element the same

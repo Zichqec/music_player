@@ -75,20 +75,8 @@ A function you might find helpful is the Singing function. It returns a 1 if mus
 
 Another useful function is MusicPlayer.CurrentSong, which outputs the name of the currently playing song.
 
-Listed below are the variables this music player uses, as well as the values they should be initialized to. I would recommend putting this in your OnFirstBoot.
-
-NowPlaying = ("",-1,"")
-MusicSettings = (100,100,0,0,"","Off") //Volume, Speed, Balance, Play mode, Stop after current flag, Song bar
-CurrentPlaylist = IARRAY
-ShuffledPlaylist = IARRAY
-Hotkeys = IARRAY
-BalloonLines = # //Replace the # with the number of lines in the balloon that you'll be using for the music menu. This is mostly used for the menu where you can change the order of songs in the playlist. This will be automatically set any time the user changes balloons, but it's good to make sure the initial value is correct. If you look in the OnBalloonChange function, it'll have a property command you could use for this, as well.
-Playtime = 0 //Only needed if you implement the Playtime counter below
-DiscordDisplay = ("On",0) //Only needed if you implement the Discord functions
-MusicPlayer.Tooltips = "On"
-MusicPlayer.AnnounceSongs = "Off"
-MusicPlayer.Priority = "Dialogue"
-MusicPlayer.Scroll = "Volume"
+To initialize all of the music player's variables, you should call the following function in OnFirstBoot:
+MusicPlayer.SetDefaultSettings
 
 Additionally, I would recommend putting %(OnNotifySongInfo) into your firstboot, boot dialogues, ghost changing dialogues, etc. This will ensure that your ghost updates any open ghosts on the status of the music player. 
 
@@ -116,13 +104,7 @@ DISCORD
 //Main music menu display; this displays the list of songs and the controls
 OnMusicMenu : all
 {
-	//Set default values if these get deleted or are not set
-	if MusicSettings[0] == ""; MusicSettings[0] = 100 //Volume
-	if MusicSettings[1] == ""; MusicSettings[1] = 100 //Speed
-	if MusicSettings[2] == ""; MusicSettings[2] = 0 //Balance
-	if MusicSettings[3] == ""; MusicSettings[3] = 0 //Play mode - 0 for loop playlist, 1 for shuffle playlist, 2 for loop song, 3 for play one song, 4 for random
-	//MusicSettings[4] is the 'stop after current' option
-	if MusicSettings[5] == ""; MusicSettings[5] = "Off" //Song bar
+	MusicPlayer.ResetDefaultSettings
 	
 	_h = "\f[color,default.anchor]" //Highlight
 	_g = "\f[color,disable]" //Gray
@@ -209,13 +191,7 @@ OnPlaySong : all
 
 	NowPlaying[2] = "" //Clearing the paused song if there was one
 	
-	//Reset variables to defaults if they got erased
-	if MusicSettings[0] == ""; MusicSettings[0] = 100 //Volume
-	if MusicSettings[1] == ""; MusicSettings[1] = 100 //Speed
-	if MusicSettings[2] == ""; MusicSettings[2] = 0 //Balance
-	if MusicSettings[3] == ""; MusicSettings[3] = 0 //Play mode
-	if MusicSettings[4] != ""; MusicSettings[4] = "" //Reset 'stop after current' setting
-	if MusicSettings[5] == ""; MusicSettings[5] = "Off" //Song bar
+	MusicPlayer.ResetDefaultSettings
 	
 	if IsMinimized //If it's minimized, the info will be coming from arguments rather than references
 	{
@@ -635,19 +611,7 @@ OnSongLocation
 //Settings menu
 OnMusicSettings : all
 {
-	//Set default values if these get deleted or are not set
-	if MusicSettings[0] == ""; MusicSettings[0] = 100 //Volume
-	if MusicSettings[1] == ""; MusicSettings[1] = 100 //Speed
-	if MusicSettings[2] == ""; MusicSettings[2] = 0 //Balance
-	if MusicSettings[3] == ""; MusicSettings[3] = 0 //Play mode - 0 for loop playlist, 1 for shuffle playlist, 2 for loop song, 3 for play one song, 4 for random
-	//MusicSettings[4] is the 'stop after current' option
-	if MusicSettings[5] == ""; MusicSettings[5] = "Off" //Song bar
-	if DiscordDisplay[0] == ""; DiscordDisplay[0] = "On"
-	if MusicPlayer.Tooltips == ""; MusicPlayer.Tooltips = "On"
-	if MusicPlayer.SongAnnouncement == ""; MusicPlayer.SongAnnouncement = "On"
-	if MusicPlayer.Priority == ""; MusicPlayer.Priority = "Dialogue" //Whether it interrupts dialogue or not when going to the next song
-	if MusicPlayer.Scroll == ""; MusicPlayer.Scroll = "Volume" //Scroll wheel setting
-	if MusicPlayer.PreviousButton == ""; MusicPlayer.PreviousButton = "Restarts song" //Behavior of the previous button
+	MusicPlayer.ResetDefaultSettings
 	
 	_h = "\f[color,default.anchor]"
 	_g = "\f[color,disable]"
@@ -2057,6 +2021,40 @@ CompatibleMusicFileTypes : array
 	".8svx"; ".ac3"; ".aiff"; ".amb"; ".ape"; ".au"; ".avo"; ".avr"; ".caf"; ".dts"; ".fap"; ".flac"; ".flv"; ".hcom"
 	".ircam"; ".m4a"; ".m4r"; ".maud"; ".mid"; ".mkv"; ".mp2"; ".mp3"; ".mp4"; ".mpg"; ".nist"; ".oga"; ".ogg"; ".opus"; ".paf"
 	".pfv"; ".ra"; ".rm"; ".rmvb"; ".sln"; ".snd"; ".sph"; ".spx"; ".tta"; ".voc"; ".w64"; ".wav"; ".wma"; ".wmv"; ".wv"; ".wve"
+}
+
+MusicPlayer.SetDefaultSettings
+{
+	NowPlaying = ("",-1,"")
+	MusicSettings = (100,100,0,0,"","Off") //Volume, Speed, Balance, Play mode, Stop after current flag, Song bar
+	CurrentPlaylist = IARRAY
+	ShuffledPlaylist = IARRAY
+	Hotkeys = IARRAY
+	BalloonLines = 0 //Replace the # with the number of lines in the balloon that you'll be using for the music menu. This is mostly used for the menu where you can change the order of songs in the playlist. This will be automatically set any time the user changes balloons, but it's good to make sure the initial value is correct. If you look in the OnBalloonChange function, it'll have a property command you could use for this, as well.
+	Playtime = 0 //Only needed if you implement the Playtime counter below
+	DiscordDisplay = ("On",0) //Only needed if you implement the Discord functions
+	MusicPlayer.Tooltips = "On"
+	MusicPlayer.AnnounceSongs = "Off"
+	MusicPlayer.Priority = "Dialogue"
+	MusicPlayer.Scroll = "Volume"
+	MusicPlayer.PreviousButton = "Restarts song" //Behavior of the previous button
+}
+
+MusicPlayer.ResetDefaultSettings
+{
+	//Set default values if these get deleted or are not set
+	if MusicSettings[0] == ""; MusicSettings[0] = 100 //Volume
+	if MusicSettings[1] == ""; MusicSettings[1] = 100 //Speed
+	if MusicSettings[2] == ""; MusicSettings[2] = 0 //Balance
+	if MusicSettings[3] == ""; MusicSettings[3] = 0 //Play mode - 0 for loop playlist, 1 for shuffle playlist, 2 for loop song, 3 for play one song, 4 for random
+	//MusicSettings[4] is the 'stop after current' option
+	if MusicSettings[5] == ""; MusicSettings[5] = "Off" //Song bar
+	if DiscordDisplay[0] == ""; DiscordDisplay[0] = "On"
+	if MusicPlayer.Tooltips == ""; MusicPlayer.Tooltips = "On"
+	if MusicPlayer.SongAnnouncement == ""; MusicPlayer.SongAnnouncement = "On"
+	if MusicPlayer.Priority == ""; MusicPlayer.Priority = "Dialogue" //Whether it interrupts dialogue or not when going to the next song
+	if MusicPlayer.Scroll == ""; MusicPlayer.Scroll = "Volume" //Scroll wheel setting
+	if MusicPlayer.PreviousButton == ""; MusicPlayer.PreviousButton = "Restarts song" //Behavior of the previous button
 }
 
 //——— ASCOOTEX ———

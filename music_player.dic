@@ -128,7 +128,7 @@ OnMusicMenu : all
 			_currentsong[0] = _song //Song name
 			_currentsong[1] = CurrentPlaylist[_i] //Song path
 		}
-		_display += "%(_h)\__q[OnPlaySong,""%(_path)"",%(_i),frommenu]%(_song)\__q%(_d)\n"
+		_display += "%(_h)\__q[OnPlaySong,""%(_path)"",%(_i),OnMusicMenu,frommenu]%(_song)\__q%(_d)\n"
 		if _i == NowPlaying[1]; _display += "\f[default]" //Reset the bold/italic if it was applied
 	}
 	
@@ -187,7 +187,8 @@ OnPlaySong : all
 {
 	//reference0 - Name of the current song
 	//reference1 - Index number of the current song
-	//reference2 - Where this is coming from (menu, hotkey, justadded, etc)
+	//reference2 - What event to return to, if any (music menu, etc)
+	//reference3 - Special flags "justadded" or "frommenu" (frommenu makes the playlist reshuffle if the user clicks a new song from the song list)
 
 	NowPlaying[2] = "" //Clearing the paused song if there was one
 	
@@ -202,7 +203,7 @@ OnPlaySong : all
 	if ARRAYSIZE(CurrentPlaylist) > 0 //If there are more songs to play
 	{
 		//This bit is for if it has been asked to play a new song and none is loaded yet, which only happens if the user clicks a hotspot, presses a hotkey, or clicks the play button directly.
-		if NowPlaying[0] == "" && !(reference2 == "frommenu" || reference2 == "justadded") //If no song was playing and this is not a manual choice by the user or a new song
+		if NowPlaying[0] == "" && !(reference3 == "frommenu" || reference3 == "justadded") //If no song was playing and this is not a manual choice by the user or a new song
 		{
 			if NowPlaying[1] == -1 //If no song was playing
 			{
@@ -226,14 +227,14 @@ OnPlaySong : all
 
 		NowPlaying[0] = reference0 //Name of the current song
 		
-		if reference2 == "justadded"; NowPlaying[1] = ARRAYSIZE(CurrentPlaylist) - 1 //Position of the current song
+		if reference3 == "justadded"; NowPlaying[1] = ARRAYSIZE(CurrentPlaylist) - 1 //Position of the current song
 		else; NowPlaying[1] = TOINT(reference1) //Position of the current song
 		
-		if reference2 == "frommenu" //If the user started a new song manually, shuffle the shuffled playlist again
+		if reference3 == "frommenu" //If the user started a new song manually, shuffle the shuffled playlist again
 		{
 			ShuffledPlaylist = ShufflePlaylist(NowPlaying[1],CurrentPlaylist)
 		}
-		if MenuIsOpen; "\C" //If the balloon is currently open, keep it open
+		if MenuIsOpen && reference3 != "justadded"; "\C" //If the balloon is currently open other than when a song was just added, keep it open
 		
 		"%(SingingSurfaces)" //Start the singing animations if they weren't already started
 		
@@ -256,7 +257,6 @@ OnPlaySong : all
 		{
 			_send
 			
-			if reference2 == "frommenu"; reference2 = "OnMusicMenu" //At this point it doesn't need to be distinct anymore
 			if reference2 != ""; "\![raise,%(reference2)]" //If music menu is already open, reopen it so that it highlights the correct song properly
 			elseif !MenuIsOpen
 			{
@@ -1663,11 +1663,12 @@ OnFileDrop2 : all
 		{
 			CurrentPlaylist ,= _filearray
 			ShuffledPlaylist = ShufflePlaylist(NowPlaying[1],CurrentPlaylist)
+			_from = CheckWhichMenu
 			
 			//DIALOGUE: Added a file to the playlist
 			"%(MusicPlayerScope)Added '\_?%(_filename)\_?' to the playlist."
 			
-			"\n\n\_q\![*]\q[Play it now,OnPlaySong,""%(_filearray)"",,justadded]\n\![*]\q[Open music player,OnMusicMenu]\n\n\![*]\q[Close,blank]\e"
+			"\n\n\_q\![*]\q[Play it now,OnPlaySong,""%(_filearray)"",,%(_from),justadded]\n\![*]\q[Open music player,OnMusicMenu]\n\n\![*]\q[Close,blank]\e"
 		}
 		elseif _fileext == ".m3u" //If it's a playlist
 		{

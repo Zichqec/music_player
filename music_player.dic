@@ -130,7 +130,7 @@ OnMusicMenu : all
 		_currentsong[1] = NowPlaying[0]
 	}
 	
-	"%(MusicPlayerScope)\c%(MusicPlayerBalloon)\_q\*\![set,autoscroll,disable]\![no-autopause]"
+	"%(MusicPlayer.Scope)\c%(MusicPlayerBalloon)\_q\*\![set,autoscroll,disable]\![no-autopause]"
 	
 	//CUSTOMIZE: If you're using something other than OnMenuRun for your menu, you'll need to edit this button and the one at the bottom of the menu
 	"\![*]\q[Back,OnMenuRun]  \![*]\__q[blank]Close window\__q\n"
@@ -297,7 +297,7 @@ OnPlaySong : all
 		}
 		if MusicPlayer.MenuIsOpen && reference3 != "justadded"; "\C" //If the balloon is currently open other than when a song was just added, keep it open
 		
-		"%(MusicPlayerScope)%(SingingSurfaces)\![no-autopause]" //Start the singing animations if they weren't already started
+		"%(MusicPlayer.Scope)%(SingingSurfaces)\![no-autopause]" //Start the singing animations if they weren't already started
 		
 		_send = ""
 		_send += "%(OnNotifySongInfo)"
@@ -321,7 +321,7 @@ OnPlaySong : all
 			if reference2 != ""; "\![raise,%(reference2)]" //If music menu is already open, reopen it so that it highlights the correct song properly
 			elseif !MusicPlayer.MenuIsOpen
 			{
-				if MusicPlayer.SongAnnouncement == "If not in menu" || !SHIORI3FW.IsTalking && MusicPlayer.SongAnnouncement == "If not talking"; "%(MusicPlayerScope)Now playing:\n%(MusicPlayer.CurrentSong)"
+				if MusicPlayer.SongAnnouncement == "If not in menu" || !SHIORI3FW.IsTalking && MusicPlayer.SongAnnouncement == "If not talking"; "%(MusicPlayer.Scope)Now playing:\n%(MusicPlayer.CurrentSong)"
 			}
 		}
 	}
@@ -537,7 +537,7 @@ OnMusicPlayer.PlaylistPage
 
 OnMusicPlayer.JumpToPlaylistPage : all
 {
-	"\C\![lock,balloonrepaint]\c%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]\![no-autopause]"
+	"\C\![lock,balloonrepaint]\c%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]\![no-autopause]"
 	"\![open,inputbox,OnMusicPlayer.JumpIndex,-1]"
 	
 	//DIALOGUE: Dialogue for typing in a page number to jump to manually in the playlist
@@ -562,7 +562,7 @@ OnMusicPlayer.JumpIndex : all
 	else
 	{
 		//DIALOGUE: Dialogue for putting in an invalid number, or something that isn't a number
-		"%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]\![no-autopause]"
+		"%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]\![no-autopause]"
 		"Invalid input.\x\![raise,OnMusicPlayer.JumpToPlaylistPage]"
 	}
 }
@@ -589,9 +589,9 @@ OnScootSongMenu : all
 	_g = "\f[color,disable]"
 	_d = "\f[color,default]"
 	
-	if reference1 != ""; "\C%(MusicPlayerScope)\![lock,balloonrepaint]\c"
+	if reference1 != ""; "\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c"
 	
-	"%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\*\![no-autopause]"
+	"%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\*\![no-autopause]"
 	
 	"\![*]\q[Back,OnMusicMenu]\n\n"
 	
@@ -761,7 +761,7 @@ OnMusicSettings : all
 	elseif _mode == 4; _mode = "Random"
 	else; _mode = "Loop Playlist"
 	
-	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c\![set,autoscroll,disable]\![no-autopause]\_q\*%(MusicPlayerBalloon)"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c\![set,autoscroll,disable]\![no-autopause]\_q\*%(MusicPlayerBalloon)"
 	
 	//▲▼⯇⯈ - buttons for ease of copying
 	//Doing this here so that the menu bit itself can be cleaner... This is just handling graying out the buttons if clicking them would do nothing.
@@ -825,7 +825,7 @@ OnMusicSettings : all
 //Changing the playback type
 OnPlaybackType : all
 {
-	"%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\![no-autopause]"
+	"%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![no-autopause]"
 	
 	"\![*]\q[Loop Playlist,OnPlaybackTypeChange,0]\n"
 	"\![*]\q[Shuffle and Loop,OnPlaybackTypeChange,1]\n"
@@ -859,7 +859,7 @@ OnPlaybackTypeChange
 //Bringing up input boxes
 OnMusicSet : all
 {
-	"%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\*\![no-autopause]"
+	"%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\*\![no-autopause]"
 	
 	if reference0 == "Balance"; "\![open,inputbox,OnMusicBalance,-1]"
 	elseif reference0 == "Speed"; "\![open,sliderinput,OnMusicSpeed,-1,100,1,%(MAX_RATE)]"
@@ -1118,7 +1118,7 @@ OnHotkeys : all
 	_h = "\f[color,default.anchor]" //Highlight color
 	_d = "\f[color,default]" //Default color
 
-	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\_q\*\![set,autoscroll,disable]\![no-autopause]"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\_q\*\![set,autoscroll,disable]\![no-autopause]"
 	
 	//DIALOGUE: Menu for changing the hotkeys
 	"Click a hotkey to change it, click the (x) to unset it.\n\n"
@@ -1160,7 +1160,7 @@ OnChangeHotkey : all
 	elseif reference0 == 11; _option = "balance right"
 	else; _option =  "Play/Pause"
 	
-	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\*\_q\![no-autopause]"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\*\_q\![no-autopause]"
 	
 	//DIALOGUE: Changing a hotkey
 	"Press a key for %(_option)."
@@ -1191,7 +1191,7 @@ OnMusicInfo : all
 		if FENUM(_path) == ""; void MKDIR(_path) //make directory if none exists
 	}
 	
-	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\_q\![no-autopause]"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\_q\![no-autopause]"
 	
 	//DIALOGUE: Answers for the FAQ - Make sure you replace the file path in the one about where playlists save
 	if reference0 == "addsong" //Asking how to add songs
@@ -1213,7 +1213,7 @@ OnMusicInfo : all
 //Display a list of all the compatible filetypes
 OnDisplayFileTypes : all
 {
-	"%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\![no-autopause]"
+	"%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![no-autopause]"
 	
 	_i = 0
 	foreach MusicPlayer.CompatibleMusicFileTypes; _type
@@ -1234,7 +1234,7 @@ OnDisplayFileTypes : all
 
 OnSavePlaylist : all
 {
-	"\C\![lock,balloonrepaint]\c%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]\![no-autopause]"
+	"\C\![lock,balloonrepaint]\c%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]\![no-autopause]"
 	"\![open,dialog,save,--id=OnMusicPlayer.PlaylistSaved,--ext=m3u,--filter=Playlist file|*.m3u,--dir=%(MusicPlayer.PlaylistPath)]"
 	
 	//DIALOGUE: Saving a playlist
@@ -1262,7 +1262,7 @@ OnMusicPlayer.PlaylistSaved : all
 	MusicPlayer.PlaylistPath = _split[0] + _split[1]
 	
 	
-	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\_q\![no-autopause]"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\_q\![no-autopause]"
 	
 	//DIALOGUE: a playlist saving correctly, or failing to save
 	if _o == 1 //If it saves successfully
@@ -1284,7 +1284,7 @@ OnPlaylist.Back
 
 OnLoadPlaylist : all
 {
-	"\C\![lock,balloonrepaint]\c%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]\![no-autopause]"
+	"\C\![lock,balloonrepaint]\c%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]\![no-autopause]"
 	"\![open,dialog,open,--id=OnMusicPlayer.PlaylistLoaded,--filter=Playlist file|*.m3u,--dir=%(MusicPlayer.PlaylistPath)]"
 	
 	//DIALOGUE: Loading a playlist
@@ -1317,7 +1317,7 @@ OnMusicPlayer.PlaylistLoaded : all
 	
 	ShuffledPlaylist = MusicPlayer.ShufflePlaylist(NowPlaying[1],CurrentPlaylist)
 	
-	"%(MusicPlayerScope)%(NonSingingSurfaces)\![no-autopause]"
+	"%(MusicPlayer.Scope)%(NonSingingSurfaces)\![no-autopause]"
 	
 	"\![sound,stop]%(OnNotifySongInfo)"
 	
@@ -1332,12 +1332,13 @@ OnClearPlaylist : all
 	_are = "are"; _s = "s"
 	if _num == 1; {_are = "is"; _s = ""}
 	
-	"%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\![no-autopause]"
+	"%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![no-autopause]"
 	
 	//DIALOGUE: Asking for confirmation before clearing the current playlist. %(_are) and %(_s) can be used for plurals.
 	"There %(_are) %(_num) song%(_s) in the current playlist. Are you sure you want to clear it? It cannot be brought back unless you have saved it."
 	
-	"\n\n\_q\![*]\q[Clear it,OnPlaylistCleared,%(_argv[0])]  \![*]\q[Don't,OnMusicSettings]"
+	"\n\n"
+	"\![*]\q[Clear it,OnPlaylistCleared,%(_argv[0])]  \![*]\q[Don't,OnMusicSettings]"
 }
 
 //Actually clearing the current playlist
@@ -1351,7 +1352,7 @@ OnPlaylistCleared : all
 	
 	"\![sound,stop]%(OnNotifySongInfo)"
 	
-	"%(NonSingingSurfaces)%(MusicPlayerBalloon)"
+	"%(NonSingingSurfaces)%(MusicPlayerBalloon)\_q\![no-autopause]"
 	
 	if reference0 == ""; OnMusicMenu
 	else
@@ -1359,7 +1360,8 @@ OnPlaylistCleared : all
 		//DIALOGUE: After clearing the playlist
 		"The playlist has been cleared."
 		
-		"\n\n\_q\![*]\q[Open music controls,OnMusicMenu]  \![*]\q[Close,OnBlank]"
+		"\n\n"
+		"\![*]\q[Open music controls,OnMusicMenu]  \![*]\q[Close,OnBlank]"
 	}
 }
 
@@ -1464,7 +1466,7 @@ NonSingingSurfaces
 }
 
 //Which scope will be used as the music player. \0 for the sakura, \1 for the kero, \p[*] for additional characters, replacing the * with the number of the character you want
-MusicPlayerScope
+MusicPlayer.Scope
 {
 	"\0"
 }
@@ -1538,7 +1540,7 @@ MusicPlayer.OnKeyPress : all
 	_key = TOUPPER(reference0)
 	if "changing hotkey: " _in_ SPLIT(MusicPlayer.LastTalk,"\e")[1] //If the hotkey input is open
 	{
-		
+		"\![no-autopause]%(MusicPlayer.Scope)\_q"
 		_changing = TOINT(SPLIT(MusicPlayer.LastTalk,"changing hotkey: ")[1])
 		
 		//CUSTOMIZE: Customizable list of reserved hotkeys. Add in any hotkeys you've already used to this array.
@@ -1547,7 +1549,7 @@ MusicPlayer.OnKeyPress : all
 		if ASEARCH(_key,_reserved_keys) != -1 //If it's reserved
 		{
 			//DIALOGUE: If the user tries to put in a hotkey that is reserved
-			"\![no-autopause]%(MusicPlayerScope)That hotkey is reserved, please choose another.\x"
+			"That hotkey is reserved, please choose another.\x"
 		}
 		elseif _key == Hotkeys[_changing] //Same option as was already entered
 		{
@@ -1557,7 +1559,7 @@ MusicPlayer.OnKeyPress : all
 		elseif ASEARCH(_key,Hotkeys) != -1 //If this hotkey is already selected for something else
 		{
 			//DIALOGUE: If the user tries to enter a hotkey that is already being used
-			"\![no-autopause]%(MusicPlayerScope)That hotkey is already in use, please clear it before assigning it to another option.\x"
+			"That hotkey is already in use, please clear it before assigning it to another option.\x"
 		}
 		else //If it's a valid key
 		{
@@ -1642,7 +1644,7 @@ MusicPlayer.OnKeyPress : all
 
 MusicPlayer.OnMouseWheel
 {
-	_character = REPLACE(MusicPlayerScope,"\","")
+	_character = REPLACE(MusicPlayer.Scope,"\","")
 	_character = REPLACE(_character,"p[","")
 	_character = REPLACE(_character,"]","")
 	
@@ -1691,14 +1693,17 @@ OnFileDrop2 : all
 			ShuffledPlaylist = MusicPlayer.ShufflePlaylist(NowPlaying[1],CurrentPlaylist)
 			_from = MusicPlayer.CheckWhichMenu
 			
-			//DIALOGUE: Added a file to the playlist
-			"%(MusicPlayerScope)\![no-autopause]Added ""\_?%(_filename)\_?"" to the playlist."
+			"%(MusicPlayer.Scope)\_q\![no-autopause]"
 			
-			"\n\n\_q\![*]\q[Play it now,OnPlaySong,""%(_filearray)"",,%(_from),justadded]\n\![*]\q[Open music player,OnMusicMenu]\n\n\![*]\q[Close,OnBlank]"
+			//DIALOGUE: Added a file to the playlist
+			"Added ""\_?%(_filename)\_?"" to the playlist."
+			
+			"\n\n"
+			"\![*]\q[Play it now,OnPlaySong,""%(_filearray)"",,%(_from),justadded]\n\![*]\q[Open music player,OnMusicMenu]\n\n\![*]\q[Close,OnBlank]"
 		}
 		elseif _fileext == ".m3u" //If it's a playlist
 		{
-			"%(MusicPlayerScope)\![no-autopause]\_q"
+			"%(MusicPlayer.Scope)\![no-autopause]\_q"
 			
 			//DIALOGUE: Confirming loading a playlist after drag and drop
 			"Load the playlist ""\_?%(_filename)\_?""? The current playlist will be lost unless it is already saved."
@@ -1720,24 +1725,30 @@ OnFileDrop2 : all
 			
 			if ARRAYSIZE(_musicfiles) == 0 //If there were no compatible songs inside
 			{
+				"%(MusicPlayer.Scope)\_q\![no-autopause]\_q"
+				
 				//DIALOGUE: The user dropped a folder on the ghost, but nothing inside was a compatible music file
-				"%(MusicPlayerScope)\![no-autopause]None of the files in ""\_?%(_folder)\_?"" are compatible music files."
+				"None of the files in ""\_?%(_folder)\_?"" are compatible music files."
 			}
 			else //If there are compatible songs
 			{
 				_num = ARRAYSIZE(_musicfiles)
 				_s = ""; if _num != 1; _s = "s"
 				
+				"%(MusicPlayer.Scope)\![no-autopause]\_q"
+				
 				//DIALOGUE: The user dropped a folder on the ghost, and some files inside were compatible music files. %(_s) can be used to add an s if the number of compatible files is plural, %(_num) can be used to list the number of files, and %(_folder) is the name of the folder that was dropped.
-				"%(MusicPlayerScope)\![no-autopause]Added %(_num) song%(_s) from ""\_?%(_folder)\_?""."
+				"Added %(_num) song%(_s) from ""\_?%(_folder)\_?""."
 				
 				"\n\n\_q\![*]\q[Open music player,OnMusicMenu]\n\![*]\q[Close,blank]"
 			}
 		}
 		else //Incompatible
 		{
-			//DIALOGUE: Any file that is not music, a playlist, or an image that can be set as a wallpaper
-			"%(MusicPlayerScope)\![no-autopause]This isn't a recognized file type."
+			"%(MusicPlayer.Scope)\![no-autopause]\_q"
+			
+			//DIALOGUE: Any file that is not music or a playlist
+			"This isn't a recognized file type."
 		}
 	}
 	else //More than 1 file
@@ -1746,8 +1757,10 @@ OnFileDrop2 : all
 
 		if ARRAYSIZE(_musicfiles) == 0 //If there are no music files
 		{
+			"%(MusicPlayer.Scope)\![no-autopause]\_q"
+			
 			//DIALOGUE: Multiple files were dropped on the ghost, but none of them are compatible music files.
-			"%(MusicPlayerScope)\![no-autopause]None of these files are compatible with the music player."
+			"None of these files are compatible with the music player."
 		}
 		else //If there are music files
 		{
@@ -1755,10 +1768,12 @@ OnFileDrop2 : all
 			
 			_s = ""; if _num != 1; _s = "s"
 			
-			//Multiple files were dragged on the ghost, and some of them were music files. %(_s) can be used to add an s if the number of compatible files is plural, and %(_num) can be used to list the number of files.
-			"%(MusicPlayerScope)\![no-autopause]%(_num) compatible song%(_s) added to the playlist."
+			"%(MusicPlayer.Scope)\![no-autopause]\_q"
 			
-			"\n\n\_q\![*]\q[Open music player,OnMusicMenu]\n\![*]\q[Close,blank]"
+			//Multiple files were dragged on the ghost, and some of them were music files. %(_s) can be used to add an s if the number of compatible files is plural, and %(_num) can be used to list the number of files.
+			"%(_num) compatible song%(_s) added to the playlist."
+			
+			"\n\n\![*]\q[Open music player,OnMusicMenu]\n\![*]\q[Close,blank]"
 		}
 	}
 }
@@ -1960,13 +1975,15 @@ OnSoundError : all
 	if MusicPlayer.IsMinimized && !_playnext; MusicPlayer.MakeValueNotify("%(OnNotifySongInfo)")
 	else; "%(OnNotifySongInfo)"
 	
+	"%(MusicPlayer.Scope)\![no-autopause]\_q"
+	
 	//DIALOGUE: If there is an error, it will tell the user and try to play the next song. reference3 is the error message, reference2 is the file name. Below is dialogue for attempting to play the next song
-	"%(MusicPlayerScope)\![no-autopause]Cannot play file ""\f[color,default.anchor]\_?%(reference2)\_?\f[color,default]""\n\n""%(reference3)"""
+	"Cannot play file ""\f[color,default.anchor]\_?%(reference2)\_?\f[color,default]""\n\n""%(reference3)"""
 	
 	//If it's able to play another song
 	if _playnext
 	{
-		"\n\n\w8\w8[Starting next song...]"
+		"\n\n\_w[5000][Starting next song...]"
 		
 		"\_w[1000]\![raise,OnSoundStop]"
 	}
@@ -2242,7 +2259,7 @@ MusicPlayer.FindSongs
 //Opening the folder for the user
 OnMusicPlayer.PlaylistPath
 {
-	"\C%(MusicPlayerScope)\![open,file,playlists]\_l[0,0] "
+	"\C%(MusicPlayer.Scope)\![open,file,playlists]\_l[0,0] "
 }
 
 //Checks for special text to determine which menu the ghost is currently in, and returns 

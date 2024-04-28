@@ -595,6 +595,12 @@ OnMusicPlayer.ScootSongMenu : all
 	
 	if reference1 == "top"; "\![set,autoscroll,disable]"
 	
+	_current_song_index = NowPlaying[1]
+	if MusicSettings[3] == 1 //Shuffle and loop
+	{
+		_current_song_index = ShuffledPlaylist[_current_song_index]
+	}
+	
 	_currentsong = IARRAY
 	for _i = 0; _i < ARRAYSIZE(CurrentPlaylist); _i++
 	{
@@ -614,7 +620,7 @@ OnMusicPlayer.ScootSongMenu : all
 			"%(_d)"
 		}
 		
-		if _i == NowPlaying[1] //If this is the song that's playing right now
+		if _i == _current_song_index //If this is the song that's playing right now
 		{
 			"\f[bold,1]" //Make it bold
 			_currentsong[0] = _song //Saves the song name into _currentsong[0]

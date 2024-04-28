@@ -581,7 +581,13 @@ OnMusicPlayer.JumpIndex : all
 
 OnMusicPlayer.JumpToCurrent
 {
-	MusicPlayer.PageIndex = MusicPlayer.CurrentSongIndex / MusicPlayer.SongsPerPage
+	_current_song_index = MusicPlayer.CurrentSongIndex
+	if MusicPlayer.PlayMode == 1 //Shuffle and loop
+	{
+		_current_song_index = MusicPlayer.ShuffledPlaylist[_current_song_index]
+	}
+	
+	MusicPlayer.PageIndex = _current_song_index / MusicPlayer.SongsPerPage
 	
 	"\C\![close,inputbox,OnMusicPlayer.JumpIndex]\![raise,OnMusicPlayer.Menu]"
 }

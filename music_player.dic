@@ -8,11 +8,11 @@ This music player is based off of the one in FLUX. It is written for YAYA, and m
 
 It requires YAYATc569-4 or later. You can change some of the syntax to make it compatible with older versions, but you really should upgrade for security reasons anyways. How to upgrade: https://ukagaka.zichqec.com/guide/upgrade_old_versions_of_yaya
 
-The music player allows the user to add songs by dragging and dropping files and folders onto the ghost, and copy in .m3u playlists the same way. Music can be played through the music menu, which can be called with tags such as q[Music Menu,OnMusicPlayer.Menu], \![raise,OnMusicMenu], etc. It can also be played via hotkeys or hotspots, which you can customize a bit.
+The music player allows the user to add songs by dragging and dropping files and folders onto the ghost, and load .m3u playlists the same way. Music can be played through the music menu, which can be called with tags such as q[Music Menu,OnMusicPlayer.Menu], \![raise,OnMusicMenu], etc. It can also be played via hotkeys or hotspots, which you can customize a bit.
 
-The volume, speed, and left/right balance of the music can be customized in the settings menu, and it also comes with a few different play modes. Additionally, there is an option to make playback stop after the current song finishes.
+The volume, speed, and left/right balance of the music can be customized in the settings menu, and it also comes with a few different play modes. There are several other settings too, some of which are pretty niche.
 
-Playlists can be saved as .m3u files and are compatible with FLUX and FLELE. You can rearrange the order of your current playlist through another menu.
+Playlists can be saved as .m3u files and are compatible with FLUX and FLELE. You can rearrange the order of your current playlist through another menu, although I don't really recommend it because it's clunky.
 
 The ghost will also send out an event every time the music changes, notifying other ghosts of what music it is playing.
 
@@ -27,7 +27,7 @@ This music player was a lot of work, so if you use it in your ghost I would ask 
 This will require some adjustment to slot into your ghost. Specifically, there is a label below for BUILT IN SHIORI EVENTS
 The functions there may already exist in your ghost and therefore cause errors. You will need to go over them carefully and integrate them into your ghost's existing code.
 
-In order for hotkeys to work, you must also adjust your OnKeyPress. If you don't have OnKeyPress, you can rename the function MusicPlayer.OnKeyPress to just OnKeyPress. If you have OnKeyPress, then you'll want to make it so that if a key is pressed that isn't one of your chosen hotkeys, it calls the MusicPlayer.OnKeyPress function. Typically, this will be a simple else statement.
+In order for hotkeys to work, you must adjust your OnKeyPress. If you don't have OnKeyPress, you can rename the function MusicPlayer.OnKeyPress to just OnKeyPress . If you have OnKeyPress, then you'll want to make it so that if a key is pressed that isn't one of your chosen hotkeys, it calls the MusicPlayer.OnKeyPress function. Typically, this will be a simple else statement.
 For example, this is how you would implement it into the setup included in the Simplicity template:
 
 OnKeyPress
@@ -66,7 +66,7 @@ I have left markers in the file for what bits you actually need to mess with. Yo
 //DIALOGUE:
 //CUSTOMIZE:
 
-DIALOGUE is anywhere that you will probably want to put custom dialogue.
+DIALOGUE is anywhere that you may want to put custom dialogue.
 CUSTOMIZE is anywhere you may want to make small changes to the code to better suit your ghost.
 
 You will also definitely want to go over the functions in the FUNCTIONS THAT SHOULD BE CUSTOMIZED section. This has critical things such as which surfaces will be used while the ghost is singing.
@@ -78,7 +78,7 @@ Another useful function is MusicPlayer.CurrentSong, which outputs the name of th
 To initialize all of the music player's variables, you should call the following function in OnFirstBoot:
 MusicPlayer.SetDefaultSettings
 
-Additionally, I would recommend putting %(OnMusicPlayer.NotifySongInfo) into your firstboot, boot dialogues, ghost changing dialogues, etc. This will ensure that your ghost updates any open ghosts on the status of the music player. 
+Additionally, I would recommend putting %(OnMusicPlayer.NotifySongInfo) into your firstboot, boot dialogues, ghost changing dialogues, etc. This will ensure that your ghost updates any open ghosts on the status of the music player when it opens or closes.
 
 I will also recommend that you use developer_options.txt in order to prevent your playlists folder from ending up in your update files or nar files.
 
@@ -86,6 +86,10 @@ If you run into any trouble do let me know and I will try to help you. If you fi
 
 I may release new versions of this from time to time, but you will probably have to update this file piecemeal if you decide to update. Please check the GitHub repository for this file to see what changes have been made.
 https://github.com/Zichqec/music_player
+
+If you have an old version of this music player from before I updated the variable names, please run the function MusicPlayer.ConvertOldVariables before you open the music menu. This should convert all of the old variables over to the new ones.
+If you had already released a ghost with the old music player code in it, you can use this function in OnUpdateComplete to ensure the user's variables get converted.
+This conversion process may not be perfect, and some data may be lost. If there is an issue, please notify me and I will try to fix it.
 */
 
 /*
@@ -132,8 +136,8 @@ OnMusicPlayer.Menu : all
 	
 	"%(MusicPlayer.Scope)\c%(MusicPlayer.LargeBalloon)\_q\*\![set,autoscroll,disable]\![no-autopause]"
 	
-	//CUSTOMIZE: If you're using something other than OnMenuRun for your menu, you'll need to edit this button and the one at the bottom of the menu
-	"\![*]\q[Back,OnMenuRun]  \![*]\__q[blank]Close window\__q\n"
+	//CUSTOMIZE: If you're using something other than OnSakuraMenu for your menu, or you're using this music player on a kero, you'll need to edit this button and the one at the bottom of the menu
+	"\![*]\q[Back,OnSakuraMenu]  \![*]\__q[blank]Close window\__q\n"
 	"\![*]\__q[OnMusicPlayer.Settings,Basic]Settings\__q  \![*]\__q[OnMusicPlayer.Info]Help\__q\n\n[half]"
 	
 	if MusicPlayer.CurrentSongName == "" //This is if no song is loaded in. The text will be grayed out until a song is chosen.
@@ -230,7 +234,7 @@ OnMusicPlayer.Menu : all
 	
 	"\n"
 	
-	"\![*]\q[Back,OnMenuRun]  \![*]\__q[blank]Close window\__q"
+	"\![*]\q[Back,OnSakuraMenu]  \![*]\__q[blank]Close window\__q"
 	
 	"\![unlock,balloonrepaint]\e __MUSIC_PLAYER_MAIN_MENU__" //Do not remove this, it's here so the menu can update dynamically
 }
@@ -1565,7 +1569,7 @@ if MusicPlayer.Singing
 If you want to have a display on your main menu for the currently playing song, you need to add this after your \e in the menu:
 __GHOST_MAIN_MENU__
 
-This will let it know to run OnMenuRun again if the current song changes/stops/etc. If your menu is in a function other than OnMenuRun, you'll need to change it in a few places in this file. Ctrl F is your friend here.
+This will let it know to run OnSakuraMenu again if the current song changes/stops/etc. If your menu is in a function other than OnSakuraMenu, you'll need to change it in a few places in this file. Ctrl F is your friend here.
 */
 
 
@@ -1836,7 +1840,7 @@ MusicPlayer.OnMouseDoubleClick : all
 	//CUSTOMIZE: Hotspots. The only ones included here are for the music player and opening the menu. If you want more for your ghost you'll need to work them in here.
 	if reference4 == "menu" || reference4 == "" //Menu open
 	{
-		OnMenuRun
+		OnSakuraMenu
 	}
 	elseif reference4 == "stop_button"//Stopping the music
 	{
@@ -2529,7 +2533,7 @@ MusicPlayer.CheckWhichMenu
 	if MusicPlayer.BalloonIsOpen
 	{
 		if "__MUSIC_PLAYER_MAIN_MENU__" _in_ MusicPlayer.LastTalk; _inmenu = "OnMusicPlayer.Menu"
-		elseif "__GHOST_MAIN_MENU__" _in_ MusicPlayer.LastTalk; _inmenu = "OnMenuRun"
+		elseif "__GHOST_MAIN_MENU__" _in_ MusicPlayer.LastTalk; _inmenu = "OnSakuraMenu"
 		elseif "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; _inmenu = "OnMusicPlayer.Settings"
 	}
 	_inmenu

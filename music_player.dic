@@ -648,7 +648,7 @@ OnMusicPlayer.Settings : all
 	elseif reference0 == "Hotkeys"; MusicPlayer.Settings.Hotkeys
 	else; MusicPlayer.Settings.Basic
 	
-	"\n\n\![*]\__q[OnMusicPlayer.Menu]Back to music menu\__q"
+	"\n\n\![*]\__q[OnMusicPlayer.Menu]Back to music menu\__q  \![*]\__q[OnBlank]Close window\__q"
 	"\![unlock,balloonrepaint]"
 	if _isbasic && MusicPlayer.Singing; "\![timerraise,1000,1,OnMusicPlayer.SettingsRecall]"
 	"\e __MUSIC_SETTINGS_MENU__,%(_isbasic)__"
@@ -731,15 +731,17 @@ MusicPlayer.Settings.Basic : all
 MusicPlayer.Settings.Advanced : all
 {
 	"Song Bar \![*]%(_h)\__q[OnMusicPlayer.ToggleSongBar]%(MusicPlayer.SongBar)\__q%(_d)\n"
-	"Tooltips \![*]%(_h)\__q[OnMusicPlayer.ToggleTooltips]%(MusicPlayer.Tooltips)\__q%(_d)\n"
+	"Hotspot tooltips \![*]%(_h)\__q[OnMusicPlayer.ToggleTooltips]%(MusicPlayer.Tooltips)\__q%(_d)\n"
+	"\n"
 	"Song announcements \![*]%(_h)\__q[OnMusicPlayer.ToggleSongAnnouncement]%(MusicPlayer.SongAnnouncement)\__q%(_d)\n"
 	"Prioritize \![*]%(_h)\__q[OnMusicPlayer.TogglePriority]%(MusicPlayer.Priority)\__q%(_d)\n"
+	"\n"
 	"Scroll wheel controls \![*]%(_h)\__q[OnMusicPlayer.ToggleScrollWheel]%(MusicPlayer.Scroll)\__q%(_d)\n"
 	"Previous button \![*]%(_h)\__q[OnMusicPlayer.TogglePreviousButton]%(MusicPlayer.PreviousButton)\__q%(_d)\n"
+	"\n"
 	"Playlist view \![*]%(_h)\__q[OnMusicPlayer.TogglePagination]%(MusicPlayer.Pagination)\__q%(_d)\n"
 	"\n"
-	
-	"\![*]\__q[OnMusicPlayer.ScootSongMenuWarn]Move songs\__q"
+	"\![*]\__q[OnMusicPlayer.ScootSongMenuWarn]Move songs in playlist\__q"
 	
 	//CUSTOMIZE: If you want Discord functionality, you'll need to uncomment this
 	/*
@@ -1302,9 +1304,10 @@ OnMusicPlayer.Info : all
 	"\![*]\__q[OnMusicPlayer.MusicInfo,compatiblefiles]What file types are compatible?\__q\n"
 	"\![*]\__q[OnMusicPlayer.MusicInfo,error]Why do some songs give an error?\__q\n"
 	"\n"
-	"\![*]\q[Back,OnMusicPlayer.Menu]"
+	"\![*]\__q[OnMusicPlayer.Menu]Back to music menu\__q  \![*]\__q[OnBlank]Close window\__q"
+	
 	"\n\n\n\n"
-	//Would appreciate if you leave this here, I have poured many many hours into this player :)
+	//Would appreciate if you leave this here, I have poured many many hours of work into this player :)
 	"\f[height,-2]\f[color,disable]Music Player code by \f[color,default.anchor]\__q[https://ukagaka.zichqec.com/]Zichqec\__q"
 }
 
@@ -1316,7 +1319,7 @@ OnMusicPlayer.MusicInfo : all
 	
 	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayer.LargeBalloon)\_q\![no-autopause]"
 	
-	//DIALOGUE: Answers for the FAQ
+	//DIALOGUE: Answers for the help section, you can just leave these as is unless you really want to change them for some reason
 	if reference0 == "addsong" //Asking how to add songs
 	{
 		"To add songs, drag and drop them onto the ghost. Folders can also be dragged and dropped, and multiple files may be dropped at a time.\n\n"

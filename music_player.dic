@@ -174,18 +174,20 @@ OnMusicPlayer.Menu : all
 	
 	if MusicPlayer.Pagination == "Paginated"
 	{
+		_up = "\f[name,calibri]▲\f[name,default]"
+		_down = "\f[name,calibri]▼\f[name,default]"
 		"\n\n[half]"
 		"\f[align,left]    "
 		switch MusicPlayer.PageIndex == 0
 		{
-			"\q[▲▲,OnMusicPlayer.PlaylistPage,previous]"
-			"\f[color,disable]▲▲\f[color,default]"
+			"\__q[OnMusicPlayer.PlaylistPage,previous]%(_up)%(_up)\__q"
+			"\f[color,disable]%(_up)%(_up)\f[color,default]"
 		}
 		"\_l[]\f[align,right]"
 		switch MusicPlayer.PageIndex == MusicPlayer.MaxPages
 		{
-			"\q[▼▼,OnMusicPlayer.PlaylistPage,next]"
-			"\f[color,disable]▼▼\f[color,default]"
+			"\__q[OnMusicPlayer.PlaylistPage,next]%(_down)%(_down)\__q"
+			"\f[color,disable]%(_down)%(_down)\f[color,default]"
 		}
 		"    "
 		"\n \n[-100]\f[align,center]\__q[OnMusicPlayer.JumpToPlaylistPage]Page %(MusicPlayer.PageIndex + 1)/%(MusicPlayer.MaxPages + 1)\__q"
@@ -660,36 +662,47 @@ MusicPlayer.Settings.Basic : all
 	else; _mode = "Loop Playlist"
 	
 	//▲▼⯇⯈ - buttons for ease of copying
+	//Setting fonts so we don't get tofus or anything else weird...
+	_up = "\f[name,calibri]▲\f[name,default]"
+	_down = "\f[name,calibri]▼\f[name,default]"
+	_left = "\f[name,calibri]⯇\f[name,default]"
+	_right = "\f[name,calibri]⯈\f[name,default]"
+	
 	//Doing this here so that the menu bit itself can be cleaner... This is just handling graying out the buttons if clicking them would do nothing.
-	_vol_up_btn = "\q[▲,OnMusicPlayer.QuickVolume,Up]"
-	if MusicPlayer.Volume >= 100; _vol_up_btn = "%(_g)▲%(_d)"
-	_vol_down_btn = "\q[▼,OnMusicPlayer.QuickVolume,Down]"
-	if MusicPlayer.Volume <= 0; _vol_down_btn = "%(_g)▼%(_d)"
+	_vol_up_btn = "\__q[OnMusicPlayer.QuickVolume,Up]%(_up)\__q"
+	if MusicPlayer.Volume >= 100; _vol_up_btn = "%(_g)%(_up)%(_d)"
+	_vol_down_btn = "\__q[OnMusicPlayer.QuickVolume,Down]%(_down)\__q"
+	if MusicPlayer.Volume <= 0; _vol_down_btn = "%(_g)%(_down)%(_d)"
 	
-	_speed_up_btn = "\q[▲,OnMusicPlayer.QuickSpeed,Up]"
-	if MusicPlayer.Speed >= MusicPlayer.MaxRate; _speed_up_btn = "%(_g)▲%(_d)"
-	_speed_down_btn = "\q[▼,OnMusicPlayer.QuickSpeed,Down]"
-	if MusicPlayer.Speed <= 0; _speed_down_btn = "%(_g)▼%(_d)"
+	_speed_up_btn = "\__q[OnMusicPlayer.QuickSpeed,Up]%(_up)\__q"
+	if MusicPlayer.Speed >= MusicPlayer.MaxRate; _speed_up_btn = "%(_g)%(_up)%(_d)"
+	_speed_down_btn = "\__q[OnMusicPlayer.QuickSpeed,Down]%(_down)\__q"
+	if MusicPlayer.Speed <= 0; _speed_down_btn = "%(_g)%(_down)%(_d)"
 	
-	_balance_left_btn = "\q[⯇,OnMusicPlayer.QuickBalance,Left]"
-	if MusicPlayer.Balance <= -100; _balance_left_btn = "%(_g)⯇%(_d)"
-	_balance_right_btn = "\q[⯈,OnMusicPlayer.QuickBalance,Right]"
-	if MusicPlayer.Balance >= 100; _balance_right_btn = "%(_g)⯈%(_d)"
+	_balance_left_btn = "\__q[OnMusicPlayer.QuickBalance,Left]%(_left)\__q"
+	if MusicPlayer.Balance <= -100; _balance_left_btn = "%(_g)%(_left)%(_d)"
+	_balance_right_btn = "\__q[OnMusicPlayer.QuickBalance,Right]%(_right)\__q"
+	if MusicPlayer.Balance >= 100; _balance_right_btn = "%(_g)%(_right)%(_d)"
 	
 	
 	"Play mode: \![*]%(_h)\__q[OnMusicPlayer.PlaybackType]%(_mode)\__q%(_d)\n\n[half]"
 	"Volume: %(_vol_up_btn)%(_vol_down_btn) %(_h)\q[%(_vol),OnMusicPlayer.SetOption,Volume]%(_d)\n"
 	"Speed: %(_speed_up_btn)%(_speed_down_btn) %(_h)\q[%(_speed),OnMusicPlayer.SetOption,Speed]%(_d)\n"
 	"Balance: %(_balance_left_btn)%(_balance_right_btn) %(_h)\q[%(_bal),OnMusicPlayer.SetOption,Balance]%(_d)\n\n"
-	"\__q[OnMusicPlayer.StopAfterPlayback,song]Stop after current song\__q"
+	
+	switch MusicPlayer.PlayMode != 3
+	{
+		"\f[color,disable]Stop after current song\f[color,default]"
+		"\__q[OnMusicPlayer.StopAfterPlayback,song]Stop after current song\__q"
+	}
 	if MusicPlayer.StopAfterCurrent == "stop after playback"; " \![*]"
 	"\n"
-	if MusicPlayer.PlayMode == 0 || MusicPlayer.PlayMode == 1
+	switch MusicPlayer.PlayMode == 0 || MusicPlayer.PlayMode == 1
 	{
+		"\f[color,disable]Stop after playlist ends\f[color,default]"
 		"\__q[OnMusicPlayer.StopAfterPlayback,playlist]Stop after playlist ends\__q"
-		if MusicPlayer.StopAfterCurrent == "stop after playlist"; " \![*]"
 	}
-	else; "\f[color,disable]Stop after playlist ends\f[color,default]"
+	if MusicPlayer.StopAfterCurrent == "stop after playlist"; " \![*]"
 	
 	//Uncomment if you're using the playtime counter and want to display playtime in the menu
 	"\n\n"

@@ -110,7 +110,7 @@ OnMusicPlayer.Menu : all
 	_g = "\f[color,disable]" //Gray
 	_d = "\f[color,default]" //Default
 	
-	if _argv[0] != "manual" && MusicPlayer.BalloonIsOpen; "\C\![lock,balloonrepaint]\c" //TODO this needs tested fully
+	if _argv[0] != "manual" && MusicPlayer.BalloonIsOpen; "\C\![lock,balloonrepaint]\c"
 	
 	_starting_value = 0
 	if MusicPlayer.Pagination == "Paginated"
@@ -1274,7 +1274,7 @@ OnMusicPlayer.Info : all
 	"\![*]\__q[OnMusicPlayer.MusicInfo,error]Why do some songs give an error?\__q\n"
 	"\n"
 	"\![*]\q[Back,OnMusicPlayer.Menu]"
-	"\n\n"
+	"\n\n\n\n"
 	"\f[height,-2]\f[color,disable]Music Player code by \f[color,default.anchor]\__q[https://ukagaka.zichqec.com/]Zichqec\__q"
 }
 
@@ -2021,7 +2021,7 @@ OnSoundError : all
 	//If it's able to play another song
 	if _playnext
 	{
-		"\n\n\_w[5000][Starting next song...]"
+		"\n\nStarting next song...\_w[5000]"
 		
 		"\_w[1000]\![raise,OnSoundStop]"
 	}
@@ -2254,7 +2254,7 @@ MusicPlayer.SetDefaultSettings
 	MusicPlayer.PageIndex = 0
 	MusicPlayer.PlaylistPath = "../../playlists/" //Default playlist folder, change if desired
 	
-	void MKDIR(MusicPlayer.PlaylistPath) //TODO test this
+	void MKDIR(MusicPlayer.PlaylistPath)
 }
 
 //Set default values if these get deleted or are not set
@@ -2290,7 +2290,7 @@ MusicPlayer.ResetDefaultSettings
 	if !ISVAR("MusicPlayer.PageIndex"); MusicPlayer.PageIndex = 0
 	if !ISVAR("MusicPlayer.PlaylistPath"); MusicPlayer.PlaylistPath = "../../playlists/" //Default playlist folder
 	
-	void MKDIR(MusicPlayer.PlaylistPath) //TODO test this
+	void MKDIR(MusicPlayer.PlaylistPath)
 }
 
 //Only needed if you had an old version of the music player and need to convert to the new variables. If you don't need it, just remove it!

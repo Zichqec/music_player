@@ -130,7 +130,7 @@ OnMusicPlayer.Menu : all
 		_currentsong[1] = MusicPlayer.CurrentSongName
 	}
 	
-	"%(MusicPlayer.Scope)\c%(MusicPlayerBalloon)\_q\*\![set,autoscroll,disable]\![no-autopause]"
+	"%(MusicPlayer.Scope)\c%(MusicPlayer.Balloon)\_q\*\![set,autoscroll,disable]\![no-autopause]"
 	
 	//CUSTOMIZE: If you're using something other than OnMenuRun for your menu, you'll need to edit this button and the one at the bottom of the menu
 	"\![*]\q[Back,OnMenuRun]  \![*]\__q[blank]Close window\__q\n"
@@ -295,7 +295,7 @@ OnMusicPlayer.PlaySong : all
 		}
 		if MusicPlayer.MenuIsOpen && reference3 != "justadded"; "\C" //If the balloon is currently open other than when a song was just added, keep it open
 		
-		"%(MusicPlayer.Scope)%(SingingSurfaces)\![no-autopause]" //Start the singing animations if they weren't already started
+		"%(MusicPlayer.Scope)%(MusicPlayer.SingingSurfaces)\![no-autopause]" //Start the singing animations if they weren't already started
 		
 		_send = ""
 		_send += "%(OnMusicPlayer.NotifySongInfo)"
@@ -344,7 +344,7 @@ OnMusicPlayer.StopSong : all
 	
 	"\![sound,stop]"
 	
-	"%(NonSingingSurfaces)%(OnMusicPlayer.NotifySongInfo)" //Stop the singing animations
+	"%(MusicPlayer.NonSingingSurfaces)%(OnMusicPlayer.NotifySongInfo)" //Stop the singing animations
 	
 	if reference0 != ""; "\![raise,%(reference0)]" //If music menu is already open, reopen it so that it highlights the correct song properly
 }
@@ -364,12 +364,12 @@ OnMusicPlayer.PauseSong : all
 	if reference1 == "resume" //Unpausing
 	{
 		MusicPlayer.IsPaused = 0
-		"%(SingingSurfaces)\![sound,resume]"
+		"%(MusicPlayer.SingingSurfaces)\![sound,resume]"
 	}
 	else //Pausing
 	{
 		MusicPlayer.IsPaused = 1
-		"%(NonSingingSurfaces)\![sound,pause]"
+		"%(MusicPlayer.NonSingingSurfaces)\![sound,pause]"
 	}
 	
 	"%(OnMusicPlayer.NotifySongInfo)"
@@ -535,7 +535,7 @@ OnMusicPlayer.PlaylistPage
 
 OnMusicPlayer.JumpToPlaylistPage : all
 {
-	"\C\![lock,balloonrepaint]\c%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]\![no-autopause]"
+	"\C\![lock,balloonrepaint]\c%(MusicPlayer.Scope)%(MusicPlayer.Balloon)\_q\![set,autoscroll,disable]\![no-autopause]"
 	"\![open,inputbox,OnMusicPlayer.JumpIndex,-1]"
 	
 	//DIALOGUE: Dialogue for typing in a page number to jump to manually in the playlist
@@ -560,7 +560,7 @@ OnMusicPlayer.JumpIndex : all
 	else
 	{
 		//DIALOGUE: Dialogue for putting in an invalid number, or something that isn't a number
-		"%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]\![no-autopause]"
+		"%(MusicPlayer.Scope)%(MusicPlayer.Balloon)\_q\![set,autoscroll,disable]\![no-autopause]"
 		"Invalid input.\x\![raise,OnMusicPlayer.JumpToPlaylistPage]"
 	}
 }
@@ -589,7 +589,7 @@ OnMusicPlayer.ScootSongMenu : all
 	
 	if reference1 != ""; "\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c"
 	
-	"%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\*\![no-autopause]"
+	"%(MusicPlayer.Scope)%(MusicPlayer.Balloon)\_q\*\![no-autopause]"
 	
 	"\![*]\q[Back,OnMusicPlayer.Menu]\n\n"
 	
@@ -765,7 +765,7 @@ OnMusicPlayer.Settings : all
 	elseif _mode == 4; _mode = "Random"
 	else; _mode = "Loop Playlist"
 	
-	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c\![set,autoscroll,disable]\![no-autopause]\_q\*%(MusicPlayerBalloon)"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c\![set,autoscroll,disable]\![no-autopause]\_q\*%(MusicPlayer.Balloon)"
 	
 	//▲▼⯇⯈ - buttons for ease of copying
 	//Doing this here so that the menu bit itself can be cleaner... This is just handling graying out the buttons if clicking them would do nothing.
@@ -775,7 +775,7 @@ OnMusicPlayer.Settings : all
 	if MusicPlayer.Volume <= 0; _vol_down_btn = "%(_g)▼%(_d)"
 	
 	_speed_up_btn = "\q[▲,OnMusicPlayer.QuickSpeed,Up]"
-	if MusicPlayer.Speed >= MAX_RATE; _speed_up_btn = "%(_g)▲%(_d)"
+	if MusicPlayer.Speed >= MusicPlayer.MaxRate; _speed_up_btn = "%(_g)▲%(_d)"
 	_speed_down_btn = "\q[▼,OnMusicPlayer.QuickSpeed,Down]"
 	if MusicPlayer.Speed <= 0; _speed_down_btn = "%(_g)▼%(_d)"
 	
@@ -819,7 +819,6 @@ OnMusicPlayer.Settings : all
 	
 	"\![*]\__q[OnMusicPlayer.MusicInfo,addsong]How do I add a song?\__q\n"
 	"\![*]\__q[OnMusicPlayer.MusicInfo,error]Why do some songs give an error?\__q\n"
-	"\![*]\__q[OnMusicPlayer.MusicInfo,playlistsave]Where are playlists saved?\__q"
 	"\n\n\![*]\__q[OnMusicPlayer.Menu]Back to music menu\__q"
 	
 	
@@ -829,7 +828,7 @@ OnMusicPlayer.Settings : all
 //Changing the playback type
 OnMusicPlayer.PlaybackType : all
 {
-	"%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![no-autopause]"
+	"%(MusicPlayer.Scope)%(MusicPlayer.Balloon)\_q\![no-autopause]"
 	
 	"\![*]\q[Loop Playlist,OnMusicPlayer.PlaybackTypeChange,0]\n"
 	"\![*]\q[Shuffle and Loop,OnMusicPlayer.PlaybackTypeChange,1]\n"
@@ -863,10 +862,10 @@ OnMusicPlayer.PlaybackTypeChange
 //Bringing up input boxes
 OnMusicPlayer.SetOption : all
 {
-	"%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\*\![no-autopause]"
+	"%(MusicPlayer.Scope)%(MusicPlayer.Balloon)\_q\*\![no-autopause]"
 	
 	if reference0 == "Balance"; "\![open,inputbox,OnMusicPlayer.Balance,-1]"
-	elseif reference0 == "Speed"; "\![open,sliderinput,OnMusicPlayer.Speed,-1,100,1,%(MAX_RATE)]"
+	elseif reference0 == "Speed"; "\![open,sliderinput,OnMusicPlayer.Speed,-1,100,1,%(MusicPlayer.MaxRate)]"
 	else; "\![open,sliderinput,OnMusicPlayer.Volume,-1,100,1,100]"
 	
 	//DIALOGUE: Dialogue for when you click the numbers for volume/speed/balance to set them directly.
@@ -961,7 +960,7 @@ OnMusicPlayer.QuickSpeed : all
 	if reference0 == "Up" || _argv[0] == "Up"
 	{
 		MusicPlayer.Speed += _amt
-		if MusicPlayer.Speed > MAX_RATE; MusicPlayer.Speed = MAX_RATE
+		if MusicPlayer.Speed > MusicPlayer.MaxRate; MusicPlayer.Speed = MusicPlayer.MaxRate
 	}
 	else //Down
 	{
@@ -1122,7 +1121,7 @@ OnMusicPlayer.Hotkeys : all
 	_h = "\f[color,default.anchor]" //Highlight color
 	_d = "\f[color,default]" //Default color
 
-	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\_q\*\![set,autoscroll,disable]\![no-autopause]"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayer.Balloon)\_q\*\![set,autoscroll,disable]\![no-autopause]"
 	
 	//DIALOGUE: Menu for changing the hotkeys
 	"Click a hotkey to change it, click the (x) to unset it.\n\n"
@@ -1164,7 +1163,7 @@ OnMusicPlayer.ChangeHotkey : all
 	elseif reference0 == 11; _option = "balance right"
 	else; _option =  "Play/Pause"
 	
-	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\*\_q\![no-autopause]"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayer.Balloon)\*\_q\![no-autopause]"
 	
 	//DIALOGUE: Changing a hotkey
 	"Press a key for %(_option)."
@@ -1189,13 +1188,7 @@ OnMusicPlayer.MusicInfo : all
 	_h = "\f[color,default.anchor]" //highlight
 	_d = "\f[color,default]" //default
 	
-	if reference0 == "playlistsave"
-	{
-		_path = PLAYLIST_FOLDER
-		if FENUM(_path) == ""; void MKDIR(_path) //make directory if none exists
-	}
-	
-	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\_q\![no-autopause]"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayer.Balloon)\_q\![no-autopause]"
 	
 	//DIALOGUE: Answers for the FAQ - Make sure you replace the file path in the one about where playlists save
 	if reference0 == "addsong" //Asking how to add songs
@@ -1206,10 +1199,6 @@ OnMusicPlayer.MusicInfo : all
 	{
 		"Some songs will not play despite being the correct type. This is an SSP limitation. You can install \_a[https://github.com/Nevcairiel/LAVFilters/releases]LAV Filters\_a, an open source program, to fix most of these errors. If you don't want to do that, you can import a song into an audio editing program like \_a[https://www.audacityteam.org/]Audacity\_a and export it again, or convert it to another compatible type with something like \_a[https://www.onlineconverter.com/]Online Converter\_a."
 	}
-	elseif reference0 == "playlistsave" //Asking where playlists save
-	{
-		"Playlists are saved in \_a[OnMusicPlayer.PlaylistPath]SSP/ghost/THIS GHOST/playlists/\_a. You can also load a playlist from elsewhere by dragging and dropping it onto the ghost."
-	}
 	
 	"\![unlock,balloonrepaint]\x[noclear]\![raise,OnMusicPlayer.Settings]"
 }
@@ -1217,7 +1206,7 @@ OnMusicPlayer.MusicInfo : all
 //Display a list of all the compatible filetypes
 OnMusicPlayer.DisplayFileTypes : all
 {
-	"%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![no-autopause]"
+	"%(MusicPlayer.Scope)%(MusicPlayer.Balloon)\_q\![no-autopause]"
 	
 	_i = 0
 	foreach MusicPlayer.CompatibleMusicFileTypes; _type
@@ -1238,7 +1227,7 @@ OnMusicPlayer.DisplayFileTypes : all
 
 OnMusicPlayer.SavePlaylist : all
 {
-	"\C\![lock,balloonrepaint]\c%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]\![no-autopause]"
+	"\C\![lock,balloonrepaint]\c%(MusicPlayer.Scope)%(MusicPlayer.Balloon)\_q\![set,autoscroll,disable]\![no-autopause]"
 	"\![open,dialog,save,--id=OnMusicPlayer.PlaylistSaved,--ext=m3u,--filter=Playlist file|*.m3u,--dir=""%(MusicPlayer.PlaylistPath)""]"
 	
 	//DIALOGUE: Saving a playlist
@@ -1266,7 +1255,7 @@ OnMusicPlayer.PlaylistSaved : all
 	MusicPlayer.PlaylistPath = _split[0] + _split[1]
 	
 	
-	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\_q\![no-autopause]"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayer.Balloon)\_q\![no-autopause]"
 	
 	//DIALOGUE: a playlist saving correctly, or failing to save
 	if _o == 1 //If it saves successfully
@@ -1288,7 +1277,7 @@ OnPlaylist.Back
 
 OnMusicPlayer.LoadPlaylist : all
 {
-	"\C\![lock,balloonrepaint]\c%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]\![no-autopause]"
+	"\C\![lock,balloonrepaint]\c%(MusicPlayer.Scope)%(MusicPlayer.Balloon)\_q\![set,autoscroll,disable]\![no-autopause]"
 	"\![open,dialog,open,--id=OnMusicPlayer.PlaylistLoaded,--filter=Playlist file|*.m3u,--dir=""%(MusicPlayer.PlaylistPath)""]"
 	
 	//DIALOGUE: Loading a playlist
@@ -1321,7 +1310,7 @@ OnMusicPlayer.PlaylistLoaded : all
 	
 	MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentSongIndex,MusicPlayer.CurrentPlaylist)
 	
-	"%(MusicPlayer.Scope)%(NonSingingSurfaces)\![no-autopause]"
+	"%(MusicPlayer.Scope)%(MusicPlayer.NonSingingSurfaces)\![no-autopause]"
 	
 	"\![sound,stop]%(OnMusicPlayer.NotifySongInfo)"
 	
@@ -1336,7 +1325,7 @@ OnMusicPlayer.ClearPlaylist : all
 	_are = "are"; _s = "s"
 	if _num == 1; {_are = "is"; _s = ""}
 	
-	"%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![no-autopause]"
+	"%(MusicPlayer.Scope)%(MusicPlayer.Balloon)\_q\![no-autopause]"
 	
 	//DIALOGUE: Asking for confirmation before clearing the current playlist. %(_are) and %(_s) can be used for plurals.
 	"There %(_are) %(_num) song%(_s) in the current playlist. Are you sure you want to clear it? It cannot be brought back unless you have saved it."
@@ -1356,7 +1345,7 @@ OnMusicPlayer.PlaylistCleared : all
 	
 	"\![sound,stop]%(OnMusicPlayer.NotifySongInfo)"
 	
-	"%(NonSingingSurfaces)%(MusicPlayerBalloon)\_q\![no-autopause]"
+	"%(MusicPlayer.NonSingingSurfaces)%(MusicPlayer.Balloon)\_q\![no-autopause]"
 	
 	if reference0 == ""; OnMusicPlayer.Menu
 	else
@@ -1392,7 +1381,7 @@ OnMusicPlayer.NotifySongInfo
 	//2 - The index number of the currently playing song. If the song is paused, the index number is still tracked. This probably isn't that useful but I feel like I'll regret it later if I don't add it.
 	//3 - 1 if the player is paused, 0 otherwise
 	//4 - Current volume from 0 - 100
-	//5 - Current speed, from 0 - 400 (see MAX_RATE function for more info). 100 is normal speed
+	//5 - Current speed, from 0 - 400 (see MusicPlayer.MaxRate function for more info). 100 is normal speed
 	//6 - Current balance. 0 is normal, -100 is all the way left, 100 is all the way right
 	//7 - The play mode. 0 for loop playlist, 1 for shuffle playlist, 2 for loop song, 3 for play one song, 4 for random
 	//8 - "stop after playback" means it will stop after the current song, "stop after playlist" means it will stop when the playlist completes
@@ -1408,13 +1397,13 @@ OnMusicPlayer.NotifySongInfo
 //CUSTOMIZE: Functions that either must be customized, such as which surfaces are used for singing, or that you may want to customize such as the path of the playlists folder.
 
 //Surfaces used for singing animation
-SingingSurfaces
+MusicPlayer.SingingSurfaces
 {
 	"\s[25]"
 }
 
 //Surfaces to go to when music stops
-NonSingingSurfaces
+MusicPlayer.NonSingingSurfaces
 {
 	"\s[0]"
 }
@@ -1426,21 +1415,15 @@ MusicPlayer.Scope
 }
 
 //Which balloon will be used for the menus in the music player.
-MusicPlayerBalloon
+MusicPlayer.Balloon
 {
 	"\b[2]"
 }
 
 //Maximum speed for the music player. Because of an SSP bug, this is capped at 435 at the time of writing. According to Ukadoc it should be able to go up to 10000. To avoid bugs I'm going to cap this at 400, but if the bug is fixed in the future you can change the rate to whatever cap you want here.
-MAX_RATE
+MusicPlayer.MaxRate
 {
 	400
-}
-
-//Change the below path if you want your folder called something other than 'playlists', or if you want it placed somewhere else.
-PLAYLIST_FOLDER
-{
-	"../../playlists/"
 }
 
 //Replace this number with the number of lines in the balloon that you'll be using for the music menu.
@@ -1909,7 +1892,7 @@ OnSoundStop : all
 			}
 			else
 			{
-				"%(SingingSurfaces)\![raise,OnMusicPlayer.PlaySong,""%(MusicPlayer.CurrentSongName)"",%(MusicPlayer.CurrentSongIndex),%(_inmenu)]"
+				"%(MusicPlayer.SingingSurfaces)\![raise,OnMusicPlayer.PlaySong,""%(MusicPlayer.CurrentSongName)"",%(MusicPlayer.CurrentSongIndex),%(_inmenu)]"
 			}
 		}
 	}
@@ -1948,7 +1931,7 @@ OnBalloonChange : all
 {
 	if MusicPlayer.BalloonIsOpen; "\C"
 	
-	"%(MusicPlayerBalloon)\![get,property,OnBalloonLines,currentghost.balloon.scope(0).lines.initial]"
+	"%(MusicPlayer.Balloon)\![get,property,OnBalloonLines,currentghost.balloon.scope(0).lines.initial]"
 }
 
 //Not a built in event, but related to the above

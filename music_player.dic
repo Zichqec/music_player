@@ -217,7 +217,7 @@ OnMusicMenu : all
 			"\f[color,disable]▼▼\f[color,default]"
 		}
 		"    "
-		"\n \n[-100]\f[align,center]\__q[OnMusicPlayer.JumpToPlaylistPage]%(MusicPlayer.PageIndex + 1)/%(MusicPlayer.MaxPages + 1)\__q"
+		"\n \n[-100]\f[align,center]\__q[OnMusicPlayer.JumpToPlaylistPage]Page %(MusicPlayer.PageIndex + 1)/%(MusicPlayer.MaxPages + 1)\__q"
 		"\_l[]\f[align,left]"
 	}
 	

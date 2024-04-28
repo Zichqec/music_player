@@ -785,7 +785,7 @@ OnMusicPlayer.Settings : all
 	if MusicPlayer.Balance >= 100; _balance_right_btn = "%(_g)⯈%(_d)"
 	
 	
-	"Play mode: \![*]\__q[OnMusicPlayer.PlaybackType]%(_mode)\__q\n\n[half]"
+	"Play mode: \![*]%(_h)\__q[OnMusicPlayer.PlaybackType]%(_mode)\__q%(_d)\n\n[half]"
 	"Volume: %(_vol_up_btn)%(_vol_down_btn) %(_h)\q[%(_vol),OnMusicPlayer.SetOption,Volume]%(_d)\n"
 	"Speed: %(_speed_up_btn)%(_speed_down_btn) %(_h)\q[%(_speed),OnMusicPlayer.SetOption,Speed]%(_d)\n"
 	"Balance: %(_balance_left_btn)%(_balance_right_btn) %(_h)\q[%(_bal),OnMusicPlayer.SetOption,Balance]%(_d)\n\n"

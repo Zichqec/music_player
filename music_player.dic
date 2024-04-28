@@ -168,10 +168,8 @@ OnMusicPlayer.Menu : all
 	
 	if NowPlaying[0] != ""
 	{
-		_song = NowPlaying[0]
-		_song = SPLITPATH(_song)[2] //Picks out just the name of the file, no extension
-		_path = CurrentPlaylist[_i]
-		" %(_h)\__q[OnMusicPlayer.SongLocation,""%(_path)""]%(_song)\__q\f[default]"
+		_song = SPLITPATH(NowPlaying[0])[2] //Picks out just the name of the file, no extension
+		" %(_h)\__q[OnMusicPlayer.SongLocation,""%(NowPlaying[0])""]%(_song)\__q\f[default]"
 	}
 	
 	if MusicPlayer.Pagination == "Paginated"

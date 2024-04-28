@@ -124,39 +124,6 @@ OnMusicMenu : all
 		_current_song_index = ShuffledPlaylist[_current_song_index]
 	}
 	
-	_display = ""
-	_currentsong = IARRAY
-	for _i = 0; _i < ARRAYSIZE(CurrentPlaylist); _i++
-	{
-		_song = CurrentPlaylist[_i]
-		_song = SPLITPATH(_song)[2] //Picks out just the name of the file, no extension
-		_path = CurrentPlaylist[_i]
-		
-		if _i == _current_song_index //If this is the song that's playing right now
-		{
-			_currentsong[0] = _song //Song name
-			_currentsong[1] = CurrentPlaylist[_i] //Song path
-		}
-		if MusicPlayer.Pagination == "Paginated" 
-		{
-			if _i < _starting_value; continue
-			if _i > _starting_value + (MusicPlayer.SongsPerPage - 1)
-			{
-				if _currentsong[0] == ""; continue
-				else; break
-			}
-		}
-
-		_display += "\q[(x),OnRemoveSong,%(_i)] " //(x) button
-
-		if _i == _current_song_index //If this is the song that's playing right now
-		{
-			_display += "\f[bold,1]\f[italic,1]"
-		}
-		_display += "%(_h)\__q[OnPlaySong,""%(_path)"",%(_i),OnMusicMenu,frommenu]%(_song)\__q%(_d)\n"
-		if _i == _current_song_index; _display += "\f[default]" //Reset the bold/italic if it was applied
-	}
-	
 	if _currentsong[0] == "" //Placeholder if the song was removed from the playlist
 	{
 		_currentsong[0] = "(Removed from playlist)"
@@ -199,7 +166,13 @@ OnMusicMenu : all
 	
 	"Now playing:"
 	
-	if NowPlaying[0] != ""; " %(_h)\__q[OnSongLocation,""%(_currentsong[1])""]%(_currentsong[0])\__q\f[default]"
+	if NowPlaying[0] != ""
+	{
+		_song = NowPlaying[0]
+		_song = SPLITPATH(_song)[2] //Picks out just the name of the file, no extension
+		_path = CurrentPlaylist[_i]
+		" %(_h)\__q[OnSongLocation,""%(_path)""]%(_song)\__q\f[default]"
+	}
 	
 	if MusicPlayer.Pagination == "Paginated"
 	{
@@ -221,7 +194,41 @@ OnMusicMenu : all
 		"\_l[]\f[align,left]"
 	}
 	
-	"\n\n[half]%(_display)\n"
+	"\n\n[half]"
+	
+	_currentsong = IARRAY
+	for _i = 0; _i < ARRAYSIZE(CurrentPlaylist); _i++
+	{
+		_song = CurrentPlaylist[_i]
+		_song = SPLITPATH(_song)[2] //Picks out just the name of the file, no extension
+		_path = CurrentPlaylist[_i]
+		
+		if _i == _current_song_index //If this is the song that's playing right now
+		{
+			_currentsong[0] = _song //Song name
+			_currentsong[1] = CurrentPlaylist[_i] //Song path
+		}
+		if MusicPlayer.Pagination == "Paginated" 
+		{
+			if _i < _starting_value; continue
+			if _i > _starting_value + (MusicPlayer.SongsPerPage - 1)
+			{
+				if _currentsong[0] == ""; continue
+				else; break
+			}
+		}
+
+		"\q[(x),OnRemoveSong,%(_i)] " //(x) button
+
+		if _i == _current_song_index //If this is the song that's playing right now
+		{
+			"\f[bold,1]\f[italic,1]"
+		}
+		"%(_h)\__q[OnPlaySong,""%(_path)"",%(_i),OnMusicMenu,frommenu]%(_song)\__q%(_d)\n"
+		if _i == _current_song_index; "\f[default]" //Reset the bold/italic if it was applied
+	}
+	
+	"\n"
 	
 	"\![*]\q[Back,OnMenuRun]  \![*]\__q[blank]Close window\__q"
 	
@@ -582,8 +589,13 @@ OnScootSongMenu : all
 	_g = "\f[color,disable]"
 	_d = "\f[color,default]"
 	
-	_display = ""
-	if reference1 == "top"; _display += "\![set,autoscroll,disable]"
+	if reference1 != ""; "\C%(MusicPlayerScope)\![lock,balloonrepaint]\c"
+	
+	"%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\*"
+	
+	"\![*]\q[Back,OnMusicMenu]\n\n"
+	
+	if reference1 == "top"; "\![set,autoscroll,disable]"
 	
 	_currentsong = IARRAY
 	for _i = 0; _i < ARRAYSIZE(CurrentPlaylist); _i++
@@ -593,20 +605,20 @@ OnScootSongMenu : all
 
 		if _i != 0
 		{
-			_display += "\q[▲▲,OnMoveSong,%(_i),top]  "
-			_display += "\f[bold,1]\q[△,OnScootSong,%(_i),-]\f[bold,default] "
+			"\q[▲▲,OnMoveSong,%(_i),top]  "
+			"\f[bold,1]\q[△,OnScootSong,%(_i),-]\f[bold,default] "
 		}
 		else
 		{
-			_display += "%(_g)"
-			_display += "▲▲  "
-			_display += "\f[bold,1]△\f[bold,default] "
-			_display += "%(_d)"
+			"%(_g)"
+			"▲▲  "
+			"\f[bold,1]△\f[bold,default] "
+			"%(_d)"
 		}
 		
 		if _i == NowPlaying[1] //If this is the song that's playing right now
 		{
-			_display += "\f[bold,1]" //Make it bold
+			"\f[bold,1]" //Make it bold
 			_currentsong[0] = _song //Saves the song name into _currentsong[0]
 			_currentsong[1] = CurrentPlaylist[_i] //Saves the song path into _currentsong[1]
 		}
@@ -615,7 +627,7 @@ OnScootSongMenu : all
 		_lines = BalloonLines / 2 - 1
 		if reference1 == "+"; _lines += 1
 		elseif reference1 == "-"; _lines -= 1
-		if (_i - _lines) == reference0 && reference1 != "end"; _display += "\![set,autoscroll,disable]"
+		if (_i - _lines) == reference0 && reference1 != "end"; "\![set,autoscroll,disable]"
 		
 		//Handle which song name to highlight (by unhighlighting)
 		_justmoved = reference0
@@ -624,31 +636,26 @@ OnScootSongMenu : all
 		elseif reference1 == "+"; _justmoved++
 		else; _justmoved--
 		
-		if _i != _justmoved; _display += "%(_h)" //Highlight song if it's not the one that was just moved
+		if _i != _justmoved; "%(_h)" //Highlight song if it's not the one that was just moved
 		//NOTE: If you're getting an error about the line below, you probably don't have yaya_optional.txt! You can pick that up here: https://github.com/ponapalt/yaya-dic
-		_display += "\_n%(SHIORI3FW.MakeShortText(_song,_max_name_length)) \_n" //Add song to list
-		if _i != _justmoved; _display += "%(_d)"
-		if _i == NowPlaying[1]; _display += "\f[default]" //Reset the bold if it was applied
+		"\_n%(SHIORI3FW.MakeShortText(_song,_max_name_length)) \_n" //Add song to list
+		if _i != _justmoved; "%(_d)"
+		if _i == NowPlaying[1]; "\f[default]" //Reset the bold if it was applied
 		
-		_display += "%(newline)\f[align,right]\f[bold,1]"
+		"%(newline)\f[align,right]\f[bold,1]"
 		if _i != (ARRAYSIZE(CurrentPlaylist) - 1)
 		{
-			_display += "\q[▽,OnScootSong,%(_i),+]\f[bold,default]  "
-			_display += "\q[▼▼,OnMoveSong,%(_i),end]"
+			"\q[▽,OnScootSong,%(_i),+]\f[bold,default]  "
+			"\q[▼▼,OnMoveSong,%(_i),end]"
 		}
 		else
 		{
-			_display += "%(_g)"
-			_display += "▽\f[bold,default]  "
-			_display += "▼▼"
+			"%(_g)"
+			"▽\f[bold,default]  "
+			"▼▼"
 		}
-		_display += "\n\f[align,left]%(newline)%(_d)" //Align commands... so useful but so tricky. Idk why this works but it does. It was putting extra spaces before which are really obvious on some balloons with fonts that have wide spaces
+		"\n\f[align,left]%(newline)%(_d)" //Align commands... so useful but so tricky. Idk why this works but it does. It was putting extra spaces before which are really obvious on some balloons with fonts that have wide spaces
 	}
-	if reference1 != ""; "\C%(MusicPlayerScope)\![lock,balloonrepaint]\c"
-	
-	"%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\*"
-	
-	"\![*]\q[Back,OnMusicMenu]\n\n"
 	
 	"%(_display)\n\n"
 	
@@ -1207,20 +1214,19 @@ OnDisplayFileTypes : all
 {
 	"%(MusicPlayerScope)%(MusicPlayerBalloon)\_q"
 	
-	_display = ""
 	_i = 0
 	foreach CompatibleMusicFileTypes; _type
 	{
 		if _i >= 3; _i = 0
 		
 		
-		if _i != 0; _display += "    "
-		else; {_display += "\n"}
+		if _i != 0; "    "
+		else; "\n"
 		
 		_i++
-		_display += "\f[color,default.anchor]%(_type)\f[color,default]"
+		"\f[color,default.anchor]%(_type)\f[color,default]"
 	}
-	_display
+
 	
 	"\x\![raise,OnMusicSettings]"
 }

@@ -1235,7 +1235,7 @@ OnMusicPlayer.DisplayFileTypes : all
 OnMusicPlayer.SavePlaylist : all
 {
 	"\C\![lock,balloonrepaint]\c%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]\![no-autopause]"
-	"\![open,dialog,save,--id=OnMusicPlayer.PlaylistSaved,--ext=m3u,--filter=Playlist file|*.m3u,--dir=%(MusicPlayer.PlaylistPath)]"
+	"\![open,dialog,save,--id=OnMusicPlayer.PlaylistSaved,--ext=m3u,--filter=Playlist file|*.m3u,--dir=""%(MusicPlayer.PlaylistPath)""]"
 	
 	//DIALOGUE: Saving a playlist
 	"Choose a file name and location for the playlist."
@@ -1285,7 +1285,7 @@ OnPlaylist.Back
 OnMusicPlayer.LoadPlaylist : all
 {
 	"\C\![lock,balloonrepaint]\c%(MusicPlayer.Scope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]\![no-autopause]"
-	"\![open,dialog,open,--id=OnMusicPlayer.PlaylistLoaded,--filter=Playlist file|*.m3u,--dir=%(MusicPlayer.PlaylistPath)]"
+	"\![open,dialog,open,--id=OnMusicPlayer.PlaylistLoaded,--filter=Playlist file|*.m3u,--dir=""%(MusicPlayer.PlaylistPath)""]"
 	
 	//DIALOGUE: Loading a playlist
 	"Select a playlist to load.\n\nThe current playlist will be lost unless it is already saved."

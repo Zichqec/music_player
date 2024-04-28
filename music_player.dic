@@ -134,7 +134,7 @@ OnMusicPlayer.Menu : all
 	
 	//CUSTOMIZE: If you're using something other than OnMenuRun for your menu, you'll need to edit this button and the one at the bottom of the menu
 	"\![*]\q[Back,OnMenuRun]  \![*]\__q[blank]Close window\__q\n"
-	"\![*]\__q[OnMusicPlayer.Settings]Settings and Info\__q  \![*]\__q[OnMusicPlayer.ScootSongMenu]Move songs\__q\n\n[half]"
+	"\![*]\__q[OnMusicPlayer.Settings,Basic]Settings\__q  \![*]\__q[OnMusicPlayer.Info]Help\__q\n\n[half]"
 	
 	if MusicPlayer.CurrentSongName == "" //This is if no song is loaded in. The text will be grayed out until a song is chosen.
 	{
@@ -577,165 +577,6 @@ OnMusicPlayer.JumpBack
 	"\C\![close,inputbox,OnMusicPlayer.JumpIndex]\![raise,OnMusicPlayer.Menu]"
 }
 
-//Menu for moving songs around in the playlist. Would love to eventually set it up to allow you to move songs to certain index numbers...
-OnMusicPlayer.ScootSongMenu : all
-{
-	//CUSTOMIZE: This is the menu for moving songs in the playlist. The value below determines how much of the file name should be displayed before it shows an ellipsis. Adjust as needed to fit your balloon.
-	_max_name_length = 23 //Max length of names in this menu. After this number of characters it will write an ellipsis
-	
-	_h = "\f[color,default.anchor]"
-	_g = "\f[color,disable]"
-	_d = "\f[color,default]"
-	
-	if reference1 != ""; "\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c"
-	
-	"%(MusicPlayer.Scope)%(MusicPlayer.Balloon)\_q\*\![no-autopause]"
-	
-	"\![*]\q[Back,OnMusicPlayer.Menu]\n\n"
-	
-	if reference1 == "top"; "\![set,autoscroll,disable]"
-	
-	_current_song_index = MusicPlayer.CurrentSongIndex
-	if MusicPlayer.PlayMode == 1 //Shuffle and loop
-	{
-		_current_song_index = MusicPlayer.ShuffledPlaylist[_current_song_index]
-	}
-	
-	_currentsong = IARRAY
-	for _i = 0; _i < ARRAYSIZE(MusicPlayer.CurrentPlaylist); _i++
-	{
-		_song = MusicPlayer.CurrentPlaylist[_i]
-		_song = SPLITPATH(_song)[2] //Picks out just the name of the file, no extension
-
-		if _i != 0
-		{
-			"\q[▲▲,OnMusicPlayer.MoveSong,%(_i),top]  "
-			"\f[bold,1]\q[△,OnMusicPlayer.ScootSong,%(_i),-]\f[bold,default] "
-		}
-		else
-		{
-			"%(_g)"
-			"▲▲  "
-			"\f[bold,1]△\f[bold,default] "
-			"%(_d)"
-		}
-		
-		if _i == _current_song_index //If this is the song that's playing right now
-		{
-			"\f[bold,1]" //Make it bold
-			_currentsong[0] = _song //Saves the song name into _currentsong[0]
-			_currentsong[1] = MusicPlayer.CurrentPlaylist[_i] //Saves the song path into _currentsong[1]
-		}
-		
-		//Attempt to position the menu such that it's not jumping around _too_ badly... as long as you don't click too fast.
-		_lines = MusicPlayer.BalloonLines / 2 - 1
-		if reference1 == "+"; _lines += 1
-		elseif reference1 == "-"; _lines -= 1
-		if (_i - _lines) == reference0 && reference1 != "end"; "\![set,autoscroll,disable]"
-		
-		//Handle which song name to highlight (by unhighlighting)
-		_justmoved = reference0
-		if reference1 == "end"; _justmoved = ARRAYSIZE(MusicPlayer.CurrentPlaylist) - 1
-		elseif reference1 == "top"; _justmoved = 0
-		elseif reference1 == "+"; _justmoved++
-		else; _justmoved--
-		
-		if _i != _justmoved; "%(_h)" //Highlight song if it's not the one that was just moved
-		//NOTE: If you're getting an error about the line below, you probably don't have yaya_optional.txt! You can pick that up here: https://github.com/ponapalt/yaya-dic
-		"\_n%(SHIORI3FW.MakeShortText(_song,_max_name_length)) \_n" //Add song to list
-		if _i != _justmoved; "%(_d)"
-		if _i == MusicPlayer.CurrentSongIndex; "\f[default]" //Reset the bold if it was applied
-		
-		"%(MusicPlayer.newline)\f[align,right]\f[bold,1]"
-		if _i != (ARRAYSIZE(MusicPlayer.CurrentPlaylist) - 1)
-		{
-			"\q[▽,OnMusicPlayer.ScootSong,%(_i),+]\f[bold,default]  "
-			"\q[▼▼,OnMusicPlayer.MoveSong,%(_i),end]"
-		}
-		else
-		{
-			"%(_g)"
-			"▽\f[bold,default]  "
-			"▼▼"
-		}
-		"\n\f[align,left]%(MusicPlayer.newline)%(_d)" //Align commands... so useful but so tricky. Idk why this works but it does. It was putting extra spaces before which are really obvious on some balloons with fonts that have wide spaces
-	}
-	
-	"%(_display)\n\n"
-	
-	"\![*]\q[Back,OnMusicPlayer.Menu]\![unlock,balloonrepaint]"
-}
-
-//Move song to top or bottom of playlist
-OnMusicPlayer.MoveSong : all
-{
-	_temp = MusicPlayer.CurrentPlaylist[reference0]
-	if reference1 == "top"
-	{
-		_temparray = MusicPlayer.CurrentPlaylist
-		_temparray[reference0] = IARRAY
-		MusicPlayer.CurrentPlaylist = IARRAY
-		MusicPlayer.CurrentPlaylist ,= _temp
-		foreach _temparray; _song
-		{
-			MusicPlayer.CurrentPlaylist ,= _song
-		}
-		if reference0 == MusicPlayer.CurrentSongIndex //If it's the current song, the index will now be 0
-		{
-			MusicPlayer.CurrentSongIndex = 0
-		}
-		elseif reference0 > MusicPlayer.CurrentSongIndex //If not, and the song _used_ to be below this one on the list, increase the index number since now the current song is lower in the list
-		{
-			MusicPlayer.CurrentSongIndex = MusicPlayer.CurrentSongIndex + 1
-		}
-	}
-	else //End
-	{
-		MusicPlayer.CurrentPlaylist[reference0] = IARRAY
-		MusicPlayer.CurrentPlaylist ,= _temp
-		if reference0 == MusicPlayer.CurrentSongIndex //If it's the current song, the index will now be the last in the array
-		{
-			MusicPlayer.CurrentSongIndex = ARRAYSIZE(MusicPlayer.CurrentPlaylist) - 1
-		}
-		elseif reference0 < MusicPlayer.CurrentSongIndex //If not, and the song _used_ to be above this one in the list, decrease the index number since now the current song is higher in the list 
-		{
-			MusicPlayer.CurrentSongIndex = MusicPlayer.CurrentSongIndex - 1
-		}
-	}
-	MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentSongIndex,MusicPlayer.CurrentPlaylist)
-	
-	"\C\![raise,OnMusicPlayer.ScootSongMenu,%(reference0),%(reference1)]"
-}
-
-//Moving a song in the playlist by one space
-OnMusicPlayer.ScootSong : all
-{
-	MusicPlayer.CurrentPlaylist = MusicPlayer.ArrayScootEx(TOINT(reference0),reference1,MusicPlayer.CurrentPlaylist)
-	if reference0 == MusicPlayer.CurrentSongIndex
-	{
-		if reference1 == "+"
-		{
-			MusicPlayer.CurrentSongIndex = MusicPlayer.CurrentSongIndex + 1
-		}
-		else //-
-		{
-			MusicPlayer.CurrentSongIndex = MusicPlayer.CurrentSongIndex - 1
-		}
-	}
-	elseif (reference0 + 1) == MusicPlayer.CurrentSongIndex && reference1 == "+"
-	{
-		MusicPlayer.CurrentSongIndex = MusicPlayer.CurrentSongIndex - 1
-	}
-	elseif (reference0 - 1) == MusicPlayer.CurrentSongIndex && reference1 == "-"
-	{
-		MusicPlayer.CurrentSongIndex = MusicPlayer.CurrentSongIndex + 1
-	}
-	
-	MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentSongIndex,MusicPlayer.CurrentPlaylist)
-	
-	"\C\![raise,OnMusicPlayer.ScootSongMenu,%(reference0),%(reference1)]"
-}
-
 //Open the folder of the currently playing song
 OnMusicPlayer.SongLocation
 {
@@ -749,7 +590,60 @@ OnMusicPlayer.SongLocation
 OnMusicPlayer.Settings : all
 {
 	MusicPlayer.ResetDefaultSettings
+	if reference0 != ""; MusicPlayer.LastMenuTab = reference0
+	else; reference0 = MusicPlayer.LastMenuTab
+	_isbasic = 0
+	if !(reference0 == "Advanced" || reference0 == "Playlists" || reference0 == "Hotkeys"); _isbasic = 1
 	
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c\![set,autoscroll,disable]\![no-autopause]\_q\*%(MusicPlayer.Balloon)"
+	
+	"\![*]"
+	switch _isbasic
+	{
+		"\f[color,disable]\__q[OnMusicPlayer.Settings,Basic]Basic\__q\f[color,default]"
+		"\f[color,default.anchor]\__q[OnMusicPlayer.Settings,Basic]Basic\__q\f[color,default]"
+	}
+	"  \![*]"
+	switch reference0 == "Advanced"
+	{
+		"\f[color,disable]\__q[OnMusicPlayer.Settings,Advanced]Advanced\__q\f[color,default]"
+		"\f[color,default.anchor]\__q[OnMusicPlayer.Settings,Advanced]Advanced\__q\f[color,default]"
+	}
+	"\n\![*]"
+	switch reference0 == "Playlists"
+	{
+		"\f[color,disable]\__q[OnMusicPlayer.Settings,Playlists]Playlists\__q\f[color,default]"
+		"\f[color,default.anchor]\__q[OnMusicPlayer.Settings,Playlists]Playlists\__q\f[color,default]"
+	}
+	"  \![*]"
+	switch reference0 == "Hotkeys"
+	{
+		"\f[color,disable]\__q[OnMusicPlayer.Settings,Hotkeys]Hotkeys\__q\f[color,default]"
+		"\f[color,default.anchor]\__q[OnMusicPlayer.Settings,Hotkeys]Hotkeys\__q\f[color,default]"
+	}
+	"\n\n"
+	
+	if reference0 == "Advanced"; MusicPlayer.Settings.Advanced
+	elseif reference0 == "Playlists"; MusicPlayer.Settings.Playlists
+	elseif reference0 == "Hotkeys"; MusicPlayer.Settings.Hotkeys
+	else; MusicPlayer.Settings.Basic
+	
+	"\n\n\![*]\__q[OnMusicPlayer.Menu]Back to music menu\__q"
+	"\![unlock,balloonrepaint]"
+	if _isbasic && MusicPlayer.Singing; "\![timerraise,1000,1,OnMusicPlayer.SettingsRecall]"
+	"\e __MUSIC_SETTINGS_MENU__,%(_isbasic)__"
+}
+
+OnMusicPlayer.SettingsRecall
+{
+	if "__MUSIC_SETTINGS_MENU__,1__" _in_ MusicPlayer.LastTalk
+	{
+		OnMusicPlayer.Settings
+	}
+}
+
+MusicPlayer.Settings.Basic : all
+{
 	_h = "\f[color,default.anchor]"
 	_g = "\f[color,disable]"
 	_d = "\f[color,default]"
@@ -764,8 +658,6 @@ OnMusicPlayer.Settings : all
 	elseif _mode == 3; _mode = "Play One Song"
 	elseif _mode == 4; _mode = "Random"
 	else; _mode = "Loop Playlist"
-	
-	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c\![set,autoscroll,disable]\![no-autopause]\_q\*%(MusicPlayer.Balloon)"
 	
 	//▲▼⯇⯈ - buttons for ease of copying
 	//Doing this here so that the menu bit itself can be cleaner... This is just handling graying out the buttons if clicking them would do nothing.
@@ -798,7 +690,15 @@ OnMusicPlayer.Settings : all
 		if MusicPlayer.StopAfterCurrent == "stop after playlist"; " \![*]"
 	}
 	else; "\f[color,disable]Stop after playlist ends\f[color,default]"
+	
+	//Uncomment if you're using the playtime counter and want to display playtime in the menu
 	"\n\n"
+	"Total playtime:\n"
+	"%(MusicPlayer.DisplayPlaytime(MusicPlayer.Playtime))"
+}
+
+MusicPlayer.Settings.Advanced : all
+{
 	"Song Bar \![*]%(_h)\__q[OnMusicPlayer.ToggleSongBar]%(MusicPlayer.SongBar)\__q%(_d)\n"
 	"Tooltips \![*]%(_h)\__q[OnMusicPlayer.ToggleTooltips]%(MusicPlayer.Tooltips)\__q%(_d)\n"
 	"Song announcements \![*]%(_h)\__q[OnMusicPlayer.ToggleSongAnnouncement]%(MusicPlayer.SongAnnouncement)\__q%(_d)\n"
@@ -806,23 +706,82 @@ OnMusicPlayer.Settings : all
 	"Scroll wheel controls \![*]%(_h)\__q[OnMusicPlayer.ToggleScrollWheel]%(MusicPlayer.Scroll)\__q%(_d)\n"
 	"Previous button \![*]%(_h)\__q[OnMusicPlayer.TogglePreviousButton]%(MusicPlayer.PreviousButton)\__q%(_d)\n"
 	"Playlist view \![*]%(_h)\__q[OnMusicPlayer.TogglePagination]%(MusicPlayer.Pagination)\__q%(_d)\n"
-	
-	//CUSTOMIZE: If you want Discord functionality, you'll need to uncomment this
-	//"Show current song in Discord? %(_h)\__q[OnMusicPlayer.ToggleDiscordPlugin]%(MusicPlayer.DiscordDisplay)\__q%(_d)\n"
 	"\n"
 	
+	"\![*]\__q[OnMusicPlayer.ScootSongMenuWarn]Move songs\__q"
+	
+	//CUSTOMIZE: If you want Discord functionality, you'll need to uncomment this
+	/*
+	"\n"
+	"Show current song in Discord? %(_h)\__q[OnMusicPlayer.ToggleDiscordPlugin]%(MusicPlayer.DiscordDisplay)\__q%(_d)"
+	*/
+}
+
+
+MusicPlayer.Settings.Playlists : all
+{
 	"\![*]\__q[OnMusicPlayer.SavePlaylist]Save current playlist\__q\n"
 	"\![*]\__q[OnMusicPlayer.LoadPlaylist]Load playlist\__q\n"
-	"\![*]\__q[OnMusicPlayer.ClearPlaylist]Clear current playlist\__q\n\n"
+	"\![*]\__q[OnMusicPlayer.ClearPlaylist]Clear current playlist\__q\n"
+	"\n"
+	"Length of current playlist: %(ARRAYSIZE(MusicPlayer.CurrentPlaylist)) songs"
 	
-	"\![*]\__q[OnMusicPlayer.Hotkeys]Change Hotkeys\__q\n\n"
+}
+
+
+MusicPlayer.Settings.Hotkeys : all
+//Hotkey menu
+//OnMusicPlayer.Hotkeys : all
+{
+	if reference1 != ""; MusicPlayer.Hotkeys[reference0] = reference1 //If the user cancelled, set the hotkey back to what it was
 	
-	"\![*]\__q[OnMusicPlayer.MusicInfo,addsong]How do I add a song?\__q\n"
-	"\![*]\__q[OnMusicPlayer.MusicInfo,error]Why do some songs give an error?\__q\n"
-	"\n\n\![*]\__q[OnMusicPlayer.Menu]Back to music menu\__q"
+	_msg = "Unbound"
+	
+	if MusicPlayer.Hotkeys[0] == ""; MusicPlayer.Hotkeys[0] = _msg //Play/pause
+	if MusicPlayer.Hotkeys[1] == ""; MusicPlayer.Hotkeys[1] = _msg //Next
+	if MusicPlayer.Hotkeys[2] == ""; MusicPlayer.Hotkeys[2] = _msg //Previous
+	if MusicPlayer.Hotkeys[3] == ""; MusicPlayer.Hotkeys[3] = _msg //Stop
+	if MusicPlayer.Hotkeys[4] == ""; MusicPlayer.Hotkeys[4] = _msg //Menu
+	if MusicPlayer.Hotkeys[5] == ""; MusicPlayer.Hotkeys[5] = _msg //Volume Up
+	if MusicPlayer.Hotkeys[6] == ""; MusicPlayer.Hotkeys[6] = _msg //Volume Down
+	if MusicPlayer.Hotkeys[7] == ""; MusicPlayer.Hotkeys[7] = _msg //Speed Up
+	if MusicPlayer.Hotkeys[8] == ""; MusicPlayer.Hotkeys[8] = _msg //Speed Down
+	if MusicPlayer.Hotkeys[9] == ""; MusicPlayer.Hotkeys[9] = _msg //Balance Left
+	if MusicPlayer.Hotkeys[10] == ""; MusicPlayer.Hotkeys[10] = _msg //Balance Right
+	if MusicPlayer.Hotkeys[11] == ""; MusicPlayer.Hotkeys[11] = _msg //Song Bar
 	
 	
-	"\![unlock,balloonrepaint]\e __MUSIC_SETTINGS_MENU__"
+	_playpause = MusicPlayer.Hotkeys[0]
+	_next = MusicPlayer.Hotkeys[1]
+	_prev = MusicPlayer.Hotkeys[2]
+	_stop = MusicPlayer.Hotkeys[3]
+	_menu = MusicPlayer.Hotkeys[4]
+	_songbar = MusicPlayer.Hotkeys[5]
+	_volup = MusicPlayer.Hotkeys[6]
+	_voldown = MusicPlayer.Hotkeys[7]
+	_speedup = MusicPlayer.Hotkeys[8]
+	_speeddown = MusicPlayer.Hotkeys[9]
+	_balanceleft = MusicPlayer.Hotkeys[10]
+	_balanceright = MusicPlayer.Hotkeys[11]
+
+	_h = "\f[color,default.anchor]" //Highlight color
+	_d = "\f[color,default]" //Default color
+
+	"\q[(x),OnMusicPlayer.UnsetHotkey,0] \__q[OnMusicPlayer.ChangeHotkey,0]Play/Pause: %(_h)%(_playpause)%(_d)\__q\n"
+	"\q[(x),OnMusicPlayer.UnsetHotkey,1] \__q[OnMusicPlayer.ChangeHotkey,1]Next Song: %(_h)%(_next)%(_d)\__q\n"
+	"\q[(x),OnMusicPlayer.UnsetHotkey,2] \__q[OnMusicPlayer.ChangeHotkey,2]Previous Song: %(_h)%(_prev)%(_d)\__q\n"
+	"\q[(x),OnMusicPlayer.UnsetHotkey,3] \__q[OnMusicPlayer.ChangeHotkey,3]Stop Song: %(_h)%(_stop)%(_d)\__q\n"
+	"\q[(x),OnMusicPlayer.UnsetHotkey,4] \__q[OnMusicPlayer.ChangeHotkey,4]Open Music Menu: %(_h)%(_menu)%(_d)\__q\n"
+	"\q[(x),OnMusicPlayer.UnsetHotkey,5] \__q[OnMusicPlayer.ChangeHotkey,5]Toggle Song Bar: %(_h)%(_songbar)%(_d)\__q\n\n"
+	
+	"\q[(x),OnMusicPlayer.UnsetHotkey,6] \__q[OnMusicPlayer.ChangeHotkey,6]Volume Up: %(_h)%(_volup)%(_d)\__q\n"
+	"\q[(x),OnMusicPlayer.UnsetHotkey,7] \__q[OnMusicPlayer.ChangeHotkey,7]Volume Down: %(_h)%(_voldown)%(_d)\__q\n"
+	"\q[(x),OnMusicPlayer.UnsetHotkey,8] \__q[OnMusicPlayer.ChangeHotkey,8]Speed Up: %(_h)%(_speedup)%(_d)\__q\n"
+	"\q[(x),OnMusicPlayer.UnsetHotkey,9] \__q[OnMusicPlayer.ChangeHotkey,9]Speed Down: %(_h)%(_speeddown)%(_d)\__q\n"
+	"\q[(x),OnMusicPlayer.UnsetHotkey,10] \__q[OnMusicPlayer.ChangeHotkey,10]Balance Left: %(_h)%(_balanceleft)%(_d)\__q\n"
+	"\q[(x),OnMusicPlayer.UnsetHotkey,11] \__q[OnMusicPlayer.ChangeHotkey,11]Balance Right: %(_h)%(_balanceright)%(_d)\__q"
+	
+	"\![unlock,balloonrepaint]"
 }
 
 //Changing the playback type
@@ -1084,63 +1043,186 @@ OnMusicPlayer.TogglePagination : all
 	OnMusicPlayer.Settings
 }
 
-//Hotkey menu
-OnMusicPlayer.Hotkeys : all
+//Menu for moving songs around in the playlist. I'd like to make this better, but alas...
+OnMusicPlayer.ScootSongMenuWarn : all
 {
-	if reference1 != ""; MusicPlayer.Hotkeys[reference0] = reference1 //If the user cancelled, set the hotkey back to what it was
-	
-	_msg = "Unbound"
-	
-	if MusicPlayer.Hotkeys[0] == ""; MusicPlayer.Hotkeys[0] = _msg //Play/pause
-	if MusicPlayer.Hotkeys[1] == ""; MusicPlayer.Hotkeys[1] = _msg //Next
-	if MusicPlayer.Hotkeys[2] == ""; MusicPlayer.Hotkeys[2] = _msg //Previous
-	if MusicPlayer.Hotkeys[3] == ""; MusicPlayer.Hotkeys[3] = _msg //Stop
-	if MusicPlayer.Hotkeys[4] == ""; MusicPlayer.Hotkeys[4] = _msg //Menu
-	if MusicPlayer.Hotkeys[5] == ""; MusicPlayer.Hotkeys[5] = _msg //Volume Up
-	if MusicPlayer.Hotkeys[6] == ""; MusicPlayer.Hotkeys[6] = _msg //Volume Down
-	if MusicPlayer.Hotkeys[7] == ""; MusicPlayer.Hotkeys[7] = _msg //Speed Up
-	if MusicPlayer.Hotkeys[8] == ""; MusicPlayer.Hotkeys[8] = _msg //Speed Down
-	if MusicPlayer.Hotkeys[9] == ""; MusicPlayer.Hotkeys[9] = _msg //Balance Left
-	if MusicPlayer.Hotkeys[10] == ""; MusicPlayer.Hotkeys[10] = _msg //Balance Right
-	if MusicPlayer.Hotkeys[11] == ""; MusicPlayer.Hotkeys[11] = _msg //Song Bar
-	
-	
-	_playpause = MusicPlayer.Hotkeys[0]
-	_next = MusicPlayer.Hotkeys[1]
-	_prev = MusicPlayer.Hotkeys[2]
-	_stop = MusicPlayer.Hotkeys[3]
-	_menu = MusicPlayer.Hotkeys[4]
-	_songbar = MusicPlayer.Hotkeys[5]
-	_volup = MusicPlayer.Hotkeys[6]
-	_voldown = MusicPlayer.Hotkeys[7]
-	_speedup = MusicPlayer.Hotkeys[8]
-	_speeddown = MusicPlayer.Hotkeys[9]
-	_balanceleft = MusicPlayer.Hotkeys[10]
-	_balanceright = MusicPlayer.Hotkeys[11]
+	if ARRAYSIZE(MusicPlayer.CurrentPlaylist) > 100
+	{
+		//DIALOGUE: A little warning before opening this menu if you have a lot of songs loaded, since it will run slowly
+		"%(MusicPlayer.Scope)%(MusicPlayer.Balloon)\_q\*\![set,autoscroll,disable]\![no-autopause]"
+		
+		"Warning: there are currently %(ARRAYSIZE(MusicPlayer.CurrentPlaylist)) songs in the playlist.\n"
+		"This menu is not paginated and will run slowly. Open it anyways?"
+		"\n\n"
+		"(Note: Playlists are saved as .m3u files and can be edited in a text editor such as Notepad++ if you wish to do mass editing or edit a long playlist.)"
+		
+		"\n\n"
+		"\![*]\__q[OnMusicPlayer.ScootSongMenu]Yes, open the menu\__q"
+		"\n\n"
+		"\![*]\__q[OnMusicPlayer.Settings]No, go back to settings\__q"
+	}
+	else
+	{
+		"\C\![raise,OnMusicPlayer.ScootSongMenu]"
+	}
+}
 
-	_h = "\f[color,default.anchor]" //Highlight color
-	_d = "\f[color,default]" //Default color
+OnMusicPlayer.ScootSongMenu : all
+{
+	//CUSTOMIZE: This is the menu for moving songs in the playlist. The value below determines how much of the file name should be displayed before it shows an ellipsis. Adjust as needed to fit your balloon.
+	_max_name_length = 23 //Max length of names in this menu. After this number of characters it will write an ellipsis
+	
+	_h = "\f[color,default.anchor]"
+	_g = "\f[color,disable]"
+	_d = "\f[color,default]"
+	
+	if reference1 != ""; "\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c"
+	
+	"%(MusicPlayer.Scope)%(MusicPlayer.Balloon)\_q\*\![no-autopause]"
+	
+	"\![*]\q[Back,OnMusicPlayer.Settings]\n\n"
+	
+	if reference1 == "top"; "\![set,autoscroll,disable]"
+	
+	_current_song_index = MusicPlayer.CurrentSongIndex
+	if MusicPlayer.PlayMode == 1 //Shuffle and loop
+	{
+		_current_song_index = MusicPlayer.ShuffledPlaylist[_current_song_index]
+	}
+	
+	_currentsong = IARRAY
+	for _i = 0; _i < ARRAYSIZE(MusicPlayer.CurrentPlaylist); _i++
+	{
+		_song = MusicPlayer.CurrentPlaylist[_i]
+		_song = SPLITPATH(_song)[2] //Picks out just the name of the file, no extension
 
-	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayer.Balloon)\_q\*\![set,autoscroll,disable]\![no-autopause]"
+		if _i != 0
+		{
+			"\q[▲▲,OnMusicPlayer.MoveSong,%(_i),top]  "
+			"\f[bold,1]\q[△,OnMusicPlayer.ScootSong,%(_i),-]\f[bold,default] "
+		}
+		else
+		{
+			"%(_g)"
+			"▲▲  "
+			"\f[bold,1]△\f[bold,default] "
+			"%(_d)"
+		}
+		
+		if _i == _current_song_index //If this is the song that's playing right now
+		{
+			"\f[bold,1]" //Make it bold
+			_currentsong[0] = _song //Saves the song name into _currentsong[0]
+			_currentsong[1] = MusicPlayer.CurrentPlaylist[_i] //Saves the song path into _currentsong[1]
+		}
+		
+		//Attempt to position the menu such that it's not jumping around _too_ badly... as long as you don't click too fast.
+		_lines = MusicPlayer.BalloonLines / 2 - 1
+		if reference1 == "+"; _lines += 1
+		elseif reference1 == "-"; _lines -= 1
+		if (_i - _lines) == reference0 && reference1 != "end"; "\![set,autoscroll,disable]"
+		
+		//Handle which song name to highlight (by unhighlighting)
+		_justmoved = reference0
+		if reference1 == "end"; _justmoved = ARRAYSIZE(MusicPlayer.CurrentPlaylist) - 1
+		elseif reference1 == "top"; _justmoved = 0
+		elseif reference1 == "+"; _justmoved++
+		else; _justmoved--
+		
+		if _i != _justmoved; "%(_h)" //Highlight song if it's not the one that was just moved
+		//NOTE: If you're getting an error about the line below, you probably don't have yaya_optional.txt! You can pick that up here: https://github.com/ponapalt/yaya-dic
+		"\_n%(SHIORI3FW.MakeShortText(_song,_max_name_length)) \_n" //Add song to list
+		if _i != _justmoved; "%(_d)"
+		if _i == MusicPlayer.CurrentSongIndex; "\f[default]" //Reset the bold if it was applied
+		
+		"%(MusicPlayer.newline)\f[align,right]\f[bold,1]"
+		if _i != (ARRAYSIZE(MusicPlayer.CurrentPlaylist) - 1)
+		{
+			"\q[▽,OnMusicPlayer.ScootSong,%(_i),+]\f[bold,default]  "
+			"\q[▼▼,OnMusicPlayer.MoveSong,%(_i),end]"
+		}
+		else
+		{
+			"%(_g)"
+			"▽\f[bold,default]  "
+			"▼▼"
+		}
+		"\n\f[align,left]%(MusicPlayer.newline)%(_d)" //Align commands... so useful but so tricky. Idk why this works but it does. It was putting extra spaces before which are really obvious on some balloons with fonts that have wide spaces
+	}
 	
-	//DIALOGUE: Menu for changing the hotkeys
-	"Click a hotkey to change it, click the (x) to unset it.\n\n"
+	"%(_display)\n\n"
+	
+	"\![*]\q[Back,OnMusicPlayer.Settings]\![unlock,balloonrepaint]"
+}
 
-	"\q[(x),OnMusicPlayer.UnsetHotkey,0] \__q[OnMusicPlayer.ChangeHotkey,0]Play/Pause: %(_h)%(_playpause)%(_d)\__q\n"
-	"\q[(x),OnMusicPlayer.UnsetHotkey,1] \__q[OnMusicPlayer.ChangeHotkey,1]Next Song: %(_h)%(_next)%(_d)\__q\n"
-	"\q[(x),OnMusicPlayer.UnsetHotkey,2] \__q[OnMusicPlayer.ChangeHotkey,2]Previous Song: %(_h)%(_prev)%(_d)\__q\n"
-	"\q[(x),OnMusicPlayer.UnsetHotkey,3] \__q[OnMusicPlayer.ChangeHotkey,3]Stop Song: %(_h)%(_stop)%(_d)\__q\n"
-	"\q[(x),OnMusicPlayer.UnsetHotkey,4] \__q[OnMusicPlayer.ChangeHotkey,4]Open Music Menu: %(_h)%(_menu)%(_d)\__q\n"
-	"\q[(x),OnMusicPlayer.UnsetHotkey,5] \__q[OnMusicPlayer.ChangeHotkey,5]Toggle Song Bar: %(_h)%(_songbar)%(_d)\__q\n\n"
+//Move song to top or bottom of playlist
+OnMusicPlayer.MoveSong : all
+{
+	_temp = MusicPlayer.CurrentPlaylist[reference0]
+	if reference1 == "top"
+	{
+		_temparray = MusicPlayer.CurrentPlaylist
+		_temparray[reference0] = IARRAY
+		MusicPlayer.CurrentPlaylist = IARRAY
+		MusicPlayer.CurrentPlaylist ,= _temp
+		foreach _temparray; _song
+		{
+			MusicPlayer.CurrentPlaylist ,= _song
+		}
+		if reference0 == MusicPlayer.CurrentSongIndex //If it's the current song, the index will now be 0
+		{
+			MusicPlayer.CurrentSongIndex = 0
+		}
+		elseif reference0 > MusicPlayer.CurrentSongIndex //If not, and the song _used_ to be below this one on the list, increase the index number since now the current song is lower in the list
+		{
+			MusicPlayer.CurrentSongIndex = MusicPlayer.CurrentSongIndex + 1
+		}
+	}
+	else //End
+	{
+		MusicPlayer.CurrentPlaylist[reference0] = IARRAY
+		MusicPlayer.CurrentPlaylist ,= _temp
+		if reference0 == MusicPlayer.CurrentSongIndex //If it's the current song, the index will now be the last in the array
+		{
+			MusicPlayer.CurrentSongIndex = ARRAYSIZE(MusicPlayer.CurrentPlaylist) - 1
+		}
+		elseif reference0 < MusicPlayer.CurrentSongIndex //If not, and the song _used_ to be above this one in the list, decrease the index number since now the current song is higher in the list 
+		{
+			MusicPlayer.CurrentSongIndex = MusicPlayer.CurrentSongIndex - 1
+		}
+	}
+	MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentSongIndex,MusicPlayer.CurrentPlaylist)
 	
-	"\q[(x),OnMusicPlayer.UnsetHotkey,6] \__q[OnMusicPlayer.ChangeHotkey,6]Volume Up: %(_h)%(_volup)%(_d)\__q\n"
-	"\q[(x),OnMusicPlayer.UnsetHotkey,7] \__q[OnMusicPlayer.ChangeHotkey,7]Volume Down: %(_h)%(_voldown)%(_d)\__q\n"
-	"\q[(x),OnMusicPlayer.UnsetHotkey,8] \__q[OnMusicPlayer.ChangeHotkey,8]Speed Up: %(_h)%(_speedup)%(_d)\__q\n"
-	"\q[(x),OnMusicPlayer.UnsetHotkey,9] \__q[OnMusicPlayer.ChangeHotkey,9]Speed Down: %(_h)%(_speeddown)%(_d)\__q\n"
-	"\q[(x),OnMusicPlayer.UnsetHotkey,10] \__q[OnMusicPlayer.ChangeHotkey,10]Balance Left: %(_h)%(_balanceleft)%(_d)\__q\n"
-	"\q[(x),OnMusicPlayer.UnsetHotkey,11] \__q[OnMusicPlayer.ChangeHotkey,11]Balance Right: %(_h)%(_balanceright)%(_d)\__q\n"
+	"\C\![raise,OnMusicPlayer.ScootSongMenu,%(reference0),%(reference1)]"
+}
+
+//Moving a song in the playlist by one space
+OnMusicPlayer.ScootSong : all
+{
+	MusicPlayer.CurrentPlaylist = MusicPlayer.ArrayScootEx(TOINT(reference0),reference1,MusicPlayer.CurrentPlaylist)
+	if reference0 == MusicPlayer.CurrentSongIndex
+	{
+		if reference1 == "+"
+		{
+			MusicPlayer.CurrentSongIndex = MusicPlayer.CurrentSongIndex + 1
+		}
+		else //-
+		{
+			MusicPlayer.CurrentSongIndex = MusicPlayer.CurrentSongIndex - 1
+		}
+	}
+	elseif (reference0 + 1) == MusicPlayer.CurrentSongIndex && reference1 == "+"
+	{
+		MusicPlayer.CurrentSongIndex = MusicPlayer.CurrentSongIndex - 1
+	}
+	elseif (reference0 - 1) == MusicPlayer.CurrentSongIndex && reference1 == "-"
+	{
+		MusicPlayer.CurrentSongIndex = MusicPlayer.CurrentSongIndex + 1
+	}
 	
-	"\n\![*]\q[Back to Music Settings,OnMusicPlayer.Settings]\![unlock,balloonrepaint]"
+	MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentSongIndex,MusicPlayer.CurrentPlaylist)
+	
+	"\C\![raise,OnMusicPlayer.ScootSongMenu,%(reference0),%(reference1)]"
 }
 
 //Waiting for user input to change the hotkey
@@ -1168,7 +1250,7 @@ OnMusicPlayer.ChangeHotkey : all
 	//DIALOGUE: Changing a hotkey
 	"Press a key for %(_option)."
 	
-	"\n\n\![*]\q[Cancel,OnMusicPlayer.Hotkeys,%(reference0),%(_temp)]"
+	"\n\n\![*]\q[Cancel,OnMusicPlayer.Settings,Hotkeys,%(reference0),%(_temp)]"
 	
 	"\![unlock,balloonrepaint]\e changing hotkey: %(reference0)" //DO NOT TOUCH THIS. It will not work if you erase or change this.
 }
@@ -1179,7 +1261,21 @@ OnMusicPlayer.UnsetHotkey
 	reference0 = TOINT(reference0)
 	MusicPlayer.Hotkeys[reference0] = "Unbound"
 	
-	OnMusicPlayer.Hotkeys
+	OnMusicPlayer.Settings
+}
+
+
+OnMusicPlayer.Info : all
+{
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayer.Balloon)\_q\![no-autopause]"
+	
+	"\![*]\__q[OnMusicPlayer.MusicInfo,addsong]How do I add a song?\__q\n"
+	"\![*]\__q[OnMusicPlayer.MusicInfo,compatiblefiles]What file types are compatible?\__q\n"
+	"\![*]\__q[OnMusicPlayer.MusicInfo,error]Why do some songs give an error?\__q\n"
+	"\n"
+	"\![*]\q[Back,OnMusicPlayer.Menu]"
+	"\n\n"
+	"\f[height,-2]\f[color,disable]Music Player code by \f[color,default.anchor]\__q[https://ukagaka.zichqec.com/]Zichqec\__q"
 }
 
 //Information that the user can ask about
@@ -1190,39 +1286,38 @@ OnMusicPlayer.MusicInfo : all
 	
 	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayer.Balloon)\_q\![no-autopause]"
 	
-	//DIALOGUE: Answers for the FAQ - Make sure you replace the file path in the one about where playlists save
+	//DIALOGUE: Answers for the FAQ
 	if reference0 == "addsong" //Asking how to add songs
 	{
-		"To add songs, drag and drop them onto the ghost. Multiple files may be dragged at once, or entire folders. Compatible file types are %(_h).mp3%(_d), %(_h).wav%(_d), %(_h).wma%(_d), and %(_h).mid%(_d).\n\nIf you have \_a[https://github.com/Nevcairiel/LAVFilters/releases]LAV Filters\_a installed, many more file types will be compatible, including %(_h).flac%(_d), %(_h).ogg%(_d), and %(_h).m4a%(_d). For a full list of compatible file types, \_a[OnMusicPlayer.DisplayFileTypes]click here\_a."
+		"To add songs, drag and drop them onto the ghost. Folders can also be dragged and dropped, and multiple files may be dropped at a time.\n\n"
+		"You can also use the ""Open File"" option built into SSP to select a file through File Explorer. This can be done using the Ctrl + O shortcut, or by right clicking the ghost, going to the Utilities tab, and clicking ""Open File (I)"".\n\n"
+		".m3u playlists can be loaded through the settings menu, or by using the same methods described above for songs."
+	}
+	elseif reference0 == "compatiblefiles" //What file types are compatible
+	{
+		"By default, compatible file types are %(_h).mp3%(_d), %(_h).wav%(_d), %(_h).wma%(_d), and %(_h).mid%(_d).\n\n"
+		"With \_a[https://github.com/Nevcairiel/LAVFilters/releases]LAV Filters\_a installed, the following file types are compatible with this music player:"
+		"\n"
+		
+		_i = 0
+		foreach MusicPlayer.CompatibleMusicFileTypes; _type
+		{
+			if _i >= 3; _i = 0
+			
+			
+			if _i != 0; "    "
+			else; "\n"
+			
+			_i++
+			"\f[color,default.anchor]%(_type)\f[color,default]"
+		}
 	}
 	elseif reference0 == "error" //Asking why some songs give errors
 	{
 		"Some songs will not play despite being the correct type. This is an SSP limitation. You can install \_a[https://github.com/Nevcairiel/LAVFilters/releases]LAV Filters\_a, an open source program, to fix most of these errors. If you don't want to do that, you can import a song into an audio editing program like \_a[https://www.audacityteam.org/]Audacity\_a and export it again, or convert it to another compatible type with something like \_a[https://www.onlineconverter.com/]Online Converter\_a."
 	}
 	
-	"\![unlock,balloonrepaint]\x[noclear]\![raise,OnMusicPlayer.Settings]"
-}
-
-//Display a list of all the compatible filetypes
-OnMusicPlayer.DisplayFileTypes : all
-{
-	"%(MusicPlayer.Scope)%(MusicPlayer.Balloon)\_q\![no-autopause]"
-	
-	_i = 0
-	foreach MusicPlayer.CompatibleMusicFileTypes; _type
-	{
-		if _i >= 3; _i = 0
-		
-		
-		if _i != 0; "    "
-		else; "\n"
-		
-		_i++
-		"\f[color,default.anchor]%(_type)\f[color,default]"
-	}
-
-	
-	"\x\![raise,OnMusicPlayer.Settings]"
+	"\![unlock,balloonrepaint]\x[noclear]\![raise,OnMusicPlayer.Info]"
 }
 
 OnMusicPlayer.SavePlaylist : all
@@ -1267,7 +1362,7 @@ OnMusicPlayer.PlaylistSaved : all
 		"Failed to save playlist."
 	}
 	
-	"\![unlock,balloonrepaint]\x[noclear]\![raise,OnMusicPlayer.Menu]"
+	"\![unlock,balloonrepaint]\x[noclear]\![raise,OnMusicPlayer.Settings]"
 }
 
 OnPlaylist.Back
@@ -1490,7 +1585,7 @@ MusicPlayer.OnKeyPress : all
 		}
 		elseif _key == MusicPlayer.Hotkeys[_changing] //Same option as was already entered
 		{
-			"\C\![raise,OnMusicPlayer.Hotkeys]"
+			"\C\![raise,OnMusicPlayer.Settings,Hotkeys]"
 			return
 		}
 		elseif ASEARCH(_key,MusicPlayer.Hotkeys) != -1 //If this hotkey is already selected for something else
@@ -1501,7 +1596,7 @@ MusicPlayer.OnKeyPress : all
 		else //If it's a valid key
 		{
 			MusicPlayer.Hotkeys[_changing] = _key
-			"\C\![raise,OnMusicPlayer.Hotkeys]"
+			"\C\![raise,OnMusicPlayer.Settings,Hotkeys]"
 			return
 		}
 		
@@ -2082,6 +2177,42 @@ MusicPlayer.CompatibleMusicFileTypes : array
 	".8svx"; ".ac3"; ".aiff"; ".amb"; ".ape"; ".au"; ".avo"; ".avr"; ".caf"; ".dts"; ".fap"; ".flac"; ".flv"; ".hcom"
 	".ircam"; ".m4a"; ".m4r"; ".maud"; ".mid"; ".mkv"; ".mp2"; ".mp3"; ".mp4"; ".mpg"; ".nist"; ".oga"; ".ogg"; ".opus"; ".paf"
 	".pfv"; ".ra"; ".rm"; ".rmvb"; ".sln"; ".snd"; ".sph"; ".spx"; ".tta"; ".voc"; ".w64"; ".wav"; ".wma"; ".wmv"; ".wv"; ".wve"
+}
+
+MusicPlayer.DisplayPlaytime : all
+{
+	_num = TOINT(_argv[0])
+	
+	_units = ( /
+	"yr,31536000",/
+	"d,86400",/
+	":,3600",/
+	":,60",/
+	",1"/
+	)
+	
+	_output = ""
+	foreach _units; _unit
+	{
+		_duration = TOINT(_unit[1])
+		_amt = _num / _duration
+		_num = _num % _duration
+		
+		if _amt > 0 || _unit[0] == "" || _unit[0] == ":"
+		{
+			//The second function call here handles whether the unit name should be displayed as plural or not, depending on if the amount of that unit is greater than 1
+			if _unit[0] == "" || _unit[0] == ":"
+			{
+				if _amt < 10; _amt = "0" + TOSTR(_amt)
+			}
+			_output += "%(_amt)%(_unit[0])"
+			if !(_unit[0] == "" || _unit[0] == ":")
+			{
+				_output += " "
+			}
+		}
+	}
+	_output
 }
 
 MusicPlayer.SetDefaultSettings

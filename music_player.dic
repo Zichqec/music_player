@@ -521,7 +521,7 @@ OnRemoveSong : all
 		if _origmax > 0; MusicPlayer.PageIndex--
 	}
 	
-	"%(OnNotifySongInfo)\![raise,OnMusicMenu]"
+	"\C%(OnNotifySongInfo)\![raise,OnMusicMenu]"
 }
 
 OnMusicPlayer.PlaylistPage

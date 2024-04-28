@@ -1288,7 +1288,7 @@ OnMusicPlayer.LoadPlaylist : all
 	"\![open,dialog,open,--id=OnMusicPlayer.PlaylistLoaded,--filter=Playlist file|*.m3u,--dir=%(MusicPlayer.PlaylistPath)]"
 	
 	//DIALOGUE: Loading a playlist
-	"Select a playlist to load. Note that the current playlist will be lost unless it is already saved."
+	"Select a playlist to load.\n\nThe current playlist will be lost unless it is already saved."
 	"\n\n"
 	"\![*]\__q[OnPlaylist.Back,Loaded]Back\__q"
 	
@@ -1656,7 +1656,7 @@ OnFileDrop2 : all
 			"%(MusicPlayer.Scope)\![no-autopause]\_q"
 			
 			//DIALOGUE: Confirming loading a playlist after drag and drop
-			"Load the playlist ""\_?%(_filename)\_?""? The current playlist will be lost unless it is already saved."
+			"Load the playlist ""\_?%(_filename)\_?""?\n\nThe current playlist will be lost unless it is already saved."
 			
 			"\n\n"
 			"\![*]\__q[OnMusicPlayer.PlaylistLoaded,,,""%(reference.raw[0])""]Yes, load the playlist\__q  \![*]\__q[OnBlank]No, do not load the playlist\__q"
@@ -2021,8 +2021,7 @@ OnTranslateInternal.MusicPlayer
 
 
 //—————————— TOOLS ——————————
-//These are (mostly) pure functions that aid in various places in the code. You may already have some of these in your ghost, in which case they will cause conflicts. You should be able to comment out any functions that are causing errors, though maybe compare to see how similar they are just to be sure.
-
+//These are (mostly) pure functions that aid in various places in the code.
 
 //Checks if the balloon is currently open. 1 if yes, 0 if no.
 MusicPlayer.BalloonIsOpen

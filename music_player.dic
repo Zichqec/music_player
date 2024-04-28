@@ -121,8 +121,7 @@ OnMusicMenu : all
 	_current_song_index = NowPlaying[1]
 	if MusicSettings[3] == 1 //Shuffle and loop
 	{
-		_index = NowPlaying[1]
-		_current_song_index = ShuffledPlaylist[_index]
+		_current_song_index = ShuffledPlaylist[_current_song_index]
 	}
 	
 	_display = ""
@@ -284,7 +283,10 @@ OnPlaySong : all
 		
 		if reference3 == "frommenu" //If the user started a new song manually, shuffle the shuffled playlist again
 		{
-			ShuffledPlaylist = ShufflePlaylist(NowPlaying[1],CurrentPlaylist)
+			_index = NowPlaying[1]
+			_songnum = ShuffledPlaylist[_index]
+			ShuffledPlaylist = ShufflePlaylist(_index,CurrentPlaylist)
+			if MusicSettings[3] == 1; NowPlaying[1] = 0 //Shuffle
 		}
 		if MenuIsOpen && reference3 != "justadded"; "\C" //If the balloon is currently open other than when a song was just added, keep it open
 		
@@ -331,7 +333,7 @@ OnStopSong : all
 	
 	NowPlaying[0] = "" //song name
 	NowPlaying[2] = "" //Clearing paused song
-	MusicSettings[4] = "" //Reset the stop after current option
+	MusicSettings[4] = "" //Reset the stop after current/playlist option
 	
 	if MenuIsOpen; "\C"
 	
@@ -776,8 +778,15 @@ OnMusicSettings : all
 	"Volume: %(_vol_up_btn)%(_vol_down_btn) %(_h)\q[%(_vol),OnMusicSet,Volume]%(_d)\n"
 	"Speed: %(_speed_up_btn)%(_speed_down_btn) %(_h)\q[%(_speed),OnMusicSet,Speed]%(_d)\n"
 	"Balance: %(_balance_left_btn)%(_balance_right_btn) %(_h)\q[%(_bal),OnMusicSet,Balance]%(_d)\n\n"
-	"\__q[OnStopAfterPlayback]Stop after current song\__q"
+	"\__q[OnStopAfterPlayback,song]Stop after current song\__q"
 	if MusicSettings[4] == "stop after playback"; " \![*]"
+	"\n"
+	if MusicSettings[3] == 0 || MusicSettings[3] == 1
+	{
+		"\__q[OnStopAfterPlayback,playlist]Stop after playlist ends\__q"
+		if MusicSettings[4] == "stop after playlist"; " \![*]"
+	}
+	else; "\f[color,disable]Stop after playlist ends\f[color,default]"
 	"\n\n"
 	"Song Bar \![*]%(_h)\__q[OnToggleSongBar]%(MusicSettings[5])\__q%(_d)\n"
 	"Tooltips \![*]%(_h)\__q[OnToggleTooltips]%(MusicPlayer.Tooltips)\__q%(_d)\n"
@@ -822,11 +831,19 @@ OnPlaybackType : all
 //Actually making the change
 OnPlaybackTypeChange
 {
+	_oldmode = MusicSettings[3]
 	reference0 = TOINT(reference0)
 	MusicSettings[3] = reference0
 	if reference0 == 1 //If the user set it to shuffle, shuffle the playlist
 	{
 		ShuffledPlaylist = ShufflePlaylist(NowPlaying[1],CurrentPlaylist)
+		NowPlaying[1] = 0
+	}
+	elseif _oldmode == 1 //Shuffle and loop
+	{
+		_index = NowPlaying[1]
+		_songnum = ShuffledPlaylist[_index]
+		NowPlaying[1] = _songnum
 	}
 	OnMusicSettings
 }
@@ -920,8 +937,6 @@ OnQuickVolume : all
 		"\![sound,option,""%(NowPlaying[0])"",--volume=%(MusicSettings[0])]"
 	}
 	
-	LOGGING("SHIORI3FW.LastTalk: %(SHIORI3FW.LastTalk)")
-	LOGGING("MusicPlayer.LastTalk: %(MusicPlayer.LastTalk)")
 	if "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; OnMusicSettings //Only refresh in the music settings menu
 }
 
@@ -980,8 +995,10 @@ OnQuickBalance : all
 //Toggles the stop after playback function
 OnStopAfterPlayback 
 {
-	if MusicSettings[4] != "stop after playback"; MusicSettings[4] = "stop after playback"
+	if reference0 == "playlist" && MusicSettings[4] != "stop after playlist"; MusicSettings[4] = "stop after playlist"
+	elseif reference0 == "song" && MusicSettings[4] != "stop after playback"; MusicSettings[4] = "stop after playback"
 	else; MusicSettings[4] = ""
+	
 
 	OnMusicSettings
 }
@@ -1534,6 +1551,7 @@ On_tooltip
 		elseif reference4 == "music_menu_button"; "Music Menu"
 		elseif reference4 == "clear_button"; "Clear Playlist"
 		elseif reference4 == "stop_after_current_button"; "Stop After Current Song"
+		elseif reference4 == "stop_after_playlist_button"; "Stop When Playlist Ends"
 		elseif reference4 == "song_bar_button"; "Toggle Song Bar"
 		elseif reference4 == "volume_up_button"; "Volume Up"
 		elseif reference4 == "volume_down_button"; "Volume Down"
@@ -1953,6 +1971,18 @@ MusicPlayer.OnMouseDoubleClick : all
 		}
 		if _inmenu == "OnMusicSettings"; "\C\![raise,OnMusicSettings]"
 	}
+	elseif reference4 == "stop_after_playlist_button"
+	{
+		if MusicSettings[4] != "stop after playlist"
+		{
+			MusicSettings[4] = "stop after playlist"
+		}
+		else
+		{
+			MusicSettings[4] = ""
+		}
+		if _inmenu == "OnMusicSettings"; "\C\![raise,OnMusicSettings]"
+	}
 	elseif reference4 == "music_menu_button"
 	{
 		OnMusicMenu("manual")
@@ -2005,6 +2035,7 @@ OnSoundStop : all
 	else //If another song needs to play
 	{
 		_next = 0
+		_lastsong = 0
 		
 		if MusicSettings[3] == 2 //Loop one song
 		{
@@ -2019,6 +2050,7 @@ OnSoundStop : all
 			if NowPlaying[1] >= (ARRAYSIZE(CurrentPlaylist) - 1) //If it was the last song on the list
 			{
 				_next = 0
+				_lastsong = 1
 			}
 			else
 			{
@@ -2039,7 +2071,7 @@ OnSoundStop : all
 		}
 		
 		//If it's set to stop after the current song, make sure it stops. Down here so the index number still advances if you're not set to loop a single song
-		if MusicSettings[4] == "stop after playback"
+		if MusicSettings[4] == "stop after playback" || (MusicSettings[4] == "stop after playlist" && _lastsong)
 		{
 			"\![raise,OnStopSong,%(_inmenu)]"
 		}
@@ -2061,7 +2093,7 @@ OnSoundStop : all
 OnSoundError : all
 {
 	_playnext = 0
-	if !(MusicSettings[3] == 2 || MusicSettings[3] == 3 || MusicSettings[4] == "stop after playback" || ARRAYSIZE(CurrentPlaylist) <= 1); _playnext = 1 //If it IS able to play another song
+	if !(MusicSettings[3] == 2 || MusicSettings[3] == 3 || MusicSettings[4] == "stop after playback" || (MusicSettings[4] == "stop after playlist" && NowPlaying[1] >= (ARRAYSIZE(CurrentPlaylist) - 1)) || ARRAYSIZE(CurrentPlaylist) <= 1); _playnext = 1 //If it IS able to play another song
 	
 	if _playnext == 0
 	{
@@ -2213,7 +2245,7 @@ MusicPlayer.ResetDefaultSettings
 	if MusicSettings[1] == ""; MusicSettings[1] = 100 //Speed
 	if MusicSettings[2] == ""; MusicSettings[2] = 0 //Balance
 	if MusicSettings[3] == ""; MusicSettings[3] = 0 //Play mode - 0 for loop playlist, 1 for shuffle playlist, 2 for loop song, 3 for play one song, 4 for random
-	//MusicSettings[4] is the 'stop after current' option
+	//MusicSettings[4] is the 'stop after current' or 'stop after playlist' option
 	if MusicSettings[5] == ""; MusicSettings[5] = "Off" //Song bar
 	if DiscordDisplay[0] == ""; DiscordDisplay[0] = "On"
 	if MusicPlayer.Tooltips == ""; MusicPlayer.Tooltips = "On"

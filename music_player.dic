@@ -290,7 +290,7 @@ OnPlaySong : all
 		}
 		if MenuIsOpen && reference3 != "justadded"; "\C" //If the balloon is currently open other than when a song was just added, keep it open
 		
-		"%(SingingSurfaces)" //Start the singing animations if they weren't already started
+		"%(MusicPlayerScope)%(SingingSurfaces)" //Start the singing animations if they weren't already started
 		
 		_send = ""
 		_send += "%(OnNotifySongInfo)"
@@ -530,7 +530,7 @@ OnMusicPlayer.PlaylistPage
 
 OnMusicPlayer.JumpToPlaylistPage : all
 {
-	"\C\![lock,balloonrepaint]\c%(MusicPlayerScope)\_q\![set,autoscroll,disable]"
+	"\C\![lock,balloonrepaint]\c%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]"
 	"\![open,inputbox,OnMusicPlayer.JumpIndex,-1]"
 	
 	//DIALOGUE: Dialogue for typing in a page number to jump to manually in the playlist
@@ -555,7 +555,7 @@ OnMusicPlayer.JumpIndex : all
 	else
 	{
 		//DIALOGUE: Dialogue for putting in an invalid number, or something that isn't a number
-		"%(MusicPlayerScope)\_q\![set,autoscroll,disable]"
+		"%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]"
 		"Invalid input.\x\![raise,OnMusicPlayer.JumpToPlaylistPage]"
 	}
 }
@@ -1225,141 +1225,81 @@ OnDisplayFileTypes : all
 	"\x\![raise,OnMusicSettings]"
 }
 
-//Saving a playlist
 OnSavePlaylist : all
 {
-	_playlists = FENUM(PLAYLIST_FOLDER,C_BYTE1)
-	if _playlists == ""; void MKDIR(PLAYLIST_FOLDER)
-	_playlists = SPLIT(_playlists,C_BYTE1)
-	
-	_display = ""
-	for _i = 0; _i < ARRAYSIZE(_playlists); _i++
-	{
-		_playlist = _playlists[_i]
-		_playlist = RE_REPLACE(_playlist,"\.m3u$","")
-		_display += "\__q[OnPlaylistOverwrite,""%(_playlist)"",are you sure click]\_?%(_playlist)\_?\__q\n"
-	}
-	
-	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\*\_q\![set,autoscroll,disable]\![open,inputbox,OnPlaylistName,-1]"
+	"\C\![lock,balloonrepaint]\c%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]"
+	"\![open,dialog,save,--id=OnMusicPlayer.PlaylistSaved,--ext=m3u,--filter=Playlist file|*.m3u,--dir=%(MusicPlayer.PlaylistPath)]"
 	
 	//DIALOGUE: Saving a playlist
-	"Type a name to save the current playlist as a new playlist, or click an old playlist to save over it."
+	"Choose a file name and location for the playlist."
+	"\n\n"
+	"\![*]\__q[OnPlaylist.Back,Saved]Back\__q"
 	
-	"\n\n\![*]\q[Cancel,OnPlaylistSaveCancel]"
+	"\![unlock,balloonrepaint]"
+}
+
+OnMusicPlayer.PlaylistSaved : all
+{
+	_path = reference2
+	_o = FOPEN(_path,"w") //Create a new file
 	
-	"\n\n%(_display)\![unlock,balloonrepaint]\e"
-}
-
-//Closing the input box if the user chooses to cancel
-OnPlaylistSaveCancel
-{
-	"\C\![close,inputbox,OnPlaylistName]\![raise,OnMusicSettings]"
-}
-
-//After the user types a name
-OnPlaylistName : all
-{
-	_name = TOSTR(reference0) //Removing illegal characters
-	_name = REPLACE(_name,"\","_") 
-	_name = REPLACE(_name,"/","_")
-	_name = REPLACE(_name,":","_")
-	_name = REPLACE(_name,"*","_")
-	_name = REPLACE(_name,"%(CHR(0x22))","_")
-	_name = REPLACE(_name,"<","_")
-	_name = REPLACE(_name,">","_")
-	_name = REPLACE(_name,"|","_")
-	_name = REPLACE(_name,"?","_")
+	for _i = 0; _i < ARRAYSIZE(CurrentPlaylist); _i++
+	{
+		void FWRITE(_path,"%(CurrentPlaylist[_i])") //Write each file path
+	}
 	
-	_playlists = FENUM(PLAYLIST_FOLDER,C_BYTE1)
-	_playlists = SPLIT(_playlists,C_BYTE1)
-	if ASEARCH("%(_name).m3u",_playlists) != -1 && reference1 == ""; "\C\![raise,OnPlaylistOverwrite,""%(_name)"",are you sure]\e"
-	else
+	void FCLOSE(_path)
+	
+	_split = SPLITPATH(reference2)
+	_name = _split[2]
+	MusicPlayer.PlaylistPath = _split[0] + _split[1]
+	
+	
+	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c%(MusicPlayerBalloon)\_q"
+	
+	//DIALOGUE: a playlist saving correctly, or failing to save
+	if _o == 1 //If it saves successfully
 	{
-		_path = PLAYLIST_FOLDER + "%(_name).m3u"
-		_o = FOPEN(_path,"w") //Create a new file
-		
-		for _i = 0; _i < ARRAYSIZE(CurrentPlaylist); _i++
-		{
-			void FWRITE(_path,"%(CurrentPlaylist[_i])") //Write each file path
-		}
-		
-		void FCLOSE(_path)
-		
-		"\C%(MusicPlayerScope)\![lock,balloonrepaint]\![close,inputbox,OnPlaylistName]\c%(MusicPlayerBalloon)\_q"
-		
-		//DIALOGUE: a playlist saving correctly, or failing to save
-		if _o == 1 //If it saves successfully
-		{
-			"Playlist saved successfully as '\_?%(_name)\_?'."
-		}
-		else //If saving fails
-		{
-			"Failed to save playlist."
-		}
-		
-		"\![unlock,balloonrepaint]\x[noclear]\![raise,OnMusicMenu]"
+		"Playlist saved successfully as ""\_?%(_name).m3u\_?""."
 	}
+	else //If saving fails
+	{
+		"Failed to save playlist."
+	}
+	
+	"\![unlock,balloonrepaint]\x[noclear]\![raise,OnMusicMenu]"
 }
 
-//Checking before overwriting playlists
-OnPlaylistOverwrite : all
+OnPlaylist.Back
 {
-	"\![close,inputbox,OnPlaylistName]"
-	if "are you sure" _in_ reference1
-	{
-		"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c\*%(MusicPlayerBalloon)\_q"
-		
-		//DIALOGUE: If the user puts in a playlist name that is the same as an existing playlist, it'll ask if they want to overwrite the old one or not
-		if "click" _in_ reference1 //This is for if they clicked an existing playlist
-		{
-			"Are you sure you want to overwrite '\_?%(reference0)\_?'?"
-		}
-		else //This is if they typed the name in
-		{
-			"The name '\_?%(reference0)\_?' is already in use. Do you want to overwrite '\_?%(reference0)\_?'?"
-		}
-		
-		"\n\n\![*]\q[Overwrite it,OnPlaylistOverwrite,""%(reference0)""]  \![*]\q[Don't,OnSavePlaylist]"
-		
-		"\![unlock,balloonrepaint]\e"
-	}
-	else
-	{
-		"\C\![raise,OnPlaylistName,%(reference0),overwrite]"
-	}
+	"\C\![close,dialog,OnMusicPlayer.Playlist%(reference0)]\![raise,OnMusicSettings]"
 }
 
-//Menu for loading playlists
 OnLoadPlaylist : all
 {
-	_playlists = FENUM(PLAYLIST_FOLDER)
-	if _playlists == ""; void MKDIR(PLAYLIST_FOLDER)
-	_display = ""
-	foreach _playlists; _playlist
-	{
-		_playlist = RE_REPLACE(_playlist,"\.m3u$","")
-		_display += "\q[(x),OnDeletePlaylist,%(_playlist)] \q[""%(_playlist)"",OnSelectPlaylist,%(_playlist)]\n"
-	}
-	
-	"\C%(MusicPlayerScope)\![lock,balloonrepaint]\c\_q%(MusicPlayerBalloon)\*\![set,autoscroll,disable]"
+	"\C\![lock,balloonrepaint]\c%(MusicPlayerScope)%(MusicPlayerBalloon)\_q\![set,autoscroll,disable]"
+	"\![open,dialog,open,--id=OnMusicPlayer.PlaylistLoaded,--filter=Playlist file|*.m3u,--dir=%(MusicPlayer.PlaylistPath)]"
 	
 	//DIALOGUE: Loading a playlist
-	"Which playlist do you want to load? If the current playlist is not saved, it will be lost."
+	"Select a playlist to load. Note that the current playlist will be lost unless it is already saved."
+	"\n\n"
+	"\![*]\__q[OnPlaylist.Back,Loaded]Back\__q"
 	
-	"\n\n\![*]\q[Back to Music Settings,OnMusicSettings]"
-	
-	"\n\n%(_display)\![unlock,balloonrepaint]\e"
+	"\![unlock,balloonrepaint]"
 }
 
 //Loading the playlist
-OnSelectPlaylist : all
+OnMusicPlayer.PlaylistLoaded : all
 {
 	NowPlaying[0] = ""
 	NowPlaying[1] = 0
 	NowPlaying[2] = ""
 	CurrentPlaylist = IARRAY
-	_path = PLAYLIST_FOLDER + "%(reference0).m3u"
+	_path = reference2
 	MusicPlayer.PageIndex = 0
+	
+	_split = SPLITPATH(reference2)
+	MusicPlayer.PlaylistPath = _split[0] + _split[1]
 	
 	void FOPEN(_path,"r")
 	for _buff = FREAD(_path); _buff != -1; _buff = FREAD(_path)
@@ -1370,55 +1310,11 @@ OnSelectPlaylist : all
 	
 	ShuffledPlaylist = ShufflePlaylist(NowPlaying[1],CurrentPlaylist)
 	
-	"%(NonSingingSurfaces)"
+	"%(MusicPlayerScope)%(NonSingingSurfaces)"
 	
 	"\![sound,stop]%(OnNotifySongInfo)"
 	
 	OnMusicMenu
-}
-
-//Confirmation before deleting a playlist
-OnDeletePlaylist : all
-{
-	_playlist = IARRAY
-	_path = PLAYLIST_FOLDER + "%(reference0).m3u"
-	
-	void FOPEN(_path,"r")
-	for _buff = FREAD(_path); _buff != -1; _buff = FREAD(_path)
-	{
-		_playlist ,= _buff
-	}
-	void FCLOSE(_path)
-	
-	_songs = ARRAYSIZE(_playlist)
-	
-	"%(MusicPlayerScope)%(MusicPlayerBalloon)\*"
-	
-	_s = ""; if _songs != 1; _s = "s"
-	//DIALOGUE: Asking for confirmation before deleting a playlist. You can use %(_s) to add an s if there is more than one song in the playlist
-	"Are you sure you want to delete '\_?%(reference0)\_?' and the %(_songs) song%(_s) inside?\w8 This cannot be undone."
-	
-	"\n\n\![*]\q[Delete it,OnPlaylistDeleted,""%(reference0)""]\n\![*]\q[Cancel,OnLoadPlaylist]\e"
-}
-
-//Actually deleting the file
-OnPlaylistDeleted : all
-{
-	_path = PLAYLIST_FOLDER + "%(reference0).m3u"
-	
-	"%(MusicPlayerScope)%(MusicPlayerBalloon)"
-	
-	//DIALOGUE: Going through with deleting the playlist. If it fails it will offer the directory so that the user can delete it manually.
-	if FDEL(_path) == 1 //If the playlist deleted successfully
-	{
-		"Playlist '\_?%(reference0)\_?' deleted.\x"
-	}
-	else //If it was unable to delete
-	{
-		"Something went wrong.\w8 You can delete it manually \_a[OnPlaylistPath]here\_a if you need to.\x"
-	}
-	
-	OnLoadPlaylist
 }
 
 //Confirmation before clearing the current playlist
@@ -1429,7 +1325,7 @@ OnClearPlaylist : all
 	_are = "are"; _s = "s"
 	if _num == 1; {_are = "is"; _s = ""}
 	
-	"%(MusicPlayerScope)%(MusicPlayerBalloon)"
+	"%(MusicPlayerScope)%(MusicPlayerBalloon)\_q"
 	
 	//DIALOGUE: Asking for confirmation before clearing the current playlist. %(_are) and %(_s) can be used for plurals.
 	"There %(_are) %(_num) song%(_s) in the current playlist. Are you sure you want to clear it? It cannot be brought back unless you have saved it."
@@ -1457,42 +1353,6 @@ OnPlaylistCleared : all
 		"The playlist has been cleared."
 		
 		"\n\n\_q\![*]\q[Open music controls,OnMusicMenu]  \![*]\q[Close,blank]\e"
-	}
-}
-
-//From OnFileDrop2. If the user chooses to overwrite, it'll overwrite. If not, it'll tell them to rename it.
-OnPlaylistCopy
-{
-	if reference0 == "Overwrite"
-	{
-		_path = PLAYLIST_FOLDER
-		if FENUM(_path) == ""; void MKDIR(_path)
-		_f = FCOPY(reference1,_path)
-		
-		PlaylistCopied("%(_f)","%(reference2)")
-	}
-	else
-	{
-		//DIALOGUE: If the user chooses not to overwrite a playlist after dragging and dropping it onto the ghost (and having a filename conflict), then it will recommend that they rename the playlist before trying again.
-		"%(MusicPlayerScope)Please rename the playlist,\w4 then drag and drop it again.\e"
-	}
-}
-
-//After copying
-PlaylistCopied : all
-{
-	_playlist = _argv[1]
-	
-	//DIALOGUE: If the user copies a playlist into the playlists folder by dragging and dropping it onto the ghost, and also dialogue for if this fails.
-	if _argv[0] == "1" //If it was successful
-	{
-		"%(MusicPlayerScope)Successfully copied playlist '\_?%(_playlist)\_?'. Do you want to load it now?"
-		
-		"\n\n\![*]\__q[OnSelectPlaylist,%(_playlist)]Load '\_?%(_playlist)\_?'\__q\n\![*]\q[Open music player,OnMusicMenu]\n\n\![*]\q[Close,blank]\e"
-	}
-	else //If it failed
-	{
-		"%(MusicPlayerScope)Copying failed, please try again.\e"
 	}
 }
 
@@ -1831,23 +1691,13 @@ OnFileDrop2 : all
 		}
 		elseif _fileext == ".m3u" //If it's a playlist
 		{
-			_path = PLAYLIST_FOLDER
-			_playlists = FENUM(_path,C_BYTE1)
-			_playlists = SPLIT(_playlists,C_BYTE1)
-			if ASEARCH("%(_filename).m3u",_playlists) != -1
-			{
-				//DIALOGUE: Dragged and dropped a playlist onto the ghost, but a playlist with the same name already exists
-				"%(MusicPlayerScope)A playlist called '\_?%(_filename)\_?' already exists.\w8 Do you wish to overwrite it?"
-				
-				"\n\n\![*]\q[Overwrite it,OnPlaylistCopy,Overwrite,""%(_filearray)"",""%(_filename)""]\n\![*]\q[Cancel,OnPlaylistCopy,Don't]"
-			}
-			else
-			{
-				if FENUM(_path) == ""; void MKDIR(_path)
-				_f = FCOPY(_filearray,_path)
-				
-				PlaylistCopied("%(_f)","%(_filename)")
-			}
+			"%(MusicPlayerScope)\_q"
+			
+			//DIALOGUE: Confirming loading a playlist after drag and drop
+			"Load the playlist ""\_?%(_filename)\_?""? The current playlist will be lost unless it is already saved."
+			
+			"\n\n"
+			"\![*]\__q[OnMusicPlayer.PlaylistLoaded,,,""%(reference.raw[0])""]Yes, load the playlist\__q  \![*]\__q[OnBlank]No, do not load the playlist\__q"
 		}
 		elseif _fileext == "" //If it's a single folder
 		{
@@ -2136,6 +1986,11 @@ OnUserInputCancel
 	elseif reference0 == "OnMusicPlayer.JumpIndex"; "\C\![raise,OnMusicMenu]"
 }
 
+//When the user closes a system dialog for saving/loading playlists. Not strictly necessary, same as the above but for playlist saving/loading.
+OnSystemDialogCancel
+{
+	if reference1 == "OnMusicPlayer.PlaylistSaved" || reference1 == "OnMusicPlayer.PlaylistLoaded"; "\![raise,OnMusicSettings]"
+}
 
 
 
@@ -2236,6 +2091,8 @@ MusicPlayer.SetDefaultSettings
 	MusicPlayer.PreviousButton = "Restarts song" //Behavior of the previous button
 	MusicPlayer.Pagination = "Paginated" //Playlist display option
 	MusicPlayer.PageIndex = 0
+	MusicPlayer.PlaylistPath = "../../playlists/"
+	void MKDIR(MusicPlayer.PlaylistPath) //TODO test this
 }
 
 MusicPlayer.ResetDefaultSettings
@@ -2255,6 +2112,7 @@ MusicPlayer.ResetDefaultSettings
 	if MusicPlayer.PreviousButton == ""; MusicPlayer.PreviousButton = "Restarts song" //Behavior of the previous button
 	if MusicPlayer.Pagination == ""; MusicPlayer.Pagination = "Paginated" //Playlist display option
 	if MusicPlayer.PageIndex == ""; MusicPlayer.PageIndex = 0 //Pagination index
+	if MusicPlayer.PlaylistPath == ""; MusicPlayer.PlaylistPath = "../../playlists/" //Default playlist folder
 }
 
 //——— ASCOOTEX ———

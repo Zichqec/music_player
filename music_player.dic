@@ -203,7 +203,7 @@ OnMusicMenu : all
 	
 	if MusicPlayer.Pagination == "Paginated"
 	{
-		"\n\n"
+		"\n\n[half]"
 		"\f[align,left]    "
 		switch MusicPlayer.PageIndex == 0
 		{
@@ -1685,7 +1685,7 @@ OnFileDrop2 : all
 			_from = CheckWhichMenu
 			
 			//DIALOGUE: Added a file to the playlist
-			"%(MusicPlayerScope)Added '\_?%(_filename)\_?' to the playlist."
+			"%(MusicPlayerScope)Added ""\_?%(_filename)\_?"" to the playlist."
 			
 			"\n\n\_q\![*]\q[Play it now,OnPlaySong,""%(_filearray)"",,%(_from),justadded]\n\![*]\q[Open music player,OnMusicMenu]\n\n\![*]\q[Close,blank]\e"
 		}
@@ -1714,7 +1714,7 @@ OnFileDrop2 : all
 			if ARRAYSIZE(_musicfiles) == 0 //If there were no compatible songs inside
 			{
 				//DIALOGUE: The user dropped a folder on the ghost, but nothing inside was a compatible music file
-				"%(MusicPlayerScope)None of the files in \_?%(_folder)\_? are compatible music files.\e"
+				"%(MusicPlayerScope)None of the files in ""\_?%(_folder)\_?"" are compatible music files.\e"
 			}
 			else //If there are compatible songs
 			{
@@ -1722,7 +1722,7 @@ OnFileDrop2 : all
 				_s = ""; if _num != 1; _s = "s"
 				
 				//DIALOGUE: The user dropped a folder on the ghost, and some files inside were compatible music files. %(_s) can be used to add an s if the number of compatible files is plural, %(_num) can be used to list the number of files, and %(_folder) is the name of the folder that was dropped.
-				"%(MusicPlayerScope)Added %(_num) song%(_s) from \_?%(_folder)\_?."
+				"%(MusicPlayerScope)Added %(_num) song%(_s) from ""\_?%(_folder)\_?""."
 				
 				"\n\n\_q\![*]\q[Open music player,OnMusicMenu]\n\![*]\q[Close,blank]\e"
 			}
@@ -1954,7 +1954,7 @@ OnSoundError : all
 	else; "%(OnNotifySongInfo)"
 	
 	//DIALOGUE: If there is an error, it will tell the user and try to play the next song. reference3 is the error message, reference2 is the file name. Below is dialogue for attempting to play the next song
-	"%(MusicPlayerScope)Cannot play file \f[color,default.anchor]\_?%(reference2)\_?\f[color,default]; '%(reference3)'"
+	"%(MusicPlayerScope)Cannot play file ""\f[color,default.anchor]\_?%(reference2)\_?\f[color,default]""; '%(reference3)'"
 	
 	//If it's able to play another song
 	if _playnext

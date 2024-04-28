@@ -183,7 +183,7 @@ OnMusicMenu : all
 		//CUSTOMIZE: As above, if you need to use regular spaces instead of align commands for your balloon, you can use this commented version instead
 		"\q[<<<,OnPrevSong]   "
 		
-		if NowPlaying[2] != ""; "\![*]\q[Resume,OnPauseSong,OnMusicMenu,resume]"
+		if NowPlaying[2] == 1; "\![*]\q[Resume,OnPauseSong,OnMusicMenu,resume]"
 		else; "\![*]\q[Pause,OnPauseSong,OnMusicMenu,pause]   "
 		
 		"    \![*]\q[Stop,OnStopSong,OnMusicMenu]    \q[>>>,OnNextSong]\n\n[half]"
@@ -191,7 +191,7 @@ OnMusicMenu : all
 		
 		"\q[<<<,OnPrevSong]   "
 		
-		if NowPlaying[2] != ""; "\![*]\q[Resume,OnPauseSong,OnMusicMenu,resume]"
+		if NowPlaying[2] == 1; "\![*]\q[Resume,OnPauseSong,OnMusicMenu,resume]"
 		else; "\![*]\q[Pause,OnPauseSong,OnMusicMenu,pause]"
 		
 		"%(newline)\f[align,right]\![*]\q[Stop,OnStopSong,OnMusicMenu]    \q[>>>,OnNextSong]\n\n[half]\f[align,left]"
@@ -236,7 +236,7 @@ OnPlaySong : all
 	//reference2 - What event to return to, if any (music menu, etc)
 	//reference3 - Special flags "justadded" or "frommenu" (frommenu makes the playlist reshuffle if the user clicks a new song from the song list)
 
-	NowPlaying[2] = "" //Clearing the paused song if there was one
+	NowPlaying[2] = 0 //Clearing the paused song if there was one
 	
 	MusicPlayer.ResetDefaultSettings
 	
@@ -332,7 +332,7 @@ OnStopSong : all
 	//reference0 is which menu this is coming from
 	
 	NowPlaying[0] = "" //song name
-	NowPlaying[2] = "" //Clearing paused song
+	NowPlaying[2] = 0 //Clearing paused song
 	MusicSettings[4] = "" //Reset the stop after current/playlist option
 	
 	if MenuIsOpen; "\C"
@@ -358,12 +358,12 @@ OnPauseSong : all
 	
 	if reference1 == "resume" //Unpausing
 	{
-		NowPlaying[2] = ""
+		NowPlaying[2] = 0
 		"%(SingingSurfaces)\![sound,resume]"
 	}
 	else //Pausing
 	{
-		NowPlaying[2] = NowPlaying[0] //Store the song in NowPlaying[2] to show it's paused
+		NowPlaying[2] = 1
 		"%(NonSingingSurfaces)\![sound,pause]"
 	}
 	
@@ -377,7 +377,7 @@ OnNextSong : all
 {
 	//reference0 is which menu this is coming from
 
-	NowPlaying[2] = ""
+	NowPlaying[2] = 0
 	
 	_from = reference0
 	if _from == ""; _from = CheckWhichMenu //Sent to OnPlaySong
@@ -430,7 +430,7 @@ OnPrevSong : all
 {
 	//reference0 is which menu this is coming from
 
-	NowPlaying[2] = ""
+	NowPlaying[2] = 0
 	
 	_from = reference0
 	if _from == ""; _from = CheckWhichMenu //Sent to OnPlaySong
@@ -494,7 +494,7 @@ OnRemoveSong : all
 	_origmax = MusicPlayer.MaxPages
 	
 	
-	if NowPlaying[2] != "" && reference0 == NowPlaying[1]; NowPlaying[2] = "" //If the song being removed was the paused song, clear it
+	if NowPlaying[2] == 1 && reference0 == NowPlaying[1]; NowPlaying[2] = "" //If the song being removed was the paused song, clear it
 	CurrentPlaylist[reference0] = IARRAY //Clear the song that we want to remove
 	
 	if reference0 < NowPlaying[1]; NowPlaying[1] = NowPlaying[1] - 1
@@ -1013,7 +1013,7 @@ OnToggleSongBar : all
 	
 	if MenuIsOpen; "\C"
 	
-	if Singing || NowPlaying[2] != ""; "\![sound,option,""%(NowPlaying[0])"",--window=%(_onoff)]"
+	if Singing || NowPlaying[2] == 1; "\![sound,option,""%(NowPlaying[0])"",--window=%(_onoff)]"
 	
 	if _argc == 0; OnMusicSettings //If this was done with the buttons - there will be no args in that case
 	elseif _argv[1] != "" //If a menu is listed to refresh
@@ -1293,7 +1293,7 @@ OnMusicPlayer.PlaylistLoaded : all
 {
 	NowPlaying[0] = ""
 	NowPlaying[1] = 0
-	NowPlaying[2] = ""
+	NowPlaying[2] = 0
 	CurrentPlaylist = IARRAY
 	_path = reference2
 	MusicPlayer.PageIndex = 0
@@ -1339,7 +1339,7 @@ OnPlaylistCleared : all
 	CurrentPlaylist = IARRAY
 	NowPlaying[0] = "" //song name
 	NowPlaying[1] = -1 //song position
-	NowPlaying[2] = "" //Paused song
+	NowPlaying[2] = 0 //Paused song
 	MusicPlayer.PageIndex = 0
 	
 	"\![sound,stop]%(OnNotifySongInfo)"
@@ -1371,13 +1371,13 @@ OnNotifySongInfo
 	else; "\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomDetail, ]"
 	*/
 	--
-	"\![notifyother,__SYSTEM_ALL_GHOST__,OnMusicPlayer.SongInfo,""%(selfname)"",""%(NowPlaying[0])"",%(NowPlaying[1]),""%(NowPlaying[2])"",%(MusicSettings[0]),%(MusicSettings[1]),%(MusicSettings[2]),%(MusicSettings[3]),%(MusicSettings[4]),%(ARRAYSIZE(CurrentPlaylist))]"
+	"\![notifyother,__SYSTEM_ALL_GHOST__,OnMusicPlayer.SongInfo,""%(selfname)"",""%(NowPlaying[0])"",%(NowPlaying[1]),%(NowPlaying[2]),%(MusicSettings[0]),%(MusicSettings[1]),%(MusicSettings[2]),%(MusicSettings[3]),%(MusicSettings[4]),%(ARRAYSIZE(CurrentPlaylist))]"
 	
 	//References:
 	//0 - The sakura name of this ghost, since this event may come from multiple ghosts
 	//1 - The file path of the currently playing song. If empty, no song is loaded. THIS IS NOT ESCAPED.
 	//2 - The index number of the currently playing song. If the song is paused, the index number is still tracked. This probably isn't that useful but I feel like I'll regret it later if I don't add it.
-	//3 - If there is a song listed in here, then that song is paused. If this is empty and there is a song loaded, the song is playing. THIS IS NOT ESCAPED.
+	//3 - 1 if the player is paused, 0 otherwise
 	//4 - Current volume from 0 - 100
 	//5 - Current speed, from 0 - 400 (see MAX_RATE function for more info). 100 is normal speed
 	//6 - Current balance. 0 is normal, -100 is all the way left, 100 is all the way right
@@ -1402,7 +1402,7 @@ On_tooltip
 		}
 		elseif reference4 == "pause_resume_button"
 		{
-			if NowPlaying[2] == ""; "Pause"
+			if NowPlaying[2] == 0; "Pause"
 			else; "Resume"
 		}
 		elseif reference4 == "stop_button"; "Stop"
@@ -1571,7 +1571,7 @@ MusicPlayer.OnKeyPress : all
 			if MenuIsOpen; "\C"
 			
 			if NowPlaying[0] == ""; "\![raise,OnPlaySong,,,%(_inmenu)]"
-			elseif NowPlaying[2] != ""; "\![raise,OnPauseSong,%(_inmenu),resume]"
+			elseif NowPlaying[2] == 1; "\![raise,OnPauseSong,%(_inmenu),resume]"
 			else; "\![raise,OnPauseSong,%(_inmenu),pause]"
 		}
 		elseif _key == Hotkeys[1] //Next song
@@ -1777,7 +1777,7 @@ MusicPlayer.OnMouseDoubleClick : all
 		{
 			"\![raise,OnPlaySong,,,%(_inmenu)]"
 		}
-		elseif NowPlaying[2] != ""
+		elseif NowPlaying[2] == 1
 		{
 			"\![raise,OnPauseSong,%(_inmenu),resume]"
 		}
@@ -1790,7 +1790,7 @@ MusicPlayer.OnMouseDoubleClick : all
 	{
 		if MenuIsOpen; "\C"
 		
-		if NowPlaying[2] != ""; "\![raise,OnPauseSong,%(_inmenu),resume]"
+		if NowPlaying[2] == 1; "\![raise,OnPauseSong,%(_inmenu),resume]"
 		else; "\![raise,OnPauseSong,%(_inmenu),pause]"
 	}
 	elseif reference4 == "next_button"
@@ -1875,7 +1875,7 @@ MusicPlayer.OnMouseDoubleClick : all
 OnSoundStop : all
 {
 	_inmenu = CheckWhichMenu
-	NowPlaying[2] = "" //Clear paused song if there somehow was one
+	NowPlaying[2] = 0 //Clear paused song if there somehow was one
 	if BalloonIsOpen && MusicPlayer.Priority != "Seamless music"; "\C\_l[0,0]"
 	
 	if MusicSettings[3] == 3  //If it's set to play one song and then stop
@@ -1948,7 +1948,7 @@ OnSoundError : all
 	if _playnext == 0
 	{
 		NowPlaying[0] = "" //song name
-		NowPlaying[2] = "" //Clearing paused song
+		NowPlaying[2] = 0 //Clearing paused song
 	}
 	if IsMinimized && !_playnext; MusicPlayer.MakeValueNotify("%(OnNotifySongInfo)")
 	else; "%(OnNotifySongInfo)"
@@ -2023,7 +2023,7 @@ IsMinimized
 //Returns 1 if singing, 0 if not
 Singing
 {
-	!(NowPlaying[0] == "" || NowPlaying[2] != "")
+	!(NowPlaying[0] == "" || NowPlaying[2] == 1)
 }
 
 //Helps with alignment commands

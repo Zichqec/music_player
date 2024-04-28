@@ -2144,6 +2144,25 @@ OnTranslateInternal.MusicPlayer
 	}
 }
 
+//CUSTOMIZE: If you don't have OnInitialize, rename this to OnInitialize. If you do have it, make sure to call this function in that event. This just means that when the ghost opens, it'll ensure it doesn't think it's already playing music.
+MusicPlayer.OnInitialize
+{
+	if reference0 != "reload" //If NOT reloading
+	{
+		MusicPlayer.CurrentSongName = ""
+		MusicPlayer.IsPaused = 0
+	}
+}
+
+//CUSTOMIZE: If you don't have OnDestroy, rename this to OnDestroy. If you do have it, make sure to call this function in that event. This just means that when the ghost closes, it'll stop playing music.
+MusicPlayer.OnDestroy
+{
+	if reference0 != "reload" //If NOT reloading
+	{
+		MusicPlayer.CurrentSongName = ""
+		MusicPlayer.IsPaused = 0
+	}
+}
 
 
 

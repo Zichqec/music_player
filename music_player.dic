@@ -1819,6 +1819,8 @@ MusicPlayer.OnMouseDoubleClick : all
 	
 	if reference4 == "stop_button"//Stopping the music
 	{
+		if MusicPlayer.MenuIsOpen; "\C"
+		
 		"\![raise,OnMusicPlayer.StopSong,%(_inmenu)]"
 	}
 	elseif reference4 == "play_button" //Playing a song. This should always start the next one, probably? If none is playing, it should either start at 0 or a random position... If something is playing, it should skip to the next, I think.

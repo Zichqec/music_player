@@ -255,31 +255,27 @@ OnMusicPlayer.PlaySong : all
 	}
 	if ARRAYSIZE(MusicPlayer.CurrentPlaylist) > 0 //If there are more songs to play
 	{
-		
+		_start_point = -1
 		if reference2 == "justadded" //Played after dragging and dropping
 		{
-			if MusicPlayer.PlayMode == 1 //If it's set to shuffle
-			{
-				MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(ARRAYSIZE(MusicPlayer.CurrentPlaylist) - 1,MusicPlayer.CurrentPlaylist)
-				MusicPlayer.CurrentSongIndex = 0
-			}
-			else; MusicPlayer.CurrentSongIndex = ARRAYSIZE(MusicPlayer.CurrentPlaylist) - 1
+			_start_point = ARRAYSIZE(MusicPlayer.CurrentPlaylist) - 1
 		}
 		elseif reference2 == "frommenu" //Picked direct from the menu
 		{
-			if MusicPlayer.PlayMode == 1 //If it's set to shuffle
-			{
-				MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(reference0,MusicPlayer.CurrentPlaylist)
-				MusicPlayer.CurrentSongIndex = 0
-			}
-			else; MusicPlayer.CurrentSongIndex = reference0
+			_start_point = reference0
 		}
 		elseif MusicPlayer.CurrentSongIndex == -1 //No song playing
 		{
-			MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(0,MusicPlayer.CurrentPlaylist)
-			MusicPlayer.CurrentSongIndex = 0
+			_start_point = 0
 		}
 		//Otherwise, just play the current index that we were stopped at
+		
+		if _start_point != -1
+		{
+			MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(_start_point,MusicPlayer.CurrentPlaylist)
+			if MusicPlayer.PlayMode == 1; MusicPlayer.CurrentSongIndex = 0 //Shuffle
+			else; MusicPlayer.CurrentSongIndex = _start_point
+		}
 		
 		if MusicPlayer.MenuIsOpen && reference2 != "justadded"; "\C" //If the balloon is currently open other than when a song was just added, keep it open
 		

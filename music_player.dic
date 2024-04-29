@@ -1514,6 +1514,12 @@ MusicPlayer.LargeBalloon
 	"\b[2]"
 }
 
+//The default path to save playlists to. You should probably leave this alone, but you can change it if you like. Just make sure it is a relative path within the ghost's folder; the ghost will try to create this folder if it does not exist.
+MusicPlayer.DefaultPlaylistPath
+{
+	"../../playlists/"
+}
+
 //Maximum speed for the music player. Because of an SSP bug, this is capped at 435 at the time of writing. According to Ukadoc it should be able to go up to 10000. To avoid bugs I'm going to cap this at 400, but if the bug is fixed in the future you can change the rate to whatever cap you want here.
 MusicPlayer.MaxRate
 {
@@ -2262,7 +2268,7 @@ MusicPlayer.SetDefaultSettings
 	MusicPlayer.Pagination = "Paginated" //Playlist display option
 	
 	MusicPlayer.PageIndex = 0
-	MusicPlayer.PlaylistPath = "../../playlists/" //Default playlist folder, change if desired
+	MusicPlayer.PlaylistPath = MusicPlayer.DefaultPlaylistPath //Default playlist folder, change if desired
 	
 	void MKDIR(MusicPlayer.PlaylistPath)
 }
@@ -2297,7 +2303,7 @@ MusicPlayer.ResetDefaultSettings
 	if !ISVAR("MusicPlayer.Pagination"); MusicPlayer.Pagination = "Paginated" //Playlist display option
 	
 	if !ISVAR("MusicPlayer.PageIndex"); MusicPlayer.PageIndex = 0
-	if !ISVAR("MusicPlayer.PlaylistPath"); MusicPlayer.PlaylistPath = "../../playlists/" //Default playlist folder
+	if !ISVAR("MusicPlayer.PlaylistPath"); MusicPlayer.PlaylistPath = MusicPlayer.DefaultPlaylistPath //Default playlist folder
 	
 	void MKDIR(MusicPlayer.PlaylistPath)
 }

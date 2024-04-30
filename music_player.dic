@@ -123,12 +123,6 @@ OnMusicPlayer.Menu : all
 		_starting_value = MusicPlayer.PageIndex * MusicPlayer.SongsPerPage
 	}
 	
-	_current_song_index = MusicPlayer.CurrentSongIndex
-	if MusicPlayer.PlayMode == 1 //Shuffle and loop
-	{
-		_current_song_index = MusicPlayer.ShuffledPlaylist[_current_song_index]
-	}
-	
 	if _currentsong[0] == "" //Placeholder if the song was removed from the playlist
 	{
 		_currentsong[0] = "(Removed from playlist)"
@@ -169,7 +163,7 @@ OnMusicPlayer.Menu : all
 		"%(MusicPlayer.newline)\f[align,right]\![*]\q[Stop,OnMusicPlayer.StopSong,OnMusicPlayer.Menu]    \q[>>>,OnMusicPlayer.NextSong]\n\n[half]\f[align,left]"
 	}
 	
-	"Now playing: %(MusicPlayer.CurrentSongIndex) - "
+	"Now playing: %(MusicPlayer.CurrentSongIndex) -  %(MusicPlayer.ShuffledIndex) - "
 	
 	if MusicPlayer.PlayState != 0
 	{
@@ -208,7 +202,7 @@ OnMusicPlayer.Menu : all
 		_song = SPLITPATH(_song)[2] //Picks out just the name of the file, no extension
 		_path = MusicPlayer.CurrentPlaylist[_i]
 		
-		if _i == _current_song_index //If this is the song that's playing right now
+		if _i == MusicPlayer.CurrentSongIndex //If this is the song that's playing right now
 		{
 			_currentsong[0] = _song //Song name
 			_currentsong[1] = MusicPlayer.CurrentPlaylist[_i] //Song path
@@ -225,12 +219,12 @@ OnMusicPlayer.Menu : all
 
 		"\q[(x),OnMusicPlayer.RemoveSong,%(_i)] " //(x) button
 
-		if _i == _current_song_index //If this is the song that's playing right now
+		if _i == MusicPlayer.CurrentSongIndex //If this is the song that's playing right now
 		{
 			"\f[bold,1]\f[italic,1]"
 		}
 		"%(_h)\__q[OnMusicPlayer.PlaySong,%(_i),OnMusicPlayer.Menu,frommenu]%(_song)\__q%(_d)\n"
-		if _i == _current_song_index; "\f[default]" //Reset the bold/italic if it was applied
+		if _i == MusicPlayer.CurrentSongIndex; "\f[default]" //Reset the bold/italic if it was applied
 	}
 	
 	"\n"
@@ -272,9 +266,9 @@ OnMusicPlayer.PlaySong : all
 		
 		if _start_point != -1
 		{
-			MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(_start_point,MusicPlayer.CurrentPlaylist)
-			if MusicPlayer.PlayMode == 1; MusicPlayer.CurrentSongIndex = 0 //Shuffle
-			else; MusicPlayer.CurrentSongIndex = _start_point
+			MusicPlayer.CurrentSongIndex = _start_point
+			MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentSongIndex,MusicPlayer.CurrentPlaylist)
+			MusicPlayer.ShuffledIndex = 0
 		}
 		
 		if MusicPlayer.MenuIsOpen && reference2 != "justadded"; "\C" //If the balloon is currently open other than when a song was just added, keep it open
@@ -386,9 +380,21 @@ OnMusicPlayer.NextSong : all
 	
 	if ARRAYSIZE(MusicPlayer.CurrentPlaylist) > 0 //Songs available to play
 	{
-		if MusicPlayer.PlayMode == 4
+		if MusicPlayer.PlayMode == 4 //Random
 		{
 			_next = RAND(ARRAYSIZE(MusicPlayer.CurrentPlaylist))
+		}
+		elseif MusicPlayer.PlayMode == 1 //Shuffle and loop
+		{
+			if MusicPlayer.ShuffledIndex >= (ARRAYSIZE(MusicPlayer.CurrentPlaylist) - 1) //If this was the last song on the list
+			{
+				MusicPlayer.ShuffledIndex = 0
+			}
+			else //If there are more songs to go
+			{
+				MusicPlayer.ShuffledIndex++
+			}
+			_next = MusicPlayer.ShuffledPlaylist[MusicPlayer.ShuffledIndex]
 		}
 		else //Looping the list normally
 		{
@@ -439,9 +445,21 @@ OnMusicPlayer.PrevSong : all
 		}
 		else
 		{
-			if MusicPlayer.PlayMode == 4
+			if MusicPlayer.PlayMode == 4 //Random
 			{
 				_next = RAND(ARRAYSIZE(MusicPlayer.CurrentPlaylist))
+			}
+			elseif MusicPlayer.PlayMode == 1 //Shuffle and loop
+			{
+				if MusicPlayer.ShuffledIndex <= 0 //If this was the last song on the list
+				{
+					MusicPlayer.ShuffledIndex = ARRAYSIZE(MusicPlayer.CurrentPlaylist) - 1
+				}
+				else //If there are more songs to go
+				{
+					MusicPlayer.ShuffledIndex--
+				}
+				_next = MusicPlayer.ShuffledPlaylist[MusicPlayer.ShuffledIndex]
 			}
 			else //Looping the list normally
 			{
@@ -473,22 +491,19 @@ OnMusicPlayer.RemoveSong : all
 	
 	
 	if MusicPlayer.PlayState == 2 && reference0 == MusicPlayer.CurrentSongIndex; MusicPlayer.PlayState = 0 //If the song being removed was the paused song, clear it
-	_to_remove = MusicPlayer.CurrentPlaylist[reference0]
 	MusicPlayer.CurrentPlaylist[reference0] = IARRAY //Clear the song that we want to remove
 	
 	if reference0 < MusicPlayer.CurrentSongIndex; MusicPlayer.CurrentSongIndex = MusicPlayer.CurrentSongIndex - 1
 	elseif reference0 == MusicPlayer.CurrentSongIndex; MusicPlayer.CurrentSongIndex = -1
 	
-	if MusicPlayer.CurrentSongName == _to_remove //If the song being removed is being played, remove it from the shuffle list
+	if MusicPlayer.CurrentSongName == MusicPlayer.CurrentPlaylist[reference0] //If the song being removed is being played, remove it from the shuffle list
 	{
 		MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist('|removed|',MusicPlayer.CurrentPlaylist) //Send a placeholder for the song that was already removed, and shuffle the playlist
 	}
 	else //If another song is playing
 	{
-		_index = MusicPlayer.ShuffledPlaylist[MusicPlayer.CurrentSongIndex]
-		MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(_index,MusicPlayer.CurrentPlaylist) //Shuffle with the current song as 1
+		MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentSongIndex,MusicPlayer.CurrentPlaylist) //Shuffle with the current song as 1
 	}
-	if MusicPlayer.PlayMode == 1; MusicPlayer.CurrentSongIndex = 0 //If shuffling
 	
 	if _origmax > MusicPlayer.MaxPages && MusicPlayer.PageIndex == _origmax
 	{
@@ -543,13 +558,7 @@ OnMusicPlayer.JumpIndex : all
 
 OnMusicPlayer.JumpToCurrent
 {
-	_current_song_index = MusicPlayer.CurrentSongIndex
-	if MusicPlayer.PlayMode == 1 //Shuffle and loop
-	{
-		_current_song_index = MusicPlayer.ShuffledPlaylist[_current_song_index]
-	}
-	
-	MusicPlayer.PageIndex = _current_song_index / MusicPlayer.SongsPerPage
+	MusicPlayer.PageIndex = MusicPlayer.CurrentSongIndex / MusicPlayer.SongsPerPage
 	
 	"\C\![close,inputbox,OnMusicPlayer.JumpIndex]\![raise,OnMusicPlayer.Menu]"
 }
@@ -794,19 +803,12 @@ OnMusicPlayer.PlaybackType : all
 //Actually making the change
 OnMusicPlayer.PlaybackTypeChange
 {
-	_oldmode = MusicPlayer.PlayMode
 	reference0 = TOINT(reference0)
 	MusicPlayer.PlayMode = reference0
 	if reference0 == 1 //If the user set it to shuffle, shuffle the playlist
 	{
 		MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentSongIndex,MusicPlayer.CurrentPlaylist)
-		MusicPlayer.CurrentSongIndex = 0
-	}
-	elseif _oldmode == 1 //Shuffle and loop
-	{
-		_index = MusicPlayer.CurrentSongIndex
-		_songnum = MusicPlayer.ShuffledPlaylist[_index]
-		MusicPlayer.CurrentSongIndex = _songnum
+		MusicPlayer.ShuffledIndex = 0
 	}
 	OnMusicPlayer.Settings
 }
@@ -1077,12 +1079,6 @@ OnMusicPlayer.ScootSongMenu : all
 	
 	if reference1 == "top"; "\![set,autoscroll,disable]"
 	
-	_current_song_index = MusicPlayer.CurrentSongIndex
-	if MusicPlayer.PlayMode == 1 //Shuffle and loop
-	{
-		_current_song_index = MusicPlayer.ShuffledPlaylist[_current_song_index]
-	}
-	
 	_currentsong = IARRAY
 	for _i = 0; _i < ARRAYSIZE(MusicPlayer.CurrentPlaylist); _i++
 	{
@@ -1102,7 +1098,7 @@ OnMusicPlayer.ScootSongMenu : all
 			"%(_d)"
 		}
 		
-		if _i == _current_song_index //If this is the song that's playing right now
+		if _i == MusicPlayer.CurrentSongIndex //If this is the song that's playing right now
 		{
 			"\f[bold,1]" //Make it bold
 			_currentsong[0] = _song //Saves the song name into _currentsong[0]
@@ -1185,6 +1181,7 @@ OnMusicPlayer.MoveSong : all
 		}
 	}
 	MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentSongIndex,MusicPlayer.CurrentPlaylist)
+	MusicPlayer.ShuffledIndex = 0
 	
 	"\C\![raise,OnMusicPlayer.ScootSongMenu,%(reference0),%(reference1)]"
 }
@@ -1214,6 +1211,7 @@ OnMusicPlayer.ScootSong : all
 	}
 	
 	MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentSongIndex,MusicPlayer.CurrentPlaylist)
+	MusicPlayer.ShuffledIndex = 0
 	
 	"\C\![raise,OnMusicPlayer.ScootSongMenu,%(reference0),%(reference1)]"
 }
@@ -1407,6 +1405,7 @@ OnMusicPlayer.PlaylistLoaded : all
 	void FCLOSE(_path)
 	
 	MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentSongIndex,MusicPlayer.CurrentPlaylist)
+	MusicPlayer.ShuffledIndex = 0
 	
 	"%(MusicPlayer.Scope)%(MusicPlayer.NonSingingSurfaces)\![no-autopause]"
 	
@@ -1733,8 +1732,9 @@ OnFileDrop2 : all
 		if ASEARCH(_fileext,MusicPlayer.CompatibleMusicFileTypes) != -1 //If it's a compatible music file
 		{
 			MusicPlayer.CurrentPlaylist ,= _filearray
-			_index = MusicPlayer.ShuffledPlaylist[MusicPlayer.CurrentSongIndex]
-			MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(_index,MusicPlayer.CurrentPlaylist)
+			
+			MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentPlaylist[MusicPlayer.CurrentIndex],MusicPlayer.CurrentPlaylist)
+			MusicPlayer.ShuffledIndex = 0
 			_from = MusicPlayer.CheckWhichMenu
 			
 			"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\_q\![no-autopause]\![set,autoscroll,disable]"
@@ -1955,9 +1955,22 @@ OnSoundStop : all
 		{
 			_next = MusicPlayer.CurrentSongIndex
 		}
-		elseif MusicPlayer.PlayMode == 4
+		elseif MusicPlayer.PlayMode == 4 //Random
 		{
 			_next = RAND(ARRAYSIZE(MusicPlayer.CurrentPlaylist))
+		}
+		elseif MusicPlayer.PlayMode == 1 //Shuffle and loop
+		{
+			if MusicPlayer.ShuffledIndex >= (ARRAYSIZE(MusicPlayer.CurrentPlaylist) - 1) //If this was the last song on the list
+			{
+				MusicPlayer.ShuffledIndex = 0
+				_lastsong = 1
+			}
+			else //If there are more songs to go
+			{
+				MusicPlayer.ShuffledIndex++
+			}
+			_next = MusicPlayer.ShuffledPlaylist[MusicPlayer.ShuffledIndex]
 		}
 		else //Loop playlist or shuffle
 		{
@@ -2158,13 +2171,7 @@ MusicPlayer.CurrentSong
 
 MusicPlayer.CurrentSongName
 {
-	_num = MusicPlayer.CurrentSongIndex
-	if MusicPlayer.PlayMode == 1 //Shuffle and loop
-	{
-		_num = MusicPlayer.ShuffledPlaylist[_num]
-		
-	}
-	MusicPlayer.CurrentPlaylist[_num]
+	MusicPlayer.CurrentPlaylist[MusicPlayer.CurrentSongIndex]
 }
 
 MusicPlayer.MaxPages
@@ -2256,6 +2263,7 @@ MusicPlayer.SetDefaultSettings
 	
 	MusicPlayer.CurrentPlaylist = IARRAY
 	MusicPlayer.ShuffledPlaylist = IARRAY
+	MusicPlayer.ShuffledIndex = 0
 	
 	MusicPlayer.Hotkeys = IARRAY
 	MusicPlayer.BalloonLines = MusicPlayer.DefaultBalloonLines
@@ -2292,6 +2300,7 @@ MusicPlayer.ResetDefaultSettings
 	
 	if !ISVAR("MusicPlayer.CurrentPlaylist"); MusicPlayer.CurrentPlaylist = IARRAY
 	if !ISVAR("MusicPlayer.ShuffledPlaylist"); MusicPlayer.ShuffledPlaylist = IARRAY
+	if !ISVAR("MusicPlayer.ShuffledIndex"); MusicPlayer.ShuffledIndex = 0
 	
 	if !ISVAR("MusicPlayer.Hotkeys"); MusicPlayer.Hotkeys = IARRAY
 	if !ISVAR("MusicPlayer.BalloonLines"); MusicPlayer.BalloonLines = MusicPlayer.DefaultBalloonLines
@@ -2372,6 +2381,7 @@ MusicPlayer.ConvertOldVariables
 	if !ISVAR("MusicPlayer.ShuffledPlaylist")
 	{
 		MusicPlayer.ShuffledPlaylist = ShuffledPlaylist
+		MusicPlayer.ShuffledIndex = 0
 		void ERASEVAR("ShuffledPlaylist")
 	}
 	
@@ -2521,8 +2531,8 @@ MusicPlayer.FindSongs
 	}
 	if ARRAYSIZE(_added) > 0
 	{
-		_index = MusicPlayer.ShuffledPlaylist[MusicPlayer.CurrentSongIndex]
-		MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(_index,MusicPlayer.CurrentPlaylist)
+		MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentPlaylist[MusicPlayer.CurrentIndex],MusicPlayer.CurrentPlaylist)
+		MusicPlayer.ShuffledIndex = 0
 	}
 	
 	_added

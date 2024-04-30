@@ -1,7 +1,7 @@
 # Music Player
 ## A music player for ukagaka, written in YAYA
 
-This music player is free to use within your own ghost projects. All I ask is that you provide a credit in your readme linking back to my website, or this repository!
+This music player is free to use within your own ghost projects. All I ask is that you either leave the credit in the Help menu, or provide a credit in your readme linking back to my website (or this repository)!
 
 My website: https://ukagaka.zichqec.com/
 

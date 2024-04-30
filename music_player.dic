@@ -123,12 +123,6 @@ OnMusicPlayer.Menu : all
 		_starting_value = MusicPlayer.PageIndex * MusicPlayer.SongsPerPage
 	}
 	
-	if _currentsong[0] == "" //Placeholder if the song was removed from the playlist
-	{
-		_currentsong[0] = "(Removed from playlist)"
-		_currentsong[1] = MusicPlayer.CurrentSongName
-	}
-	
 	"%(MusicPlayer.Scope)\c%(MusicPlayer.LargeBalloon)\_q\*\![set,autoscroll,disable]\![no-autopause]"
 	
 	//CUSTOMIZE: If you're using something other than OnSakuraMenu for your menu, or you're using this music player on a kero, you'll need to edit this button and the one at the bottom of the menu
@@ -163,11 +157,12 @@ OnMusicPlayer.Menu : all
 		"%(MusicPlayer.newline)\f[align,right]\![*]\q[Stop,OnMusicPlayer.StopSong,OnMusicPlayer.Menu]    \q[>>>,OnMusicPlayer.NextSong]\n\n[half]\f[align,left]"
 	}
 	
-	"Now playing: %(MusicPlayer.CurrentSongIndex) -  %(MusicPlayer.ShuffledIndex) - "
+	"Now playing: "
 	
 	if MusicPlayer.PlayState != 0
 	{
-		" %(_h)\__q[OnMusicPlayer.SongLocation,""%(MusicPlayer.CurrentSongName)""]%(MusicPlayer.CurrentSong)\__q\f[default]"
+		if MusicPlayer.CurrentSongIndex == -1; "%(_h)\__q[OnMusicPlayer.SongLocation,""%(MusicPlayer.LastRemovedSong)""](Removed from playlist)\__q%(_d)"
+		else; "%(_h)\__q[OnMusicPlayer.SongLocation,""%(MusicPlayer.CurrentSongName)""]%(MusicPlayer.CurrentSong)\__q%(_d)"
 	}
 	
 	if MusicPlayer.Pagination == "Paginated"
@@ -488,7 +483,7 @@ OnMusicPlayer.PrevSong : all
 OnMusicPlayer.RemoveSong : all
 {
 	_origmax = MusicPlayer.MaxPages
-	
+	MusicPlayer.LastRemovedSong = MusicPlayer.CurrentSongName
 	
 	if MusicPlayer.PlayState == 2 && reference0 == MusicPlayer.CurrentSongIndex; MusicPlayer.PlayState = 0 //If the song being removed was the paused song, clear it
 	MusicPlayer.CurrentPlaylist[reference0] = IARRAY //Clear the song that we want to remove
@@ -2253,6 +2248,7 @@ MusicPlayer.SetDefaultSettings
 {
 	MusicPlayer.CurrentSongIndex = -1
 	MusicPlayer.PlayState = 0
+	MusicPlayer.LastRemovedSong = ""
 	
 	MusicPlayer.Volume = 100
 	MusicPlayer.Speed = 100
@@ -2290,6 +2286,7 @@ MusicPlayer.ResetDefaultSettings
 {
 	if !ISVAR("MusicPlayer.CurrentSongIndex"); MusicPlayer.CurrentSongIndex = -1
 	if !ISVAR("MusicPlayer.PlayState"); MusicPlayer.PlayState = 0
+	if !ISVAR("MusicPlayer.LastRemovedSong"); MusicPlayer.LastRemovedSong = ""
 	
 	if !ISVAR("MusicPlayer.Volume"); MusicPlayer.Volume = 100
 	if !ISVAR("MusicPlayer.Speed"); MusicPlayer.Speed = 100
@@ -2339,6 +2336,7 @@ MusicPlayer.ConvertOldVariables
 			else; MusicPlayer.PlayState = 1
 		}
 	}
+	if !ISVAR("MusicPlayer.LastRemovedSong"); MusicPlayer.LastRemovedSong = ""
 	void ERASEVAR("NowPlaying")
 	
 	if !ISVAR("MusicPlayer.Volume")

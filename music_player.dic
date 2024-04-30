@@ -169,7 +169,7 @@ OnMusicPlayer.Menu : all
 		"%(MusicPlayer.newline)\f[align,right]\![*]\q[Stop,OnMusicPlayer.StopSong,OnMusicPlayer.Menu]    \q[>>>,OnMusicPlayer.NextSong]\n\n[half]\f[align,left]"
 	}
 	
-	"Now playing:"
+	"Now playing: %(MusicPlayer.CurrentSongIndex) - "
 	
 	if MusicPlayer.PlayState != 0
 	{
@@ -473,19 +473,22 @@ OnMusicPlayer.RemoveSong : all
 	
 	
 	if MusicPlayer.PlayState == 2 && reference0 == MusicPlayer.CurrentSongIndex; MusicPlayer.PlayState = 0 //If the song being removed was the paused song, clear it
+	_to_remove = MusicPlayer.CurrentPlaylist[reference0]
 	MusicPlayer.CurrentPlaylist[reference0] = IARRAY //Clear the song that we want to remove
 	
 	if reference0 < MusicPlayer.CurrentSongIndex; MusicPlayer.CurrentSongIndex = MusicPlayer.CurrentSongIndex - 1
 	elseif reference0 == MusicPlayer.CurrentSongIndex; MusicPlayer.CurrentSongIndex = -1
 	
-	if MusicPlayer.CurrentSongName == MusicPlayer.CurrentPlaylist[reference0] //If the song being removed is being played, remove it from the shuffle list
+	if MusicPlayer.CurrentSongName == _to_remove //If the song being removed is being played, remove it from the shuffle list
 	{
 		MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist('|removed|',MusicPlayer.CurrentPlaylist) //Send a placeholder for the song that was already removed, and shuffle the playlist
 	}
 	else //If another song is playing
 	{
-		MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentSongIndex,MusicPlayer.CurrentPlaylist) //Shuffle with the current song as 1
+		_index = MusicPlayer.ShuffledPlaylist[MusicPlayer.CurrentSongIndex]
+		MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(_index,MusicPlayer.CurrentPlaylist) //Shuffle with the current song as 1
 	}
+	if MusicPlayer.PlayMode == 1; MusicPlayer.CurrentSongIndex = 0 //If shuffling
 	
 	if _origmax > MusicPlayer.MaxPages && MusicPlayer.PageIndex == _origmax
 	{
@@ -1730,10 +1733,11 @@ OnFileDrop2 : all
 		if ASEARCH(_fileext,MusicPlayer.CompatibleMusicFileTypes) != -1 //If it's a compatible music file
 		{
 			MusicPlayer.CurrentPlaylist ,= _filearray
-			MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentSongIndex,MusicPlayer.CurrentPlaylist)
+			_index = MusicPlayer.ShuffledPlaylist[MusicPlayer.CurrentSongIndex]
+			MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(_index,MusicPlayer.CurrentPlaylist)
 			_from = MusicPlayer.CheckWhichMenu
 			
-			"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\_q\![no-autopause]"
+			"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\_q\![no-autopause]\![set,autoscroll,disable]"
 			
 			//DIALOGUE: Added a file to the playlist
 			"Added ""\_?%(_filename)\_?"" to the playlist."
@@ -1743,7 +1747,7 @@ OnFileDrop2 : all
 		}
 		elseif _fileext == ".m3u" //If it's a playlist
 		{
-			"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\![no-autopause]\_q"
+			"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\![no-autopause]\![set,autoscroll,disable]\_q"
 			
 			//DIALOGUE: Confirming loading a playlist after drag and drop
 			"Load the playlist ""\_?%(_filename)\_?""?\n\nThe current playlist will be lost unless it is already saved."
@@ -1765,7 +1769,7 @@ OnFileDrop2 : all
 			
 			if ARRAYSIZE(_musicfiles) == 0 //If there were no compatible songs inside
 			{
-				"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\_q\![no-autopause]\_q"
+				"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\_q\![no-autopause]\![set,autoscroll,disable]\_q"
 				
 				//DIALOGUE: The user dropped a folder on the ghost, but nothing inside was a compatible music file
 				"None of the files in ""\_?%(_folder)\_?"" are compatible music files."
@@ -1775,7 +1779,7 @@ OnFileDrop2 : all
 				_num = ARRAYSIZE(_musicfiles)
 				_s = ""; if _num != 1; _s = "s"
 				
-				"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\![no-autopause]\_q"
+				"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\![no-autopause]\![set,autoscroll,disable]\_q"
 				
 				//DIALOGUE: The user dropped a folder on the ghost, and some files inside were compatible music files. %(_s) can be used to add an s if the number of compatible files is plural, %(_num) can be used to list the number of files, and %(_folder) is the name of the folder that was dropped.
 				"Added %(_num) song%(_s) from ""\_?%(_folder)\_?""."
@@ -1785,7 +1789,7 @@ OnFileDrop2 : all
 		}
 		else //Incompatible
 		{
-			"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\![no-autopause]\_q"
+			"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\![no-autopause]\![set,autoscroll,disable]\_q"
 			
 			//DIALOGUE: Any file that is not music or a playlist
 			"This isn't a recognized file type."
@@ -1797,7 +1801,7 @@ OnFileDrop2 : all
 
 		if ARRAYSIZE(_musicfiles) == 0 //If there are no music files
 		{
-			"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\![no-autopause]\_q"
+			"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\![no-autopause]\![set,autoscroll,disable]\_q"
 			
 			//DIALOGUE: Multiple files were dropped on the ghost, but none of them are compatible music files.
 			"None of these files are compatible with the music player."
@@ -1808,7 +1812,7 @@ OnFileDrop2 : all
 			
 			_s = ""; if _num != 1; _s = "s"
 			
-			"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\![no-autopause]\_q"
+			"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\![no-autopause]\![set,autoscroll,disable]\_q"
 			
 			//DIALOGUE: Multiple files were dragged on the ghost, and some of them were music files. %(_s) can be used to add an s if the number of compatible files is plural, and %(_num) can be used to list the number of files.
 			"%(_num) compatible song%(_s) added to the playlist."
@@ -2515,6 +2519,12 @@ MusicPlayer.FindSongs
 			if _recursive != ""; _added ,= _recursive
 		}
 	}
+	if ARRAYSIZE(_added) > 0
+	{
+		_index = MusicPlayer.ShuffledPlaylist[MusicPlayer.CurrentSongIndex]
+		MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(_index,MusicPlayer.CurrentPlaylist)
+	}
+	
 	_added
 }
 

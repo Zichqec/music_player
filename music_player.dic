@@ -614,7 +614,7 @@ OnMusicPlayer.Settings : all
 	elseif reference0 == "Hotkeys"; MusicPlayer.Settings.Hotkeys
 	else; MusicPlayer.Settings.Basic
 	
-	"\n\n\![*]\__q[OnMusicPlayer.Menu]Back to music menu\__q  \![*]\__q[OnBlank]Close window\__q"
+	"\n\n\![*]\__q[OnMusicPlayer.Menu]Back to music menu\__q  \![*]\__q[OnMusicPlayer.SettingsClose]Close window\__q"
 	"\![unlock,balloonrepaint]"
 	if _isbasic && MusicPlayer.Singing; "\![timerraise,1000,1,OnMusicPlayer.SettingsRecall]"
 	"\e __MUSIC_SETTINGS_MENU__,%(_isbasic)__"
@@ -626,6 +626,11 @@ OnMusicPlayer.SettingsRecall
 	{
 		OnMusicPlayer.Settings
 	}
+}
+
+OnMusicPlayer.SettingsClose
+{
+	"\b[-1]"
 }
 
 MusicPlayer.Settings.Basic : all
@@ -2150,7 +2155,7 @@ MusicPlayer.IsMinimized
 //Returns 1 if singing, 0 if not
 MusicPlayer.Singing
 {
-	MusicPlayer.PlayState > 0
+	MusicPlayer.PlayState == 1
 }
 
 //Helps with alignment commands

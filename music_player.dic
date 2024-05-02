@@ -28,12 +28,14 @@ You are free to study how this music player works if you want to try writing you
 This will require some adjustment to slot into your ghost. Specifically, there is a label below for BUILT IN SHIORI EVENTS
 The functions there may already exist in your ghost and therefore cause errors. You will need to go over them carefully and integrate them into your ghost's existing code.
 
-In order for hotkeys to work, you must adjust your OnKeyPress. If you don't have OnKeyPress, you can rename the function MusicPlayer.OnKeyPress to just OnKeyPress . If you have OnKeyPress, then you'll want to make it so that if a key is pressed that isn't one of your chosen hotkeys, it calls the MusicPlayer.OnKeyPress function. Typically, this will be a simple else statement.
+In order for hotkeys to work, you must adjust your OnKeyPress. If you don't have OnKeyPress, you can rename the function MusicPlayer.OnKeyPress to just OnKeyPress
+If you have OnKeyPress, then you'll want to make it so that if a key is pressed while the hotkey changing menu is open, or that isn't one of your chosen hotkeys, it calls the MusicPlayer.OnKeyPress function.
 For example, this is how you would implement it into the setup included in the Simplicity template:
 
 OnKeyPress
 {
-	if reference0 == "f1"; "\![open,readme]"
+	if MusicPlayer.ChangingHotkeys; MusicPlayer.HotkeyChange
+	elseif reference0 == "f1"; "\![open,readme]"
 	elseif reference0 == "t"; OnAiTalk
 	elseif reference0 == "r"; OnLastTalk
 	else; MusicPlayer.OnKeyPress
@@ -1574,44 +1576,12 @@ OnBalloonBreak
 }
 
 //Hotkeys. reference0 is the name of the key as displayed on the keycap. reference4, for SSP only, will have things like ctrl and alt, separated by commas.
-//CUSTOMIZE: If you have OnKeyPress in your ghost already, you need to make it call this function if no other recognized key is pressed. If you do not have OnKeyPress, then rename this to OnKeyPress
+//CUSTOMIZE: If you have OnKeyPress in your ghost already, you need to make it call this function if the hotkey changing menu is up, or if no other recognized hotkey is pressed. If you do not have OnKeyPress, then rename this to OnKeyPress
 MusicPlayer.OnKeyPress : all
 {
 	reference0 = TOSTR(reference0)
 	_key = TOUPPER(reference0)
-	if "changing hotkey: " _in_ SPLIT(MusicPlayer.LastTalk,"\e")[1] //If the hotkey input is open
-	{
-		"\![no-autopause]%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\_q"
-		_changing = TOINT(SPLIT(MusicPlayer.LastTalk,"changing hotkey: ")[1])
-		
-		//CUSTOMIZE: Customizable list of reserved hotkeys. Add in any hotkeys you've already used in your ghost to this array.
-		_reserved_keys = ("T","R","F1")
-		
-		if ASEARCH(_key,_reserved_keys) != -1 //If it's reserved
-		{
-			//DIALOGUE: If the user tries to put in a hotkey that is reserved
-			"That hotkey is reserved, please choose another.\x"
-		}
-		elseif _key == MusicPlayer.Hotkeys[_changing] //Same option as was already entered
-		{
-			"\C\![raise,OnMusicPlayer.Settings,Hotkeys]"
-			return
-		}
-		elseif ASEARCH(_key,MusicPlayer.Hotkeys) != -1 //If this hotkey is already selected for something else
-		{
-			//DIALOGUE: If the user tries to enter a hotkey that is already being used
-			"That hotkey is already in use, please clear it before assigning it to another option.\x"
-		}
-		else //If it's a valid key
-		{
-			MusicPlayer.Hotkeys[_changing] = _key
-			"\C\![raise,OnMusicPlayer.Settings,Hotkeys]"
-			return
-		}
-		
-		"\![raise,OnMusicPlayer.ChangeHotkey,%(_changing)]"
-		
-	}
+	if MusicPlayer.ChangingHotkeys; MusicPlayer.HotkeyChange //If the hotkey input is open
 	else //Actually using a hotkey
 	{
 		_inmenu = MusicPlayer.CheckWhichMenu
@@ -1681,6 +1651,40 @@ MusicPlayer.OnKeyPress : all
 			OnMusicPlayer.QuickBalance("Right",_inmenu)
 		}
 	}
+}
+
+MusicPlayer.HotkeyChange : all
+{
+	_key = TOUPPER(reference0)
+	"\![no-autopause]%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\_q"
+	_changing = TOINT(SPLIT(MusicPlayer.LastTalk,"changing hotkey: ")[1])
+	
+	//CUSTOMIZE: Customizable list of reserved hotkeys. Add in any hotkeys you've already used in your ghost to this array.
+	_reserved_keys = ("T","R","F1")
+	
+	if ASEARCH(_key,_reserved_keys) != -1 //If it's reserved
+	{
+		//DIALOGUE: If the user tries to put in a hotkey that is reserved
+		"That hotkey is reserved, please choose another.\x"
+	}
+	elseif _key == MusicPlayer.Hotkeys[_changing] //Same option as was already entered
+	{
+		"\C\![raise,OnMusicPlayer.Settings,Hotkeys]"
+		return
+	}
+	elseif ASEARCH(_key,MusicPlayer.Hotkeys) != -1 //If this hotkey is already selected for something else
+	{
+		//DIALOGUE: If the user tries to enter a hotkey that is already being used
+		"That hotkey is already in use, please clear it before assigning it to another option.\x"
+	}
+	else //If it's a valid key
+	{
+		MusicPlayer.Hotkeys[_changing] = _key
+		"\C\![raise,OnMusicPlayer.Settings,Hotkeys]"
+		return
+	}
+	
+	"\![raise,OnMusicPlayer.ChangeHotkey,%(_changing)]"
 }
 
 //CUSTOMIZE: If you don't have OnMouseWheel in your ghost, you can rename this to just OnMouseWheel. Otherwise, you'll need to make your existing OnMouseWheel call this one.
@@ -2247,6 +2251,11 @@ MusicPlayer.DisplayPlaytime : all
 		}
 	}
 	_output
+}
+
+MusicPlayer.ChangingHotkeys
+{
+	"changing hotkey: " _in_ SPLIT(MusicPlayer.LastTalk,"\e")[1]
 }
 
 MusicPlayer.SetDefaultSettings

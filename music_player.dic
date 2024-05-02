@@ -1253,6 +1253,7 @@ OnMusicPlayer.UnsetHotkey
 {
 	reference0 = TOINT(reference0)
 	MusicPlayer.Hotkeys[reference0] = "Unbound"
+	reference0 = "Hotkeys" //Setting this so that it goes back to the right menu tab after
 	
 	OnMusicPlayer.Settings
 }

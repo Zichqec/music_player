@@ -679,7 +679,7 @@ MusicPlayer.Settings.Basic : all
 	"Play mode: \![*]%(_h)\__q[OnMusicPlayer.PlaybackType]%(_mode)\__q%(_d)\n\n[half]"
 	"Volume: %(_vol_up_btn)%(_vol_down_btn) %(_h)\q[%(_vol),OnMusicPlayer.SetOption,Volume]%(_d)\n"
 	"Speed: %(_speed_up_btn)%(_speed_down_btn) %(_h)\q[%(_speed),OnMusicPlayer.SetOption,Speed]%(_d)\n"
-	"Balance: %(_balance_left_btn)%(_balance_right_btn) %(_h)\q[%(_bal),OnMusicPlayer.SetOption,Balance]%(_d)\n\n"
+	"Left/right balance: %(_balance_left_btn)%(_balance_right_btn) %(_h)\q[%(_bal),OnMusicPlayer.SetOption,Balance]%(_d)\n\n"
 	
 	switch MusicPlayer.PlayMode != 3
 	{
@@ -736,9 +736,7 @@ MusicPlayer.Settings.Playlists : all
 
 
 MusicPlayer.Settings.Hotkeys : all
-{
-	if reference1 != ""; MusicPlayer.Hotkeys[reference0] = reference1 //If the user cancelled, set the hotkey back to what it was
-	
+{	
 	_msg = "Unbound"
 	
 	if MusicPlayer.Hotkeys[0] == ""; MusicPlayer.Hotkeys[0] = _msg //Play/pause

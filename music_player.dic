@@ -1278,7 +1278,7 @@ OnMusicPlayer.MusicInfo : all
 	_h = "\f[color,default.anchor]" //highlight
 	_d = "\f[color,default]" //default
 	
-	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayer.LargeBalloon)\_q\![no-autopause]"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayer.LargeBalloon)\_q\![no-autopause]\![set,autoscroll,disable]"
 	
 	//DIALOGUE: Answers for the help section, you can just leave these as is unless you really want to change them for some reason
 	if reference0 == "addsong" //Asking how to add songs

@@ -1291,7 +1291,7 @@ OnMusicPlayer.MusicInfo : all
 	{
 		"By default, the following file types are compatible with this music player:\n"
 		"%(_h).mp3  .wav  .wma  .mid%(_d).\n\n"
-		"With \_a[https://github.com/Nevcairiel/LAVFilters/releases]LAV Filters\_a installed, the following file types are compatible with this music player:"
+		"With \_a[https://github.com/Nevcairiel/LAVFilters/releases]LAV Filters\_a installed, the following file types are compatible with this music player (you may need to scroll down to see them all):"
 		"\n"
 		
 		_i = 0

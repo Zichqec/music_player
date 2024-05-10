@@ -309,7 +309,7 @@ OnMusicPlayer.PlaySong : all
 	{
 		_from = MusicPlayer.CheckWhichMenu
 		
-		"\![raise,OnMusicPlayer.StopSong,%(_from)]"
+		"\![raise,OnMusicPlayer.StopSong,""%(_from)""]"
 	}
 }
 
@@ -407,11 +407,11 @@ OnMusicPlayer.NextSong : all
 		
 		MusicPlayer.CurrentSongIndex = _next //song position
 		
-		"\![raise,OnMusicPlayer.PlaySong,%(MusicPlayer.CurrentSongIndex),%(_from)]"
+		"\![raise,OnMusicPlayer.PlaySong,%(MusicPlayer.CurrentSongIndex),""%(_from)""]"
 	}
 	else //No more songs to play
 	{
-		"\![raise,OnMusicPlayer.StopSong,%(_from)]"
+		"\![raise,OnMusicPlayer.StopSong,""%(_from)""]"
 	}
 }
 
@@ -473,11 +473,11 @@ OnMusicPlayer.PrevSong : all
 		
 		MusicPlayer.CurrentSongIndex = _next //song position
 		
-		"\![raise,OnMusicPlayer.PlaySong,%(MusicPlayer.CurrentSongIndex),%(_from)]"
+		"\![raise,OnMusicPlayer.PlaySong,%(MusicPlayer.CurrentSongIndex),""%(_from)""]"
 	}
 	else //No songs available to play
 	{
-		"\![raise,OnMusicPlayer.StopSong,%(_from)]"
+		"\![raise,OnMusicPlayer.StopSong,""%(_from)""]"
 	}
 }
 
@@ -883,7 +883,7 @@ OnMusicPlayer.SetOptionClose : all
 OnMusicPlayer.QuickVolume : all
 {
 	_amt = 5
-	if _argv[2] != ""; _amt = _argv[2]
+	if _argv[1] != ""; _amt = _argv[1]
 	
 	if reference0 == "Up" || _argv[0] == "Up"
 	{
@@ -897,19 +897,21 @@ OnMusicPlayer.QuickVolume : all
 	}
 	if MusicPlayer.Singing
 	{
-		if MusicPlayer.MenuIsOpen || "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; "\C"
+		if MusicPlayer.MenuIsOpen; "\C"
 		
 		"\![sound,option,""%(MusicPlayer.CurrentSongName)"",--volume=%(MusicPlayer.Volume)]"
 	}
 	
-	if "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; OnMusicPlayer.Settings //Only refresh in the music settings menu
+	
+	if "__MUSIC_SETTINGS_MENU__,1__" _in_ MusicPlayer.LastTalk; OnMusicPlayer.Settings //Only refresh in the music settings menu
+	elseif "changing hotkey: " _in_ MusicPlayer.LastTalk; "\e: changing hotkey: %(MusicPlayer.CheckWhichMenu[1])" //Or if setting hotkeys...
 }
 
 //Up/Down speed buttons
 OnMusicPlayer.QuickSpeed : all
 {
 	_amt = 5
-	if _argv[2] != ""; _amt = _argv[2]
+	if _argv[1] != ""; _amt = _argv[1]
 	
 	if reference0 == "Up" || _argv[0] == "Up"
 	{
@@ -923,19 +925,20 @@ OnMusicPlayer.QuickSpeed : all
 	}
 	if MusicPlayer.Singing
 	{
-		if MusicPlayer.MenuIsOpen || "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; "\C"
+		if MusicPlayer.MenuIsOpen; "\C"
 		
 		"\![sound,option,""%(MusicPlayer.CurrentSongName)"",--rate=%(MusicPlayer.Speed)]"
 	}
 	
-	if "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; OnMusicPlayer.Settings //Only refresh in the music settings menu
+	if "__MUSIC_SETTINGS_MENU__,1__" _in_ MusicPlayer.LastTalk; OnMusicPlayer.Settings //Only refresh in the music settings menu
+	elseif "changing hotkey: " _in_ MusicPlayer.LastTalk; "\e: changing hotkey: %(MusicPlayer.CheckWhichMenu[1])" //Or if setting hotkeys...
 }
 
 //Left/Right balance buttons
 OnMusicPlayer.QuickBalance : all
 {
 	_amt = 5
-	if _argv[2] != ""; _amt = _argv[2]
+	if _argv[1] != ""; _amt = _argv[1]
 	
 	if reference0 == "Right" || _argv[0] == "Right"
 	{
@@ -949,12 +952,13 @@ OnMusicPlayer.QuickBalance : all
 	}
 	if MusicPlayer.Singing
 	{
-		if MusicPlayer.MenuIsOpen || "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; "\C"
+		if MusicPlayer.MenuIsOpen; "\C"
 		
 		"\![sound,option,""%(MusicPlayer.CurrentSongName)"",--balance=%(MusicPlayer.Balance)]"
 	}
 	
-	if "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; OnMusicPlayer.Settings //Only refresh in the music settings menu
+	if "__MUSIC_SETTINGS_MENU__,1__" _in_ MusicPlayer.LastTalk; OnMusicPlayer.Settings //Only refresh in the music settings menu
+	elseif "changing hotkey: " _in_ MusicPlayer.LastTalk; "\e: changing hotkey: %(MusicPlayer.CheckWhichMenu[1])" //Or if setting hotkeys...
 }
 
 //Toggles the stop after playback function
@@ -1234,7 +1238,7 @@ OnMusicPlayer.ChangeHotkey : all
 	elseif reference0 == 9; _option = "speed down"
 	elseif reference0 == 10; _option = "balance left"
 	elseif reference0 == 11; _option = "balance right"
-	else; _option =  "Play/Pause"
+	else; _option =  "play/pause"
 	
 	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c%(MusicPlayer.LargeBalloon)\*\_q\![no-autopause]"
 	
@@ -1590,9 +1594,9 @@ MusicPlayer.OnKeyPress : all
 		{
 			if MusicPlayer.MenuIsOpen; "\C"
 			
-			if MusicPlayer.PlayState == 0; "\![raise,OnMusicPlayer.PlaySong,,%(_inmenu)]"
-			elseif MusicPlayer.PlayState == 2; "\![raise,OnMusicPlayer.PauseSong,%(_inmenu),resume]"
-			else; "\![raise,OnMusicPlayer.PauseSong,%(_inmenu),pause]"
+			if MusicPlayer.PlayState == 0; "\![raise,OnMusicPlayer.PlaySong,,""%(_inmenu)""]"
+			elseif MusicPlayer.PlayState == 2; "\![raise,OnMusicPlayer.PauseSong,""%(_inmenu)"",resume]"
+			else; "\![raise,OnMusicPlayer.PauseSong,""%(_inmenu)"",pause]"
 		}
 		elseif _key == MusicPlayer.Hotkeys[1] //Next song
 		{
@@ -1600,7 +1604,7 @@ MusicPlayer.OnKeyPress : all
 			{
 				if MusicPlayer.MenuIsOpen; "\C"
 				
-				"\![raise,OnMusicPlayer.NextSong,%(_inmenu)]"
+				"\![raise,OnMusicPlayer.NextSong,""%(_inmenu)""]"
 			}
 		}
 		elseif _key == MusicPlayer.Hotkeys[2] //Previous song
@@ -1609,14 +1613,14 @@ MusicPlayer.OnKeyPress : all
 			{
 				if MusicPlayer.MenuIsOpen; "\C"
 				
-				"\![raise,OnMusicPlayer.PrevSong,%(_inmenu)]"
+				"\![raise,OnMusicPlayer.PrevSong,""%(_inmenu)""]"
 			}
 		}
 		elseif _key == MusicPlayer.Hotkeys[3] //Stop song
 		{
 			if MusicPlayer.MenuIsOpen; "\C"
 			
-			"\![raise,OnMusicPlayer.StopSong,%(_inmenu)]"
+			"\![raise,OnMusicPlayer.StopSong,""%(_inmenu)""]"
 		}
 		elseif _key == MusicPlayer.Hotkeys[4] //Music menu
 		{
@@ -1628,27 +1632,27 @@ MusicPlayer.OnKeyPress : all
 		}
 		elseif _key == MusicPlayer.Hotkeys[6] //Volume up
 		{
-			OnMusicPlayer.QuickVolume("Up",_inmenu)
+			OnMusicPlayer.QuickVolume("Up")
 		}
 		elseif _key == MusicPlayer.Hotkeys[7] //Volume down
 		{
-			OnMusicPlayer.QuickVolume("Down",_inmenu)
+			OnMusicPlayer.QuickVolume("Down")
 		}
 		elseif _key == MusicPlayer.Hotkeys[8] //Speed up
 		{
-			OnMusicPlayer.QuickSpeed("Up",_inmenu)
+			OnMusicPlayer.QuickSpeed("Up")
 		}
 		elseif _key == MusicPlayer.Hotkeys[9] //Speed down
 		{
-			OnMusicPlayer.QuickSpeed("Down",_inmenu)
+			OnMusicPlayer.QuickSpeed("Down")
 		}
 		elseif _key == MusicPlayer.Hotkeys[10] //Balance left
 		{
-			OnMusicPlayer.QuickBalance("Left",_inmenu)
+			OnMusicPlayer.QuickBalance("Left")
 		}
 		elseif _key == MusicPlayer.Hotkeys[11] //Balance right
 		{
-			OnMusicPlayer.QuickBalance("Right",_inmenu)
+			OnMusicPlayer.QuickBalance("Right")
 		}
 	}
 }
@@ -1696,26 +1700,24 @@ MusicPlayer.OnMouseWheel
 	
 	if TOSTR(reference3) == _character
 	{
-		_inmenu = MusicPlayer.CheckWhichMenu
-		
 		_amt = TOSTR(reference2)
 		_direction = "Up"
 		if SUBSTR(_amt,0,1) == "-"; _direction = "Down"
 		
 		if MusicPlayer.Scroll == "Volume"
 		{
-			OnMusicPlayer.QuickVolume(_direction,_inmenu,1)
+			OnMusicPlayer.QuickVolume(_direction,1)
 		}
 		elseif MusicPlayer.Scroll == "Speed"
 		{
-			OnMusicPlayer.QuickSpeed(_direction,_inmenu,1)
+			OnMusicPlayer.QuickSpeed(_direction,1)
 		}
 		elseif MusicPlayer.Scroll == "Balance"
 		{
 			if _direction == "Up"; _direction = "Right"
 			else; _direction = "Left"
 			
-			OnMusicPlayer.QuickBalance(_direction,_inmenu,1)
+			OnMusicPlayer.QuickBalance(_direction,1)
 		}
 	}
 }
@@ -1747,7 +1749,7 @@ OnFileDrop2 : all
 			"Added ""\_?%(_filename)\_?"" to the playlist."
 			
 			"\n\n"
-			"\![*]\q[Play it now,OnMusicPlayer.PlaySong,,%(_from),justadded]\n\![*]\q[Open music player,OnMusicPlayer.Menu]\n\n\![*]\q[Close,OnBlank]"
+			"\![*]\q[Play it now,OnMusicPlayer.PlaySong,,""%(_from)"",justadded]\n\![*]\q[Open music player,OnMusicPlayer.Menu]\n\n\![*]\q[Close,OnBlank]"
 		}
 		elseif _fileext == ".m3u" //If it's a playlist
 		{
@@ -1835,7 +1837,7 @@ MusicPlayer.OnMouseDoubleClick : all
 	{
 		if MusicPlayer.MenuIsOpen; "\C"
 		
-		"\![raise,OnMusicPlayer.StopSong,%(_inmenu)]"
+		"\![raise,OnMusicPlayer.StopSong,""%(_inmenu)""]"
 	}
 	elseif reference4 == "play_button" //Playing a song. This should always start the next one, probably? If none is playing, it should either start at 0 or a random position... If something is playing, it should skip to the next, I think.
 	{
@@ -1843,15 +1845,15 @@ MusicPlayer.OnMouseDoubleClick : all
 		
 		if MusicPlayer.PlayState == 0 //If no song is playing
 		{
-			"\![raise,OnMusicPlayer.PlaySong,,%(_inmenu)]"
+			"\![raise,OnMusicPlayer.PlaySong,,""%(_inmenu)""]"
 		}
 		elseif MusicPlayer.PlayState == 2
 		{
-			"\![raise,OnMusicPlayer.PauseSong,%(_inmenu),resume]"
+			"\![raise,OnMusicPlayer.PauseSong,""%(_inmenu)"",resume]"
 		}
 		else //If a song is already playing, go to the next one
 		{
-			"\![raise,OnMusicPlayer.NextSong,%(_inmenu)]"
+			"\![raise,OnMusicPlayer.NextSong,""%(_inmenu)""]"
 		}
 	}
 	elseif reference4 == "pause_resume_button"
@@ -1915,27 +1917,27 @@ MusicPlayer.OnMouseDoubleClick : all
 	}
 	elseif reference4 == "volume_up_button" //Volume up
 	{
-		OnMusicPlayer.QuickVolume("Up",_inmenu)
+		OnMusicPlayer.QuickVolume("Up")
 	}
 	elseif reference4 == "volume_down_button" //Volume down
 	{
-		OnMusicPlayer.QuickVolume("Down",_inmenu)
+		OnMusicPlayer.QuickVolume("Down")
 	}
 	elseif reference4 == "speed_up_button" //Speed up
 	{
-		OnMusicPlayer.QuickSpeed("Up",_inmenu)
+		OnMusicPlayer.QuickSpeed("Up")
 	}
 	elseif reference4 == "speed_down_button" //Speed down
 	{
-		OnMusicPlayer.QuickSpeed("Down",_inmenu)
+		OnMusicPlayer.QuickSpeed("Down")
 	}
 	elseif reference4 == "balance_left_button" //Balance left
 	{
-		OnMusicPlayer.QuickBalance("Left",_inmenu)
+		OnMusicPlayer.QuickBalance("Left")
 	}
 	elseif reference4 == "balance_right_button" //Balance right
 	{
-		OnMusicPlayer.QuickBalance("Right",_inmenu)
+		OnMusicPlayer.QuickBalance("Right")
 	}
 }
 
@@ -1948,7 +1950,7 @@ OnSoundStop : all
 	
 	if MusicPlayer.PlayMode == 3 || reference1 == "close" //If it's set to play one song and then stop, or the user clicked the X on the playback window
 	{
-		"\![raise,OnMusicPlayer.StopSong,%(_inmenu)]"
+		"\![raise,OnMusicPlayer.StopSong,""%(_inmenu)""]"
 	}
 	else //If another song needs to play
 	{
@@ -1994,7 +1996,7 @@ OnSoundStop : all
 		//If it's set to stop after the current song, make sure it stops. Down here so the index number still advances if you're not set to loop a single song
 		if MusicPlayer.StopAfterCurrent == "stop after playback" || (MusicPlayer.StopAfterCurrent == "stop after playlist" && _lastsong)
 		{
-			"\![raise,OnMusicPlayer.StopSong,%(_inmenu)]"
+			"\![raise,OnMusicPlayer.StopSong,""%(_inmenu)""]"
 		}
 		else
 		{
@@ -2004,7 +2006,7 @@ OnSoundStop : all
 			}
 			else
 			{
-				"%(MusicPlayer.SingingSurfaces)\![raise,OnMusicPlayer.PlaySong,%(MusicPlayer.CurrentSongIndex),%(_inmenu)]"
+				"%(MusicPlayer.SingingSurfaces)\![raise,OnMusicPlayer.PlaySong,%(MusicPlayer.CurrentSongIndex),""%(_inmenu)""]"
 			}
 		}
 	}
@@ -2559,6 +2561,7 @@ MusicPlayer.CheckWhichMenu
 		if "__MUSIC_PLAYER_MAIN_MENU__" _in_ MusicPlayer.LastTalk; _inmenu = "OnMusicPlayer.Menu"
 		elseif "__GHOST_MAIN_MENU__" _in_ MusicPlayer.LastTalk; _inmenu = "OnSakuraMenu"
 		elseif "__MUSIC_SETTINGS_MENU__" _in_ MusicPlayer.LastTalk; _inmenu = "OnMusicPlayer.Settings"
+		elseif "changing hotkey: " _in_ MusicPlayer.LastTalk; _inmenu = "OnMusicPlayer.ChangeHotkey,%(SPLIT(MusicPlayer.LastTalk,'changing hotkey: ')[1])"
 	}
 	_inmenu
 }

@@ -1945,7 +1945,7 @@ OnSoundStop : all
 	MusicPlayer.PlayState = 0 //Clear paused song if there somehow was one
 	if MusicPlayer.BalloonIsOpen && MusicPlayer.Priority != "Seamless music"; "\C\_l[0,0]"
 	
-	if MusicPlayer.PlayMode == 3  //If it's set to play one song and then stop
+	if MusicPlayer.PlayMode == 3 || reference1 == "close" //If it's set to play one song and then stop, or the user clicked the X on the playback window
 	{
 		"\![raise,OnMusicPlayer.StopSong,%(_inmenu)]"
 	}

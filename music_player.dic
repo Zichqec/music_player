@@ -1291,7 +1291,7 @@ OnMusicPlayer.MusicInfo : all
 	{
 		"By default, the following file types are compatible with this music player:\n"
 		"%(_h).mp3  .wav  .wma  .mid%(_d).\n\n"
-		"With \_a[https://github.com/Nevcairiel/LAVFilters/releases]LAV Filters\_a installed, the following file types are compatible with this music player (you may need to scroll down to see them all):"
+		"With \_a[https://github.com/Nevcairiel/LAVFilters/releases]LAV Filters\_a installed, the following file types are compatible with this music player:"
 		"\n"
 		
 		_i = 0
@@ -1319,7 +1319,8 @@ OnMusicPlayer.MusicInfo : all
 		"If you don't want to do that, you can import a song into an audio editing program like \_a[https://www.audacityteam.org/]Audacity\_a and export it again, or convert it to another compatible type with something like \_a[https://www.onlineconverter.com/]Online Converter\_a."
 	}
 	
-	"\![unlock,balloonrepaint]\x[noclear]\![raise,OnMusicPlayer.Info]"
+	"\n\n\![*]\q[Back,OnMusicPlayer.Info]  \![*]\q[Close window,OnBlank]"
+	"\![unlock,balloonrepaint]"
 }
 
 OnMusicPlayer.SavePlaylist : all

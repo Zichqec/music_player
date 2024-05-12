@@ -1,5 +1,4 @@
 //Written by Zichqec https://ukagaka.zichqec.com/
-//Version 1.0.0
 
 /*
 ABOUT THE MUSIC PLAYER:
@@ -268,7 +267,7 @@ OnMusicPlayer.PlaySong : all
 			MusicPlayer.ShuffledIndex = 0
 		}
 		
-		if MusicPlayer.MenuIsOpen && reference2 != "justadded"; "\C" //If the balloon is currently open other than when a song was just added, keep it open
+		if MusicPlayer.BalloonIsOpen && reference2 != "justadded"; "\C" //If the balloon is currently open other than when a song was just added, keep it open
 		
 		"%(MusicPlayer.Scope)%(MusicPlayer.SingingSurfaces)" //Start the singing animations if they weren't already started
 		

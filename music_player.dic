@@ -92,7 +92,7 @@ https://github.com/Zichqec/music_player
 
 If you have an old version of this music player from before I updated the variable names, please run the function MusicPlayer.ConvertOldVariables before you open the music menu. This should convert all of the old variables over to the new ones.
 If you had already released a ghost with the old music player code in it, you can use this function in OnUpdateComplete to ensure the user's variables get converted.
-This conversion process may not be perfect, and some data may be lost. If there is an issue, please notify me and I will try to fix it.
+This conversion process may not be perfect, and some data may be lost. If there is an issue, please notify me and I will try to fix it. However, I cannot make any guarantees or take responsibility for lost data.
 */
 
 /*

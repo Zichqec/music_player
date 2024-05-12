@@ -2322,7 +2322,7 @@ MusicPlayer.ResetDefaultSettings
 	if !ISVAR("MusicPlayer.DiscordDisplay"); MusicPlayer.DiscordDisplay = "On"
 	
 	if !ISVAR("MusicPlayer.Tooltips"); MusicPlayer.Tooltips = "On"
-	if !ISVAR("MusicPlayer.SongAnnouncement"); MusicPlayer.SongAnnouncement = "On"
+	if !ISVAR("MusicPlayer.SongAnnouncement"); MusicPlayer.SongAnnouncement = "Off"
 	if !ISVAR("MusicPlayer.Priority"); MusicPlayer.Priority = "Dialogue" //Whether it interrupts dialogue or not when going to the next song
 	if !ISVAR("MusicPlayer.Scroll"); MusicPlayer.Scroll = "Volume"
 	if !ISVAR("MusicPlayer.PreviousButton"); MusicPlayer.PreviousButton = "Restarts song" //Behavior of the previous button

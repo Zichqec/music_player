@@ -22,7 +22,7 @@ Great care has been taken to try and ensure that the menus for the music player 
 
 IMPLEMENTING THE MUSIC PLAYER:
 
-This music player took me several hours to create and maintain, so if you use it in your ghost please either leave my credit in the Help menu, or add a credit to me for the music player in your readme. My link is at the top of this file.
+This music player took me several hours to create and maintain, so if you use it in your ghost please either leave my credit in the Help menu, or add a credit to me for the music player in your readme. I can be credited as Zichqec, with the link https://ukagaka.zichqec.com/
 You are free to study how this music player works if you want to try writing your own implementation, no credit required for that. I will also gladly answer any questions you may have!
 
 This will require some adjustment to slot into your ghost. Specifically, there is a label below for BUILT IN SHIORI EVENTS

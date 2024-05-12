@@ -164,7 +164,7 @@ OnMusicPlayer.Menu : all
 	if MusicPlayer.PlayState != 0
 	{
 		if MusicPlayer.CurrentSongIndex == -1; "%(_h)\__q[OnMusicPlayer.SongLocation,""%(MusicPlayer.LastRemovedSong)""](Removed from playlist)\__q%(_d)"
-		else; "%(_h)\__q[OnMusicPlayer.SongLocation,""%(MusicPlayer.CurrentSongName)""]%(MusicPlayer.CurrentSong)\__q%(_d)"
+		else; "%(_h)\__q[OnMusicPlayer.SongLocation,""%(MusicPlayer.CurrentSongPath)""]%(MusicPlayer.CurrentSong)\__q%(_d)"
 	}
 	
 	if MusicPlayer.Pagination == "Paginated"
@@ -282,7 +282,7 @@ OnMusicPlayer.PlaySong : all
 		MusicPlayer.SongStartTime = GETSECCOUNT
 		MusicPlayer.PlayState = 1
 		
-		_send += "\![sound,play,""%(MusicPlayer.CurrentSongName)"",--volume=%(MusicPlayer.Volume),--rate=%(MusicPlayer.Speed),--balance=%(MusicPlayer.Balance),--window=%(_window),--sound-only=true]"
+		_send += "\![sound,play,""%(MusicPlayer.CurrentSongPath)"",--volume=%(MusicPlayer.Volume),--rate=%(MusicPlayer.Speed),--balance=%(MusicPlayer.Balance),--window=%(_window),--sound-only=true]"
 		
 		if MusicPlayer.IsMinimized
 		{
@@ -341,7 +341,7 @@ OnMusicPlayer.PauseSong : all
 	
 	if MusicPlayer.MenuIsOpen; "\C" //If the balloon is open, keep it open
 	"\![no-autopause]"
-	"\![sound,option,""%(MusicPlayer.CurrentSongName)"",--volume=%(MusicPlayer.Volume),--rate=%(MusicPlayer.Speed),--balance=%(MusicPlayer.Balance),--window=%(_window)]"
+	"\![sound,option,""%(MusicPlayer.CurrentSongPath)"",--volume=%(MusicPlayer.Volume),--rate=%(MusicPlayer.Speed),--balance=%(MusicPlayer.Balance),--window=%(_window)]"
 	
 	if reference1 == "resume" //Unpausing
 	{
@@ -485,7 +485,7 @@ OnMusicPlayer.PrevSong : all
 OnMusicPlayer.RemoveSong : all
 {
 	_origmax = MusicPlayer.MaxPages
-	MusicPlayer.LastRemovedSong = MusicPlayer.CurrentSongName
+	MusicPlayer.LastRemovedSong = MusicPlayer.CurrentSongPath
 	
 	if MusicPlayer.PlayState == 2 && reference0 == MusicPlayer.CurrentSongIndex; MusicPlayer.PlayState = 0 //If the song being removed was the paused song, clear it
 	MusicPlayer.CurrentPlaylist[reference0] = IARRAY //Clear the song that we want to remove
@@ -493,7 +493,7 @@ OnMusicPlayer.RemoveSong : all
 	if reference0 < MusicPlayer.CurrentSongIndex; MusicPlayer.CurrentSongIndex = MusicPlayer.CurrentSongIndex - 1
 	elseif reference0 == MusicPlayer.CurrentSongIndex; MusicPlayer.CurrentSongIndex = -1
 	
-	if MusicPlayer.CurrentSongName == MusicPlayer.CurrentPlaylist[reference0] //If the song being removed is being played, remove it from the shuffle list
+	if MusicPlayer.CurrentSongPath == MusicPlayer.CurrentPlaylist[reference0] //If the song being removed is being played, remove it from the shuffle list
 	{
 		MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist('|removed|',MusicPlayer.CurrentPlaylist) //Send a placeholder for the song that was already removed, and shuffle the playlist
 	}
@@ -846,7 +846,7 @@ OnMusicPlayer.Balance : all
 	if MusicPlayer.Balance > 100; MusicPlayer.Balance = 100
 	if MusicPlayer.Balance < -100; MusicPlayer.Balance = -100
 	
-	if MusicPlayer.Singing; "\![sound,option,""%(MusicPlayer.CurrentSongName)"",--balance=%(MusicPlayer.Balance)]"
+	if MusicPlayer.Singing; "\![sound,option,""%(MusicPlayer.CurrentSongPath)"",--balance=%(MusicPlayer.Balance)]"
 	
 	OnMusicPlayer.Settings
 }
@@ -856,7 +856,7 @@ OnMusicPlayer.Speed : all
 {
 	MusicPlayer.Speed = reference0
 	
-	if MusicPlayer.Singing; "\![sound,option,""%(MusicPlayer.CurrentSongName)"",--rate=%(MusicPlayer.Speed)]"
+	if MusicPlayer.Singing; "\![sound,option,""%(MusicPlayer.CurrentSongPath)"",--rate=%(MusicPlayer.Speed)]"
 	
 	OnMusicPlayer.Settings
 }
@@ -866,7 +866,7 @@ OnMusicPlayer.Volume : all
 {
 	MusicPlayer.Volume = reference0
 	
-	if MusicPlayer.Singing; "\![sound,option,""%(MusicPlayer.CurrentSongName)"",--volume=%(MusicPlayer.Volume)]"
+	if MusicPlayer.Singing; "\![sound,option,""%(MusicPlayer.CurrentSongPath)"",--volume=%(MusicPlayer.Volume)]"
 	
 	OnMusicPlayer.Settings
 }
@@ -899,7 +899,7 @@ OnMusicPlayer.QuickVolume : all
 	{
 		if MusicPlayer.MenuIsOpen; "\C"
 		
-		"\![sound,option,""%(MusicPlayer.CurrentSongName)"",--volume=%(MusicPlayer.Volume)]"
+		"\![sound,option,""%(MusicPlayer.CurrentSongPath)"",--volume=%(MusicPlayer.Volume)]"
 	}
 	
 	
@@ -927,7 +927,7 @@ OnMusicPlayer.QuickSpeed : all
 	{
 		if MusicPlayer.MenuIsOpen; "\C"
 		
-		"\![sound,option,""%(MusicPlayer.CurrentSongName)"",--rate=%(MusicPlayer.Speed)]"
+		"\![sound,option,""%(MusicPlayer.CurrentSongPath)"",--rate=%(MusicPlayer.Speed)]"
 	}
 	
 	if "__MUSIC_SETTINGS_MENU__,1__" _in_ MusicPlayer.LastTalk; OnMusicPlayer.Settings //Only refresh in the music settings menu
@@ -954,7 +954,7 @@ OnMusicPlayer.QuickBalance : all
 	{
 		if MusicPlayer.MenuIsOpen; "\C"
 		
-		"\![sound,option,""%(MusicPlayer.CurrentSongName)"",--balance=%(MusicPlayer.Balance)]"
+		"\![sound,option,""%(MusicPlayer.CurrentSongPath)"",--balance=%(MusicPlayer.Balance)]"
 	}
 	
 	if "__MUSIC_SETTINGS_MENU__,1__" _in_ MusicPlayer.LastTalk; OnMusicPlayer.Settings //Only refresh in the music settings menu
@@ -982,7 +982,7 @@ OnMusicPlayer.ToggleSongBar : all
 	
 	if MusicPlayer.MenuIsOpen; "\C"
 	
-	if MusicPlayer.PlayState > 0; "\![sound,option,""%(MusicPlayer.CurrentSongName)"",--window=%(_onoff)]"
+	if MusicPlayer.PlayState > 0; "\![sound,option,""%(MusicPlayer.CurrentSongPath)"",--window=%(_onoff)]"
 	
 	if _argc == 0; OnMusicPlayer.Settings //If this was done with the buttons - there will be no args in that case
 	elseif _argv[1] != "" //If a menu is listed to refresh
@@ -1470,7 +1470,7 @@ OnMusicPlayer.NotifySongInfo : all
 	else; "\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomDetail, ]"
 	*/
 	
-	"\![notifyother,__SYSTEM_ALL_GHOST__,OnMusicPlayer.SongInfo,""%(selfname)"",""%(MusicPlayer.CurrentSongName)"",%(MusicPlayer.CurrentSongIndex),%(MusicPlayer.PlayState),%(MusicPlayer.Volume),%(MusicPlayer.Speed),%(MusicPlayer.Balance),%(MusicPlayer.PlayMode),%(MusicPlayer.StopAfterCurrent),%(ARRAYSIZE(MusicPlayer.CurrentPlaylist))]"
+	"\![notifyother,__SYSTEM_ALL_GHOST__,OnMusicPlayer.SongInfo,""%(selfname)"",""%(MusicPlayer.CurrentSongPath)"",%(MusicPlayer.CurrentSongIndex),%(MusicPlayer.PlayState),%(MusicPlayer.Volume),%(MusicPlayer.Speed),%(MusicPlayer.Balance),%(MusicPlayer.PlayMode),%(MusicPlayer.StopAfterCurrent),%(ARRAYSIZE(MusicPlayer.CurrentPlaylist))]"
 	
 	//References:
 	//0 - The sakura name of this ghost, since this event may come from multiple ghosts
@@ -2172,10 +2172,10 @@ MusicPlayer.newline
 
 MusicPlayer.CurrentSong
 {
-	SPLITPATH(MusicPlayer.CurrentSongName)[2] //Picks out just the name of the file, no extension
+	SPLITPATH(MusicPlayer.CurrentSongPath)[2] //Picks out just the name of the file, no extension
 }
 
-MusicPlayer.CurrentSongName
+MusicPlayer.CurrentSongPath
 {
 	MusicPlayer.CurrentPlaylist[MusicPlayer.CurrentSongIndex]
 }
@@ -2627,7 +2627,7 @@ OnMusicPlayer.ToggleDiscordPlugin : all
 	if MusicPlayer.DiscordDisplay != "On"
 	{
 		_song = " "
-		if MusicPlayer.Singing; _song = "♫ ""%(MusicPlayer.CurrentSongName)"" ♫"
+		if MusicPlayer.Singing; _song = "♫ ""%(MusicPlayer.CurrentSongPath)"" ♫"
 
 		MusicPlayer.DiscordDisplay = "On"
 		"\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomDetail,%(_song)]"

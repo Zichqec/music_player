@@ -81,7 +81,7 @@ Another useful function is MusicPlayer.CurrentSongName, which outputs the name o
 To initialize all of the music player's variables, you should call the following function in OnFirstBoot:
 MusicPlayer.SetDefaultSettings
 
-Additionally, I would recommend putting %(OnMusicPlayer.NotifySongInfo) into your firstboot, boot dialogues, ghost changing dialogues, etc. This will ensure that your ghost updates any open ghosts on the status of the music player when it opens or closes.
+Additionally, I would recommend calling OnMusicPlayer.NotifySongInfo in your OnFirstBoot, OnBoot, and any other events that cause your ghost to open/close. This will ensure that your ghost updates any open ghosts on the status of the music player when it opens or closes.
 
 I will also recommend that you use developer_options.txt in order to prevent your playlists folder from ending up in your update files or nar files.
 

@@ -76,7 +76,7 @@ You will also definitely want to go over the functions in the FUNCTIONS THAT SHO
 
 A function you might find helpful is the MusicPlayer.Singing function. It returns a 1 if music is currently playing, and a 0 if not. You can use this to add checks to functions like OnSurfaceRestore, to make sure your ghost stays in the singing poses while playing music.
 
-Another useful function is MusicPlayer.CurrentSong, which outputs the name of the currently playing song.
+Another useful function is MusicPlayer.CurrentSongName, which outputs the name of the currently playing song.
 
 To initialize all of the music player's variables, you should call the following function in OnFirstBoot:
 MusicPlayer.SetDefaultSettings
@@ -164,7 +164,7 @@ OnMusicPlayer.Menu : all
 	if MusicPlayer.PlayState != 0
 	{
 		if MusicPlayer.CurrentSongIndex == -1; "%(_h)\__q[OnMusicPlayer.SongLocation,""%(MusicPlayer.LastRemovedSong)""](Removed from playlist)\__q%(_d)"
-		else; "%(_h)\__q[OnMusicPlayer.SongLocation,""%(MusicPlayer.CurrentSongPath)""]%(MusicPlayer.CurrentSong)\__q%(_d)"
+		else; "%(_h)\__q[OnMusicPlayer.SongLocation,""%(MusicPlayer.CurrentSongPath)""]%(MusicPlayer.CurrentSongName)\__q%(_d)"
 	}
 	
 	if MusicPlayer.Pagination == "Paginated"
@@ -300,7 +300,7 @@ OnMusicPlayer.PlaySong : all
 					"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\_q"
 					
 					//DIALOGUE: Song announcement
-					"Now playing:\n%(MusicPlayer.CurrentSong)"
+					"Now playing:\n%(MusicPlayer.CurrentSongName)"
 				}
 			}
 		}
@@ -1463,7 +1463,7 @@ OnMusicPlayer.NotifySongInfo : all
 	_song = " "
 	if MusicPlayer.Singing
 	{
-		_song = "♫ ""%(MusicPlayer.CurrentSong)"" ♫"
+		_song = "♫ ""%(MusicPlayer.CurrentSongName)"" ♫"
 	}
 	
 	if MusicPlayer.DiscordDisplay == "On"; "\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomDetail,%(_song)]"
@@ -2170,7 +2170,7 @@ MusicPlayer.newline
 	"\_l[]"
 }
 
-MusicPlayer.CurrentSong
+MusicPlayer.CurrentSongName
 {
 	SPLITPATH(MusicPlayer.CurrentSongPath)[2] //Picks out just the name of the file, no extension
 }
@@ -2593,7 +2593,7 @@ OnDiscordPluginCustomEnd
 OnMusicPlayer.DiscordPluginBoot : all
 {
 	_song = " "
-	if MusicPlayer.Singing; _song = "♫ ""%(MusicPlayer.CurrentSong))"" ♫"
+	if MusicPlayer.Singing; _song = "♫ ""%(MusicPlayer.CurrentSongName))"" ♫"
 	
 	"\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomALL,YOUR APP ID HERE,,,thumbnail,YOUR GHOSTS'S URL OR A MESSAGE HERE,]"
 	

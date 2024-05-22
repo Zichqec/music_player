@@ -1463,14 +1463,17 @@ OnMusicPlayer.NotifySongInfo : all
 {
 	//CUSTOMIZE: If you set up the Discord stuff, uncomment this bit:
 	/*
-	_song = " "
-	if MusicPlayer.Singing
+	if MusicPlayer.DiscordDisplayFlag == 1
 	{
-		_song = "♫ ""%(MusicPlayer.CurrentSongName)"" ♫"
+		_song = " "
+		if MusicPlayer.Singing
+		{
+			_song = "♫ ""%(MusicPlayer.CurrentSongName)"" ♫"
+		}
+		
+		if MusicPlayer.DiscordDisplay == "On"; "\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomDetail,%(_song)]"
+		else; "\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomDetail, ]"
 	}
-	
-	if MusicPlayer.DiscordDisplay == "On"; "\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomDetail,%(_song)]"
-	else; "\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomDetail, ]"
 	*/
 	
 	"\![notifyother,__SYSTEM_ALL_GHOST__,OnMusicPlayer.SongInfo,""%(selfname)"",""%(MusicPlayer.CurrentSongPath)"",%(MusicPlayer.CurrentSongIndex),%(MusicPlayer.PlayState),%(MusicPlayer.Volume),%(MusicPlayer.Speed),%(MusicPlayer.Balance),%(MusicPlayer.PlayMode),%(MusicPlayer.StopAfterCurrent),%(ARRAYSIZE(MusicPlayer.CurrentPlaylist))]"

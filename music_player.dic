@@ -113,7 +113,6 @@ OnMusicPlayer.Menu : all
 {
 	MusicPlayer.ResetDefaultSettings
 	
-	_h = "\f[color,default.anchor]" //Highlight
 	_g = "\f[color,disable]" //Gray
 	_d = "\f[color,default]" //Default
 	
@@ -125,7 +124,7 @@ OnMusicPlayer.Menu : all
 		_starting_value = MusicPlayer.PageIndex * MusicPlayer.SongsPerPage
 	}
 	
-	"%(MusicPlayer.Scope)\c%(MusicPlayer.LargeBalloon)\_q\*\![set,autoscroll,disable]\![no-autopause]"
+	"%(MusicPlayer.Scope)\c%(MusicPlayer.LargeBalloon)\_q\*\![set,autoscroll,disable]\![no-autopause]\f[anchorvisitedfontcolor,default.anchor]"
 	
 	//CUSTOMIZE: If you're using something other than OnSakuraMenu for your menu, or you're using this music player on a kero, you'll need to edit this button and the one at the bottom of the menu
 	"\![*]\q[Back,OnSakuraMenu]  \![*]\__q[blank]Close window\__q\n"
@@ -163,8 +162,8 @@ OnMusicPlayer.Menu : all
 	
 	if MusicPlayer.PlayState != 0
 	{
-		if MusicPlayer.CurrentSongIndex == -1; "%(_h)\__q[OnMusicPlayer.SongLocation,""%(MusicPlayer.LastRemovedSong)""](Removed from playlist)\__q%(_d)"
-		else; "%(_h)\__q[OnMusicPlayer.SongLocation,""%(MusicPlayer.CurrentSongPath)""]%(MusicPlayer.CurrentSongName)\__q%(_d)"
+		if MusicPlayer.CurrentSongIndex == -1; "\_a[OnMusicPlayer.SongLocation,""%(MusicPlayer.LastRemovedSong)""](Removed from playlist)\_a"
+		else; "\_a[OnMusicPlayer.SongLocation,""%(MusicPlayer.CurrentSongPath)""]%(MusicPlayer.CurrentSongName)\_a"
 	}
 	
 	if MusicPlayer.Pagination == "Paginated"
@@ -220,8 +219,8 @@ OnMusicPlayer.Menu : all
 		{
 			"\f[bold,1]\f[italic,1]"
 		}
-		"%(_h)\__q[OnMusicPlayer.PlaySong,%(_i),OnMusicPlayer.Menu,frommenu]%(_song)\__q%(_d)\n"
-		if _i == MusicPlayer.CurrentSongIndex; "\f[default]" //Reset the bold/italic if it was applied
+		"\_a[OnMusicPlayer.PlaySong,%(_i),OnMusicPlayer.Menu,frommenu]%(_song)\_a\n"
+		if _i == MusicPlayer.CurrentSongIndex; "\f[bold,default]\f[italic,default]" //Reset the bold/italic if it was applied
 	}
 	
 	"\n"
@@ -583,31 +582,34 @@ OnMusicPlayer.Settings : all
 	_isbasic = 0
 	if !(reference0 == "Advanced" || reference0 == "Playlists" || reference0 == "Hotkeys"); _isbasic = 1
 	
-	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c\![set,autoscroll,disable]\![no-autopause]\_q\*%(MusicPlayer.LargeBalloon)"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c\![set,autoscroll,disable]\![no-autopause]\_q\*%(MusicPlayer.LargeBalloon)\f[anchorvisitedfontcolor,default.anchor]"
+	
+	_g = "\f[color,disable]"
+	_d = "\f[color,default]"
 	
 	"\![*]"
 	switch _isbasic
 	{
-		"\f[color,disable]\__q[OnMusicPlayer.Settings,Basic]Basic\__q\f[color,default]"
-		"\f[color,default.anchor]\__q[OnMusicPlayer.Settings,Basic]Basic\__q\f[color,default]"
+		"%(_g)\__q[OnMusicPlayer.Settings,Basic]Basic\__q%(_d)"
+		"\__q[OnMusicPlayer.Settings,Basic]Basic\__q"
 	}
 	"  \![*]"
 	switch reference0 == "Advanced"
 	{
-		"\f[color,disable]\__q[OnMusicPlayer.Settings,Advanced]Advanced\__q\f[color,default]"
-		"\f[color,default.anchor]\__q[OnMusicPlayer.Settings,Advanced]Advanced\__q\f[color,default]"
+		"%(_g)\__q[OnMusicPlayer.Settings,Advanced]Advanced\__q%(_d)"
+		"\__q[OnMusicPlayer.Settings,Advanced]Advanced\__q"
 	}
 	"\n\![*]"
 	switch reference0 == "Playlists"
 	{
-		"\f[color,disable]\__q[OnMusicPlayer.Settings,Playlists]Playlists\__q\f[color,default]"
-		"\f[color,default.anchor]\__q[OnMusicPlayer.Settings,Playlists]Playlists\__q\f[color,default]"
+		"%(_g)\__q[OnMusicPlayer.Settings,Playlists]Playlists\__q%(_d)"
+		"\__q[OnMusicPlayer.Settings,Playlists]Playlists\__q"
 	}
 	"  \![*]"
 	switch reference0 == "Hotkeys"
 	{
-		"\f[color,disable]\__q[OnMusicPlayer.Settings,Hotkeys]Hotkeys\__q\f[color,default]"
-		"\f[color,default.anchor]\__q[OnMusicPlayer.Settings,Hotkeys]Hotkeys\__q\f[color,default]"
+		"%(_g)\__q[OnMusicPlayer.Settings,Hotkeys]Hotkeys\__q%(_d)"
+		"\__q[OnMusicPlayer.Settings,Hotkeys]Hotkeys\__q"
 	}
 	"\n\n"
 	
@@ -676,10 +678,10 @@ MusicPlayer.Settings.Basic : all
 	if MusicPlayer.Balance >= 100; _balance_right_btn = "%(_g)%(_right)%(_d)"
 	
 	
-	"Play mode: \![*]%(_h)\__q[OnMusicPlayer.PlaybackType]%(_mode)\__q%(_d)\n\n[half]"
-	"Volume: %(_vol_up_btn)%(_vol_down_btn) %(_h)\q[%(_vol),OnMusicPlayer.SetOption,Volume]%(_d)\n"
-	"Speed: %(_speed_up_btn)%(_speed_down_btn) %(_h)\q[%(_speed),OnMusicPlayer.SetOption,Speed]%(_d)\n"
-	"Left/right balance: %(_balance_left_btn)%(_balance_right_btn) %(_h)\q[%(_bal),OnMusicPlayer.SetOption,Balance]%(_d)\n\n"
+	"Play mode: \![*]%(_h)\_a[OnMusicPlayer.PlaybackType]%(_mode)\_a%(_d)\n\n[half]"
+	"Volume: %(_vol_up_btn)%(_vol_down_btn) \_a[OnMusicPlayer.SetOption,Volume]%(_vol)\_a\n"
+	"Speed: %(_speed_up_btn)%(_speed_down_btn) \_a[OnMusicPlayer.SetOption,Speed]%(_speed)\_a\n"
+	"Left/right balance: %(_balance_left_btn)%(_balance_right_btn) \_a[OnMusicPlayer.SetOption,Balance]%(_bal)\_a\n\n"
 	
 	switch MusicPlayer.PlayMode != 3
 	{
@@ -703,23 +705,23 @@ MusicPlayer.Settings.Basic : all
 
 MusicPlayer.Settings.Advanced : all
 {
-	"Song Bar \![*]%(_h)\__q[OnMusicPlayer.ToggleSongBar]%(MusicPlayer.SongBar)\__q%(_d)\n"
-	"Hotspot tooltips \![*]%(_h)\__q[OnMusicPlayer.ToggleTooltips]%(MusicPlayer.Tooltips)\__q%(_d)\n"
+	"Song Bar \![*]\_a[OnMusicPlayer.ToggleSongBar]%(MusicPlayer.SongBar)\_a\n"
+	"Hotspot tooltips \![*]\_a[OnMusicPlayer.ToggleTooltips]%(MusicPlayer.Tooltips)\_a\n"
 	"\n"
-	"Song announcements \![*]%(_h)\__q[OnMusicPlayer.ToggleSongAnnouncement]%(MusicPlayer.SongAnnouncement)\__q%(_d)\n"
-	"Prioritize \![*]%(_h)\__q[OnMusicPlayer.TogglePriority]%(MusicPlayer.Priority)\__q%(_d)\n"
+	"Song announcements \![*]\_a[OnMusicPlayer.ToggleSongAnnouncement]%(MusicPlayer.SongAnnouncement)\_a\n"
+	"Prioritize \![*]\_a[OnMusicPlayer.TogglePriority]%(MusicPlayer.Priority)\_a\n"
 	"\n"
-	"Scroll wheel controls \![*]%(_h)\__q[OnMusicPlayer.ToggleScrollWheel]%(MusicPlayer.Scroll)\__q%(_d)\n"
-	"Previous button \![*]%(_h)\__q[OnMusicPlayer.TogglePreviousButton]%(MusicPlayer.PreviousButton)\__q%(_d)\n"
+	"Scroll wheel controls \![*]\_a[OnMusicPlayer.ToggleScrollWheel]%(MusicPlayer.Scroll)\_a\n"
+	"Previous button \![*]\_a[OnMusicPlayer.TogglePreviousButton]%(MusicPlayer.PreviousButton)\_a\n"
 	"\n"
-	"Playlist view \![*]%(_h)\__q[OnMusicPlayer.TogglePagination]%(MusicPlayer.Pagination)\__q%(_d)\n"
+	"Playlist view \![*]\_a[OnMusicPlayer.TogglePagination]%(MusicPlayer.Pagination)\_a\n"
 	"\n"
 	"\![*]\__q[OnMusicPlayer.ScootSongMenuWarn]Move songs in playlist\__q"
 	
 	//CUSTOMIZE: If you want Discord functionality, you'll need to uncomment this
 	/*
 	"\n"
-	"Show current song in Discord? %(_h)\__q[OnMusicPlayer.ToggleDiscordPlugin]%(MusicPlayer.DiscordDisplay)\__q%(_d)"
+	"Show current song in Discord? \_a[OnMusicPlayer.ToggleDiscordPlugin]%(MusicPlayer.DiscordDisplay)\_a"
 	*/
 }
 
@@ -1271,8 +1273,8 @@ OnMusicPlayer.Info : all
 	"\n"
 	"\![*]\__q[OnMusicPlayer.Menu]Back to music menu\__q  \![*]\__q[OnBlank]Close window\__q"
 	
-	"\_l[0,0]\n[%((MusicPlayer.BalloonLines - 1) * 100)]"
 	//Would appreciate if you leave this here, I have poured many many hours of work into this player :)
+	"\_l[0,0]\n[%((MusicPlayer.BalloonLines - 1) * 100)]"
 	"\f[height,-2]\f[color,disable]Music Player code by \f[color,default.anchor]\__q[https://ukagaka.zichqec.com/]Zichqec\__q"
 }
 

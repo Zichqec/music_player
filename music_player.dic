@@ -296,10 +296,11 @@ OnMusicPlayer.PlaySong : all
 			{
 				if MusicPlayer.SongAnnouncement == "If not in menu" || !SHIORI3FW.IsTalking && MusicPlayer.SongAnnouncement == "If not talking"
 				{
-					"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\_q"
+					"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\_q\![lock,balloonrepaint]\c"
 					
 					//DIALOGUE: Song announcement
 					"Now playing:\n%(MusicPlayer.CurrentSongName)"
+					"\![unlock,balloonrepaint]"
 				}
 			}
 		}
@@ -2027,7 +2028,7 @@ OnSoundError : all
 	if MusicPlayer.IsMinimized && !_playnext; MusicPlayer.MakeValueNotify("%(OnMusicPlayer.NotifySongInfo)")
 	else; "%(OnMusicPlayer.NotifySongInfo)"
 	
-	"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\![no-autopause]\_q"
+	"%(MusicPlayer.Scope)\![unlock,balloonrepaint]\c%(MusicPlayer.SmallBalloon)\![no-autopause]\_q"
 	
 	//DIALOGUE: If there is an error, it will tell the user and try to play the next song. reference3 is the error message, reference2 is the file name. Below is dialogue for attempting to play the next song
 	"Cannot play file ""\f[color,default.anchor]\_?%(reference2)\_?\f[color,default]""\n\n""%(reference3)"""
@@ -2035,9 +2036,9 @@ OnSoundError : all
 	//If it's able to play another song
 	if _playnext
 	{
-		"\n\nStarting next song...\_w[5000]"
+		"\n\nStarting next song..."
 		
-		"\_w[1000]\![raise,OnSoundStop]"
+		"\_w[5000]\![raise,OnSoundStop]"
 	}
 }
 

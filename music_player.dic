@@ -732,7 +732,7 @@ MusicPlayer.Settings.Playlists : all
 	"\![*]\__q[OnMusicPlayer.LoadPlaylist]Load playlist\__q\n"
 	"\![*]\__q[OnMusicPlayer.ClearPlaylist]Clear current playlist\__q\n"
 	"\n"
-	"Length of current playlist: %(ARRAYSIZE(MusicPlayer.CurrentPlaylist)) songs"
+	"Length of current playlist:\n%(ARRAYSIZE(MusicPlayer.CurrentPlaylist)) songs"
 	
 }
 

@@ -2596,13 +2596,13 @@ OnDiscordPluginCustomEnd
 OnMusicPlayer.DiscordPluginBoot : all
 {
 	_song = " "
-	if MusicPlayer.Singing; _song = "♫ ""%(MusicPlayer.CurrentSongName))"" ♫"
+	if MusicPlayer.Singing; _song = "♫ %(MusicPlayer.CurrentSongName) ♫"
 	
-	"\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomALL,YOUR APP ID HERE,,,thumbnail,YOUR GHOSTS'S URL OR A MESSAGE HERE,]"
+	"\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomALL,YOUR APP ID HERE,,,thumbnail,YOUR GHOST'S URL OR A MESSAGE HERE,]"
 	
 	if MusicPlayer.DiscordDisplay == "On"
 	{
-		"\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomDetail,%(_song)]"
+		"\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomDetail,""%(_song)""]"
 		
 		"\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomState,WHATEVER YOU WANT HERE]"
 	}
@@ -2630,10 +2630,10 @@ OnMusicPlayer.ToggleDiscordPlugin : all
 	if MusicPlayer.DiscordDisplay != "On"
 	{
 		_song = " "
-		if MusicPlayer.Singing; _song = "♫ ""%(MusicPlayer.CurrentSongPath)"" ♫"
+		if MusicPlayer.Singing; _song = "♫ %(MusicPlayer.CurrentSongName) ♫"
 
 		MusicPlayer.DiscordDisplay = "On"
-		"\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomDetail,%(_song)]"
+		"\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomDetail,""%(_song)""]"
 		
 		"\![raiseplugin,Discord Rich Presence,OnDiscordPluginCustomState,WHATEVER YOU WANT HERE]"
 	}

@@ -1271,7 +1271,7 @@ OnMusicPlayer.Info : all
 	"\n"
 	"\![*]\__q[OnMusicPlayer.Menu]Back to music menu\__q  \![*]\__q[OnBlank]Close window\__q"
 	
-	"\n\n\n\n"
+	"\_l[0,0]\n[%((MusicPlayer.BalloonLines - 1) * 100)]"
 	//Would appreciate if you leave this here, I have poured many many hours of work into this player :)
 	"\f[height,-2]\f[color,disable]Music Player code by \f[color,default.anchor]\__q[https://ukagaka.zichqec.com/]Zichqec\__q"
 }

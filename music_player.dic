@@ -1834,7 +1834,7 @@ OnFileDrop2 : all
 	}
 }
 
-//CUSTOMIZE: Hotspots. If you already have OnMouseDoubleClick in your ghost, you'll need to make it direct here if an unknown hotspot is clicked. If you do not have OnMouseDoubleClick, just renae this one to OnMouseDoubleClick. If you rename this one, you may want to put in a check to open your main menu if the mouse is not over a hotspot.
+//CUSTOMIZE: Hotspots. If you already have OnMouseDoubleClick in your ghost, you'll need to make it direct here if an unknown hotspot is clicked. If you do not have OnMouseDoubleClick, just rename this one to OnMouseDoubleClick. If you rename this one, you may want to put in a check to open your main menu if the mouse is not over a hotspot.
 MusicPlayer.OnMouseDoubleClick : all
 {
 	_inmenu = MusicPlayer.CheckWhichMenu

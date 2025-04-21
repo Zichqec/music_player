@@ -621,7 +621,12 @@ OnMusicPlayer.Settings : all
 	
 	"\n\n\![*]\__q[OnMusicPlayer.Menu]Back to music menu\__q  \![*]\__q[OnMusicPlayer.SettingsClose]Close window\__q"
 	"\![unlock,balloonrepaint]"
-	if _isbasic && MusicPlayer.Singing; "\![timerraise,1000,1,OnMusicPlayer.SettingsRecall]"
+	
+	//CUSTOMIZE: Add the balloon your ghost is meant to use here! But only do so if the balloon is big enough to display the whole basic settings menu on one page. Otherwise, this snaps it to the top every second and it's annoying/difficult to navigate.
+	if SHIORI3FW.BalloonName == "YOUR BALLOON'S NAME HERE"
+	{
+		if _isbasic && MusicPlayer.Singing; "\![timerraise,1000,1,OnMusicPlayer.SettingsRecall]"
+	}
 	"\e __MUSIC_SETTINGS_MENU__,%(_isbasic)__"
 }
 
@@ -635,7 +640,7 @@ OnMusicPlayer.SettingsRecall
 
 OnMusicPlayer.SettingsClose
 {
-	"\b[-1]"
+	"\b[-1]\![timerraise,0,1,OnMusicPlayer.SettingsRecall]"
 }
 
 MusicPlayer.Settings.Basic : all

@@ -2386,10 +2386,6 @@ MusicPlayer.ConvertOldVariables
 		MusicPlayer.StopAfterCurrent = MusicSettings[4] == ""
 	}
 	
-	if !ISVAR("MusicPlayer.SongBar")
-	{
-		MusicPlayer.SongBar = MusicSettings[5]
-	}
 	void ERASEVAR("MusicSettings")
 	
 	if !ISVAR("MusicPlayer.CurrentPlaylist")

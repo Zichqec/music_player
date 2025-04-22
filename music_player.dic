@@ -1402,28 +1402,69 @@ OnMusicPlayer.LoadPlaylist : all
 //Loading the playlist
 OnMusicPlayer.PlaylistLoaded : all
 {
-	MusicPlayer.CurrentSongIndex = -1
-	MusicPlayer.PlayState = 0
-	MusicPlayer.CurrentPlaylist = IARRAY
+	_new_playlist = IARRAY
+	_new_playlist_path = ""
+	
 	_path = reference2
-	MusicPlayer.PageIndex = 0
-	
 	_split = SPLITPATH(reference2)
-	MusicPlayer.PlaylistPath = _split[0] + _split[1]
+	_new_playlist_path = _split[0] + _split[1]
+	_new_playlist_path = REPLACE(_new_playlist_path,"\","/")
 	
+	_skipped = 0
 	void FOPEN(_path,"r")
 	for _buff = FREAD(_path); _buff != -1; _buff = FREAD(_path)
 	{
-		MusicPlayer.CurrentPlaylist ,= _buff
+		if _buff == ""; continue
+		_buff = REPLACE(_buff,"\","/")
+		
+		//Skip directives. Yes, songs with relative filepaths that start with # will be ignored. Making M3U directives start with a character that is valid in file names was a poor design choice. Foobar2000 does the same thing!
+		if SUBSTR(_buff,0,1) == "#"; continue //Not counting directives because most of the time they aren't songs
+		
+		//Skip all urls, the music player can't handle them
+		if SUBSTR(_buff,0,5) == "http:" || SUBSTR(_buff,0,6) == "https:"; {_skipped++; continue}
+		
+		//Skip anything with an incompatible extension
+		_extension = TOLOWER(SPLITPATH(_buff)[3])
+		if ASEARCH(_extension,MusicPlayer.CompatibleMusicFileTypes) == -1; {_skipped++; continue}
+		
+		
+		_to_add = ""
+		//Check for relative file paths. If there's no : it must be starting from the root. This must be done for each one because they can be mixed.
+		if ":" !_in_ _buff; _to_add += _new_playlist_path
+		_to_add += _buff
+		
+		_new_playlist ,= _to_add
 	}
 	void FCLOSE(_path)
 	
-	MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentSongIndex,MusicPlayer.CurrentPlaylist)
-	MusicPlayer.ShuffledIndex = 0
 	
-	"%(MusicPlayer.Scope)%(MusicPlayer.NonSingingSurfaces)\![no-autopause]"
+	if ARRAYSIZE(_new_playlist) == 0
+	{
+		//DIALOGUE: The playlist could not be loaded at all
+		"\![quicksection,1]No compatible songs were found in this playlist. Loading canceled.\x"
+	}
+	else
+	{
+		MusicPlayer.CurrentSongIndex = -1
+		MusicPlayer.PlayState = 0
+		MusicPlayer.PageIndex = 0
+		MusicPlayer.CurrentPlaylist = _new_playlist
+		MusicPlayer.PlaylistPath = _new_playlist_path
+		
+		MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentSongIndex,MusicPlayer.CurrentPlaylist)
+		MusicPlayer.ShuffledIndex = 0
+		
+		"%(MusicPlayer.Scope)%(MusicPlayer.NonSingingSurfaces)\![no-autopause]"
 	
-	"\![sound,stop]\![no-autopause]%(OnMusicPlayer.NotifySongInfo)"
+		"\![sound,stop]\![no-autopause]%(OnMusicPlayer.NotifySongInfo)"
+	
+		if _skipped > 0
+		{
+			_s = "s"; if _skipped == 1; _s = ""
+			//DIALOGUE: The playlist was loaded but some songs were skipped due to incompatibility (urls, file types it can't handle, etc.)
+			"\![quicksection,1]Playlist loaded, however, %(_skipped) incompatible song%(_s) were skipped.\x"
+		}
+	}
 	
 	OnMusicPlayer.Menu
 }

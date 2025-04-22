@@ -8,7 +8,7 @@ This music player is based off of the one in FLUX. It is written for YAYA, and m
 
 It requires YAYATc569-4 or later. You can change some of the syntax to make it compatible with older versions, but you really should upgrade for security reasons anyways. How to upgrade: https://ukagaka.zichqec.com/guide/upgrade_old_versions_of_yaya
 
-The music player allows the user to add songs by dragging and dropping files and folders onto the ghost, and load .m3u playlists the same way. Music can be played through the music menu, which can be called with tags such as q[Music Menu,OnMusicPlayer.Menu], \![raise,OnMusicMenu], etc. It can also be played via hotkeys or hotspots, which you can customize a bit.
+The music player allows the user to add songs by dragging and dropping files and folders onto the ghost, and load .m3u and .m3u8 playlists the same way. Music can be played through the music menu, which can be called with tags such as q[Music Menu,OnMusicPlayer.Menu], \![raise,OnMusicMenu], etc. It can also be played via hotkeys or hotspots, which you can customize a bit.
 
 The volume, speed, and left/right balance of the music can be customized in the settings menu, and it also comes with a few different play modes. There are several other settings too, some of which are pretty niche.
 
@@ -1297,7 +1297,7 @@ OnMusicPlayer.MusicInfo : all
 	{
 		"To add songs, drag and drop them onto the ghost. Folders can also be dragged and dropped, and multiple files may be dropped at a time.\n\n"
 		"You can also use the ""Open File"" option built into SSP to select a file through File Explorer. This can be done using the Ctrl + O shortcut, or by right clicking the ghost, going to the Utilities tab, and clicking ""Open File (I)"".\n\n"
-		".m3u playlists can be loaded through the settings menu, or by using the same methods described above for songs."
+		".m3u and .m3u8 playlists can be loaded through the settings menu, or by using the same methods described above for songs."
 	}
 	elseif reference0 == "compatiblefiles" //What file types are compatible
 	{
@@ -1387,8 +1387,8 @@ OnPlaylist.Back
 
 OnMusicPlayer.LoadPlaylist : all
 {
-	"\![open,dialog,open,--id=OnMusicPlayer.PlaylistLoaded,--filter=Playlist file|*.m3u,--dir=""%(MusicPlayer.PlaylistPath)""]"
 	"\C\![lock,balloonrepaint]\c%(MusicPlayer.Scope)%(MusicPlayer.LargeBalloon)\![quicksection,1]\![set,autoscroll,disable]\![no-autopause]"
+	"\![open,dialog,open,--id=OnMusicPlayer.PlaylistLoaded,--filter=Playlist file|*.m3u|Playlist file (UTF-8)|*.m3u8,--dir=""%(MusicPlayer.PlaylistPath)""]"
 	
 	//DIALOGUE: Loading a playlist
 	"Select a playlist to load.\n\n"
@@ -1409,6 +1409,9 @@ OnMusicPlayer.PlaylistLoaded : all
 	_split = SPLITPATH(reference2)
 	_new_playlist_path = _split[0] + _split[1]
 	_new_playlist_path = REPLACE(_new_playlist_path,"\","/")
+	
+	_original_charset = GETSETTING("charset.file")
+	if TOLOWER(_split[3]) == ".m3u8"; FCHARSET("UTF-8")
 	
 	_skipped = 0
 	void FOPEN(_path,"r")
@@ -1436,6 +1439,8 @@ OnMusicPlayer.PlaylistLoaded : all
 		_new_playlist ,= _to_add
 	}
 	void FCLOSE(_path)
+	
+	FCHARSET(_original_charset)
 	
 	
 	if ARRAYSIZE(_new_playlist) == 0
@@ -1803,7 +1808,7 @@ OnFileDrop2 : all
 			"\n\n"
 			"\![*]\q[Play it now,OnMusicPlayer.PlaySong,,""%(_from)"",justadded]\n\![*]\q[Open music player,OnMusicPlayer.Menu]\n\n\![*]\q[Close,OnBlank]"
 		}
-		elseif _fileext == ".m3u" //If it's a playlist
+		elseif _fileext == ".m3u" || _fileext == ".m3u8" //If it's a playlist
 		{
 			"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\![no-autopause]\![set,autoscroll,disable]\![quicksection,1]"
 			

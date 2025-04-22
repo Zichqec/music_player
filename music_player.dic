@@ -1,10 +1,10 @@
 //Written by Zichqec https://ukagaka.zichqec.com/
-//Version 2.0.2
+//Version 2.0.3
 
 /*
 ABOUT THE MUSIC PLAYER:
 
-This music player is based off of the one in FLUX. It is written for YAYA, and most likely is _not_ compatible with AYA.
+This music player is based off of the one in FLUX. It is written for YAYA, and most likely is *not* compatible with AYA.
 
 It requires YAYATc569-4 or later. You can change some of the syntax to make it compatible with older versions, but you really should upgrade for security reasons anyways. How to upgrade: https://ukagaka.zichqec.com/guide/upgrade_old_versions_of_yaya
 

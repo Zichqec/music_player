@@ -321,6 +321,12 @@ OnMusicPlayer.StopSong : all
 	MusicPlayer.PlayState = 0 //Clearing paused song
 	MusicPlayer.StopAfterCurrent = "" //Reset the stop after current/playlist option
 	
+	if MusicPlayer.IsMinimized
+	{
+		MusicPlayer.MakeValueNotify("%(OnMusicPlayer.NotifySongInfo)")
+		return
+	}
+	
 	if MusicPlayer.MenuIsOpen; "\C"
 	"\![no-autopause]"
 	
@@ -2062,7 +2068,14 @@ OnSoundStop : all
 		//If it's set to stop after the current song, make sure it stops. Down here so the index number still advances if you're not set to loop a single song
 		if MusicPlayer.StopAfterCurrent == "stop after playback" || (MusicPlayer.StopAfterCurrent == "stop after playlist" && _lastsong)
 		{
-			"\![raise,OnMusicPlayer.StopSong,""%(_inmenu)""]"
+			if MusicPlayer.IsMinimized
+			{
+				OnMusicPlayer.StopSong
+			}
+			else
+			{
+				"\![raise,OnMusicPlayer.StopSong,""%(_inmenu)""]"
+			}
 		}
 		else
 		{

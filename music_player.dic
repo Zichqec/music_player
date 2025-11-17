@@ -958,7 +958,7 @@ OnMusicPlayer.QuickBalance : all
 	else //Left
 	{
 		MusicPlayer.Balance -= _amt
-		if MusicPlayer.Balance < -100; MusicPlayer.Balance = 0
+		if MusicPlayer.Balance < -100; MusicPlayer.Balance = -100
 	}
 	if MusicPlayer.Singing
 	{

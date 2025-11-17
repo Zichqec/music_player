@@ -1569,7 +1569,7 @@ OnMusicPlayer.NotifySongInfo : all
 	//References:
 	//0 - The sakura name of this ghost, since this event may come from multiple ghosts
 	//1 - The file path of the currently playing song. If empty, no song is loaded. THIS IS NOT ESCAPED.
-	//2 - The index number of the currently playing song. If the song is paused, the index number is still tracked. This probably isn't that useful but I feel like I'll regret it later if I don't add it.
+	//2 - The index number of the currently playing song. If the song is paused, the index number is still tracked. This probably isn't that useful but I feel like I'll regret it later if I don't add it. Note that it may show -1 even if a song is currently playing, in the case that a song has been removed from the playlist while it is playing (on certain playmodes)
 	//3 - 0 if stopped, 1 if playing music, 2 if paused
 	//4 - Current volume from 0 - 100
 	//5 - Current speed, from 0 - 400 (see MusicPlayer.MaxRate function for more info). 100 is normal speed

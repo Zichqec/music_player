@@ -915,6 +915,7 @@ OnMusicPlayer.QuickVolume : all
 	
 	if "__MUSIC_SETTINGS_MENU__,1__" _in_ MusicPlayer.LastTalk; OnMusicPlayer.Settings //Only refresh in the music settings menu
 	elseif "changing hotkey: " _in_ MusicPlayer.LastTalk; "\e: changing hotkey: %(MusicPlayer.CheckWhichMenu[1])" //Or if setting hotkeys...
+	elseif MusicPlayer.CheckWhichMenu == "OnMusicPlayer.Menu"; "\e __MUSIC_PLAYER_MAIN_MENU__" //Or if we're on the main menu and don't want to interrupt that display...
 }
 
 //Up/Down speed buttons
@@ -942,6 +943,7 @@ OnMusicPlayer.QuickSpeed : all
 	
 	if "__MUSIC_SETTINGS_MENU__,1__" _in_ MusicPlayer.LastTalk; OnMusicPlayer.Settings //Only refresh in the music settings menu
 	elseif "changing hotkey: " _in_ MusicPlayer.LastTalk; "\e: changing hotkey: %(MusicPlayer.CheckWhichMenu[1])" //Or if setting hotkeys...
+	elseif MusicPlayer.CheckWhichMenu == "OnMusicPlayer.Menu"; "\e __MUSIC_PLAYER_MAIN_MENU__" //Or if we're on the main menu and don't want to interrupt that display...
 }
 
 //Left/Right balance buttons
@@ -969,6 +971,7 @@ OnMusicPlayer.QuickBalance : all
 	
 	if "__MUSIC_SETTINGS_MENU__,1__" _in_ MusicPlayer.LastTalk; OnMusicPlayer.Settings //Only refresh in the music settings menu
 	elseif "changing hotkey: " _in_ MusicPlayer.LastTalk; "\e: changing hotkey: %(MusicPlayer.CheckWhichMenu[1])" //Or if setting hotkeys...
+	elseif MusicPlayer.CheckWhichMenu == "OnMusicPlayer.Menu"; "\e __MUSIC_PLAYER_MAIN_MENU__" //Or if we're on the main menu and don't want to interrupt that display...
 }
 
 //Toggles the stop after playback function

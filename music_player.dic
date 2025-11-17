@@ -732,8 +732,11 @@ MusicPlayer.Settings.Advanced : all
 	
 	//CUSTOMIZE: If you want Discord functionality, you'll need to uncomment this
 	/*
-	"\n\n"
-	"Show current song in Discord? \_a[OnMusicPlayer.ToggleDiscordPlugin]%(MusicPlayer.DiscordDisplay)\_a"
+	if MusicPlayer.DiscordPluginInstalled
+	{
+		"\n\n"
+		"Show current song in Discord? \_a[OnMusicPlayer.ToggleDiscordPlugin]%(MusicPlayer.DiscordDisplay)\_a"
+	}
 	*/
 }
 
@@ -2373,6 +2376,8 @@ MusicPlayer.SetDefaultSettings
 	MusicPlayer.PageIndex = 0
 	MusicPlayer.PlaylistPath = MusicPlayer.DefaultPlaylistPath //Default playlist folder, change if desired
 	
+	if !ISVAR("MusicPlayer.DiscordPluginInstalled"); MusicPlayer.DiscordPluginInstalled = 0 //I am not sure when the function to set this will run, so... best to check
+	
 	void MKDIR(MusicPlayer.PlaylistPath)
 }
 
@@ -2409,6 +2414,8 @@ MusicPlayer.ResetDefaultSettings
 	
 	if !ISVAR("MusicPlayer.PageIndex"); MusicPlayer.PageIndex = 0
 	if !ISVAR("MusicPlayer.PlaylistPath"); MusicPlayer.PlaylistPath = MusicPlayer.DefaultPlaylistPath //Default playlist folder
+	
+	if !ISVAR("MusicPlayer.DiscordPluginInstalled"); MusicPlayer.DiscordPluginInstalled = 0
 	
 	void MKDIR(MusicPlayer.PlaylistPath)
 }
@@ -2719,5 +2726,19 @@ OnMusicPlayer.ToggleDiscordPlugin : all
 	}
 	
 	OnMusicPlayer.Settings
+}
+
+//CUSTOMIZE: If you have On_installedplugin in your ghost already, you need to make it call this function. If you do not have On_installedplugin, then rename this to On_installedplugin
+MusicPlayer.On_installedplugin
+{
+	MusicPlayer.DiscordPluginInstalled = 0
+	foreach reference.raw; _ref
+    {
+        if _ref[0,C_BYTE1] == "Discord Rich Presence"
+		{
+			MusicPlayer.DiscordPluginInstalled = 1
+			return
+		}
+    }
 }
 */

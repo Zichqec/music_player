@@ -726,7 +726,7 @@ MusicPlayer.Settings.Advanced : all
 	
 	//CUSTOMIZE: If you want Discord functionality, you'll need to uncomment this
 	/*
-	"\n"
+	"\n\n"
 	"Show current song in Discord? \_a[OnMusicPlayer.ToggleDiscordPlugin]%(MusicPlayer.DiscordDisplay)\_a"
 	*/
 }
@@ -2683,6 +2683,7 @@ if MusicPlayer.DiscordDisplayFlag == 2 && SHIORI3FW.CanTalk //If this ghost was 
 //Toggle for the settings menu. Make sure you uncomment the option that calls this.
 OnMusicPlayer.ToggleDiscordPlugin : all
 {
+	"\C"
 	if MusicPlayer.DiscordDisplay != "On"
 	{
 		_song = " "

@@ -1176,7 +1176,7 @@ OnMusicPlayer.ScootSongMenu : all
 		//NOTE: If you're getting an error about the line below, you probably don't have yaya_optional.txt! You can pick that up here: https://github.com/YAYA-shiori/yaya-dic
 		"\_n%(SHIORI3FW.MakeShortText(_song,_max_name_length)) \_n" //Add song to list
 		if _i != _justmoved; "%(_d)"
-		if _i == MusicPlayer.CurrentSongIndex; "\f[default]" //Reset the bold if it was applied
+		if _i == MusicPlayer.CurrentSongIndex; "\f[bold,default]" //Reset the bold if it was applied
 		
 		"%(MusicPlayer.newline)\f[align,right]\f[bold,1]"
 		if _i != (ARRAYSIZE(MusicPlayer.CurrentPlaylist) - 1)

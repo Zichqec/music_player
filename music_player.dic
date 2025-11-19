@@ -116,7 +116,7 @@ OnMusicPlayer.Menu : all
 	_g = "\f[color,disable]" //Gray
 	_d = "\f[color,default]" //Default
 	
-	if _argv[0] != "manual" && MusicPlayer.BalloonIsOpen; "\C\![lock,balloonrepaint]\c"
+	if _argv[0] != "manual" && MusicPlayer.BalloonIsOpen; "\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c"
 	
 	_starting_value = 0
 	if MusicPlayer.Pagination == "Paginated"
@@ -551,7 +551,8 @@ OnMusicPlayer.PlaylistPage
 
 OnMusicPlayer.JumpToPlaylistPage : all
 {
-	"\C\![lock,balloonrepaint]\c%(MusicPlayer.Scope)%(MusicPlayer.LargeBalloon)\![quicksection,1]\![set,autoscroll,disable]\![no-autopause]"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c"
+	"%(MusicPlayer.LargeBalloon)\![quicksection,1]\![set,autoscroll,disable]\![no-autopause]"
 	"\![open,inputbox,OnMusicPlayer.JumpIndex,-1]"
 	
 	//DIALOGUE: Typing in a page number to jump to manually in the playlist
@@ -827,8 +828,8 @@ MusicPlayer.Settings.Hotkeys : all
 //Changing the playback type
 OnMusicPlayer.PlaybackType : all
 {
-	"\C\![lock,balloonrepaint]\c"
-	"%(MusicPlayer.Scope)%(MusicPlayer.LargeBalloon)\![quicksection,1]\![no-autopause]"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c"
+	"%(MusicPlayer.LargeBalloon)\![quicksection,1]\![no-autopause]"
 	
 	"\![*]\q[Loop Playlist,OnMusicPlayer.PlaybackTypeChange,0]\n"
 	"\![*]\q[Shuffle and Loop,OnMusicPlayer.PlaybackTypeChange,1]\n"
@@ -1118,9 +1119,9 @@ OnMusicPlayer.ScootSongMenu : all
 	_g = "\f[color,disable]"
 	_d = "\f[color,default]"
 	
-	if reference1 != ""; "\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c"
 	
-	"%(MusicPlayer.Scope)%(MusicPlayer.LargeBalloon)\![quicksection,1]\*\![no-autopause]"
+	"%(MusicPlayer.LargeBalloon)\![quicksection,1]\*\![no-autopause]"
 	
 	"\![*]\q[Back,OnMusicPlayer.Settings]\n\n"
 	
@@ -1517,8 +1518,8 @@ OnMusicPlayer.ClearPlaylist : all
 	_are = "are"; _s = "s"
 	if _num == 1; {_are = "is"; _s = ""}
 	
-	"\C\![lock,balloonrepaint]\c"
-	"%(MusicPlayer.Scope)%(MusicPlayer.LargeBalloon)\![quicksection,1]\![no-autopause]"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c"
+	"%(MusicPlayer.LargeBalloon)\![quicksection,1]\![no-autopause]"
 	
 	//DIALOGUE: Asking for confirmation before clearing the current playlist. %(_are) and %(_s) can be used for plurals.
 	"There %(_are) %(_num) song%(_s) in the current playlist. Are you sure you want to clear it? It cannot be brought back unless you have saved it."
@@ -1536,7 +1537,7 @@ OnMusicPlayer.PlaylistCleared : all
 	MusicPlayer.PlayState = 0 //Paused song
 	MusicPlayer.PageIndex = 0
 	
-	"\C\![lock,balloonrepaint]\c"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c"
 	"\![sound,stop]\![no-autopause]%(OnMusicPlayer.NotifySongInfo)"
 	
 	"%(MusicPlayer.NonSingingSurfaces)%(MusicPlayer.LargeBalloon)\![quicksection,1]\![no-autopause]"

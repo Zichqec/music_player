@@ -762,11 +762,13 @@ MusicPlayer.Settings.Advanced : all
 
 MusicPlayer.Settings.Playlists : all
 {
+	_count = ARRAYSIZE(MusicPlayer.CurrentPlaylist)
 	"\![*]\__q[OnMusicPlayer.SavePlaylist]Save current playlist\__q\n"
 	"\![*]\__q[OnMusicPlayer.LoadPlaylist]Load playlist\__q\n"
 	"\![*]\__q[OnMusicPlayer.ClearPlaylist]Clear current playlist\__q\n"
 	"\n"
-	"Length of current playlist:\n%(ARRAYSIZE(MusicPlayer.CurrentPlaylist)) songs"
+	_s = "s"; if _count == 1; _s = ""
+	"Length of current playlist:\n%(ARRAYSIZE(MusicPlayer.CurrentPlaylist)) song%(_s)"
 	
 }
 

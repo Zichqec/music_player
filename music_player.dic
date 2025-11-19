@@ -1862,7 +1862,7 @@ OnFileDrop2 : all
 			"Load the playlist ""\_?%(_filename)\_?""?\n\nThe current playlist will be lost unless it is already saved."
 			
 			"\n\n"
-			"\![*]\__q[OnMusicPlayer.PlaylistLoaded,,,""%(reference.raw[0])""]Yes, load the playlist\__q  \![*]\__q[OnBlank]No, do not load the playlist\__q"
+			"\![*]\__q[OnMusicPlayer.PlaylistLoaded,,,""%(reference.raw[0])""]Yes, load the playlist\__q\n\n\![*]\__q[OnBlank]No, do not load the playlist\__q"
 		}
 		elseif _fileext == "" //If it's a single folder
 		{

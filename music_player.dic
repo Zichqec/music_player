@@ -576,9 +576,15 @@ OnMusicPlayer.JumpIndex : all
 	}
 	else
 	{
+		"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c"
+		"%(MusicPlayer.LargeBalloon)\![quicksection,1]\![set,autoscroll,disable]\![no-autopause]"
+		
 		//DIALOGUE: Putting in an invalid number, or something that isn't a number
-		"%(MusicPlayer.Scope)%(MusicPlayer.LargeBalloon)\![quicksection,1]\![set,autoscroll,disable]\![no-autopause]"
-		"Invalid input.\x\![raise,OnMusicPlayer.JumpToPlaylistPage]"
+		"Invalid input."
+		
+		"\![unlock,balloonrepaint]"
+		"\x[noclear]"
+		OnMusicPlayer.JumpToPlaylistPage
 	}
 }
 

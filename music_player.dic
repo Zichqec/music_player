@@ -1379,7 +1379,8 @@ OnMusicPlayer.MusicInfo : all
 
 OnMusicPlayer.SavePlaylist : all
 {
-	"\C\![lock,balloonrepaint]\c%(MusicPlayer.Scope)%(MusicPlayer.LargeBalloon)\![quicksection,1]\![set,autoscroll,disable]\![no-autopause]"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c"
+	"%(MusicPlayer.LargeBalloon)\![quicksection,1]\![set,autoscroll,disable]\![no-autopause]"
 	"\![open,dialog,save,--id=OnMusicPlayer.PlaylistSaved,--ext=m3u,--filter=Playlist file|*.m3u,--dir=""%(MusicPlayer.PlaylistPath)""]"
 	
 	//DIALOGUE: Saving a playlist
@@ -1429,7 +1430,8 @@ OnPlaylist.Back
 
 OnMusicPlayer.LoadPlaylist : all
 {
-	"\C\![lock,balloonrepaint]\c%(MusicPlayer.Scope)%(MusicPlayer.LargeBalloon)\![quicksection,1]\![set,autoscroll,disable]\![no-autopause]"
+	"\C%(MusicPlayer.Scope)\![lock,balloonrepaint]\c"
+	"%(MusicPlayer.LargeBalloon)\![quicksection,1]\![set,autoscroll,disable]\![no-autopause]"
 	"\![open,dialog,open,--id=OnMusicPlayer.PlaylistLoaded,--filter=Playlist file|*.m3u|Playlist file (UTF-8)|*.m3u8,--dir=""%(MusicPlayer.PlaylistPath)""]"
 	
 	//DIALOGUE: Loading a playlist

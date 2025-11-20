@@ -762,7 +762,7 @@ MusicPlayer.Settings.Advanced : all
 	//CUSTOMIZE: If you want Discord functionality, you'll need to uncomment this
 	/*
 	"\n\n"
-	"Show current song in Discord? \_a[OnMusicPlayer.ToggleDiscordPlugin]%(MusicPlayer.DiscordDisplay)\_a"
+	"Show current song in Discord? \![*]\_a[OnMusicPlayer.ToggleDiscordPlugin]%(MusicPlayer.DiscordDisplay)\_a"
 	*/
 }
 

@@ -256,12 +256,14 @@ OnMusicPlayer.PlaySong : all
 		{
 			_start_point = reference0
 		}
-		elseif MusicPlayer.CurrentSongIndex == -1 //No song playing
+		elseif MusicPlayer.CurrentSongIndex == -1 && !MusicPlayer.PlayingRemovedSong //No song playing
 		{
 			_start_point = 0
 		}
 		//Otherwise, just play the current index that we were stopped at
 		
+		//if _start_point is -1, that means there is nothing special to consider
+		//If there IS a special condition...
 		if _start_point != -1
 		{
 			MusicPlayer.CurrentSongIndex = _start_point
@@ -512,15 +514,15 @@ OnMusicPlayer.RemoveSong : all
 	//Special handling for if the currently playing song was deleted, or if one earlier in the playlist was deleted and the numbers need to change
 	if reference0 == MusicPlayer.CurrentSongIndex
 	{
-		//"Shuffle and loop" and "Loop playlist" need to carry on in the same order, "Play one song" and "Random" don't care, and "Loop one song" should stop
-		if MusicPlayer.PlayMode == 0 || MusicPlayer.PlayMode == 1; MusicPlayer.CurrentSongIndex--
+		//"Loop playlist" needs to carry on in the same order, "Play one song", "Shuffle and loop", and "Random" don't care, and "Loop one song" should stop
+		if MusicPlayer.PlayMode == 0; MusicPlayer.CurrentSongIndex--
 		else; MusicPlayer.CurrentSongIndex = -1
 		
 		MusicPlayer.PlayingRemovedSong = 1
 	}
 	elseif reference0 < MusicPlayer.CurrentSongIndex; MusicPlayer.CurrentSongIndex--
 	
-	if MusicPlayer.CurrentSongPath == MusicPlayer.CurrentPlaylist[reference0] //If the song being removed is being played, remove it from the shuffle list
+	if MusicPlayer.PlayingRemovedSong //If the song being removed is being played, remove it from the shuffle list
 	{
 		MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist('|removed|',MusicPlayer.CurrentPlaylist) //Send a placeholder for the song that was already removed, and shuffle the playlist
 		MusicPlayer.ShuffledIndex = -1 //Set the index to -1 so that it starts at 0 when the next song plays

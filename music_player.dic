@@ -2600,22 +2600,24 @@ MusicPlayer.ArrayScootEx
 //Shuffles the array but keeps the first element the same
 MusicPlayer.ShufflePlaylist
 {
-	_start = IARRAY
+	//Make an array of index numbers, but separate the one we want up front
+	_first = _argv[0]
+	_initial = IARRAY
 	for _i = 0; _i < _argc - 1; _i++
 	{
 		if _i == _argv[0]; continue
-		else; _start ,= _i
+		_initial ,= _i
 	}
 	
-	_len = ARRAYSIZE(_start)
+	//If it's not a removed song, add it to the start
 	_output = IARRAY
-	if _argv[0] != "|removed|"; _output ,= TOINT(_argv[0])
-	for _i = 0; _i < _len; _i++
+	if _first != "|removed|"; _output ,= TOINT(_first)
+	
+	//Take the array of initial numbers and throw them randomly into the output until there are none left
+	while ARRAYSIZE(_initial) > 0
 	{
-		_l = ARRAYSIZE(_start)
-		_rand = RAND(_l)
-		_output ,= _start[_rand]
-		_start[_rand] = IARRAY
+		_output ,= ANY(_initial)
+		_initial[LSO] = IARRAY
 	}
 	
 	MusicPlayer.ShuffledIndex = 0 //Reset to the start of the index

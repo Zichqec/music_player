@@ -1840,7 +1840,7 @@ OnFileDrop2 : all
 		{
 			MusicPlayer.CurrentPlaylist ,= _filearray
 			
-			MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentPlaylist[MusicPlayer.CurrentIndex],MusicPlayer.CurrentPlaylist)
+			MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentIndex,MusicPlayer.CurrentPlaylist)
 			_from = MusicPlayer.CheckWhichMenu
 			
 			"%(MusicPlayer.Scope)%(MusicPlayer.SmallBalloon)\![quicksection,1]\![no-autopause]\![set,autoscroll,disable]"
@@ -2659,7 +2659,7 @@ MusicPlayer.FindSongs
 	}
 	if ARRAYSIZE(_added) > 0
 	{
-		MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentPlaylist[MusicPlayer.CurrentIndex],MusicPlayer.CurrentPlaylist)
+		MusicPlayer.ShuffledPlaylist = MusicPlayer.ShufflePlaylist(MusicPlayer.CurrentIndex,MusicPlayer.CurrentPlaylist)
 	}
 	
 	_added

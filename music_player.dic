@@ -2463,7 +2463,7 @@ MusicPlayer.ConvertOldVariables
 	
 	if !ISVAR("MusicPlayer.PlayState")
 	{
-		if NowPlaying[0] != ""; MusicPlayer.PlayState = 0
+		if NowPlaying[0] == ""; MusicPlayer.PlayState = 0
 		else
 		{
 			if NowPlaying[2] != ""; MusicPlayer.PlayState = 2

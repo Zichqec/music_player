@@ -2495,7 +2495,7 @@ MusicPlayer.ConvertOldVariables
 	
 	if !ISVAR("MusicPlayer.StopAfterCurrent")
 	{
-		MusicPlayer.StopAfterCurrent = MusicSettings[4] == ""
+		MusicPlayer.StopAfterCurrent = MusicSettings[4]
 	}
 	
 	void ERASEVAR("MusicSettings")
@@ -2602,25 +2602,32 @@ MusicPlayer.ArrayScootEx
 //Shuffles the array but keeps the first element the same
 MusicPlayer.ShufflePlaylist
 {
-	//Make an array of index numbers, but separate the one we want up front
+	//This new iteration is a bit messier than the old iteration, however, I realized that adding to an array is an expensive operation. This is approximately twice as fast as the old version when dealing with large playlist lengths.
+	
 	_first = _argv[0]
-	_initial = IARRAY
-	for _i = 0; _i < _argc - 1; _i++
+	_numbers = IARRAY
+	//Create an array of numbers, slotting them into random spaces so that it comes out shuffled. Skip the specified number (so it can be placed at the start).
+	for _i = 0; _i < _argc; _i++
 	{
 		if _i == _argv[0]; continue
-		_initial ,= _i
+		
+		if ARRAYSIZE(_numbers) == 0; _numbers ,= _i
+		else
+		{
+			_rand = RAND(ARRAYSIZE(_numbers))
+			
+			//Cast the old number at this position to the end of the array, and slot the new number in its place.
+			//This seems strange, but it prevents 0 from getting stuck at the end or the beginning.
+			_numbers ,= _numbers[_rand]
+			_numbers[_rand] = _i
+		}
 	}
+	
+	_output = IARRAY
 	
 	//If it's not a removed song, add it to the start
-	_output = IARRAY
-	if _first != "|removed|"; _output ,= TOINT(_first)
-	
-	//Take the array of initial numbers and throw them randomly into the output until there are none left
-	while ARRAYSIZE(_initial) > 0
-	{
-		_output ,= ANY(_initial)
-		_initial[LSO] = IARRAY
-	}
+	if _first != "|removed|"; _output = (_first,_numbers)
+	else; _output = _numbers
 	
 	MusicPlayer.ShuffledIndex = 0 //Reset to the start of the index
 	_output

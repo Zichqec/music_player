@@ -2495,7 +2495,7 @@ MusicPlayer.ConvertOldVariables
 	
 	if !ISVAR("MusicPlayer.StopAfterCurrent")
 	{
-		MusicPlayer.StopAfterCurrent = MusicSettings[4] == ""
+		MusicPlayer.StopAfterCurrent = MusicSettings[4]
 	}
 	
 	void ERASEVAR("MusicSettings")
